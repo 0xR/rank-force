@@ -82,7 +82,16 @@ class RankAssignment {
   }
 
   get rankingComplete() {
-    return this.rankings.size === this.dimensions.length;
+    return (
+      this.rankings.size === this.dimensions.length &&
+      Array.from(this.rankings.values()).every(
+        (ranking) => ranking.length === this.items.length,
+      )
+    );
+  }
+
+  addDimension(rankDimension: RankDimension) {
+    this.dimensions.push(rankDimension);
   }
 }
 
@@ -200,5 +209,64 @@ describe('Domain', () => {
       new RankScore(new Item(1, 'item2'), new Ratio(0.5)),
       new RankScore(new Item(0, 'item1'), new Ratio(0.25)),
     ]);
+  });
+
+  it('should support adding items and dimensions', () => {
+    const rankDimension1 = new RankDimension(
+      'importance',
+      'low',
+      'high',
+      'ascending',
+      new Ratio(1),
+    );
+    const rankDimension2 = new RankDimension(
+      'urgency',
+      'low',
+      'high',
+      'ascending',
+      new Ratio(0.5),
+    );
+    const rankAssignment = new RankAssignment([rankDimension1, rankDimension2]);
+
+    expect(rankAssignment.rankingComplete).toBe(false);
+    expect(() => rankAssignment.score).toThrowError('Ranking not complete');
+    rankAssignment.rank(rankAssignment.dimensions[0], []);
+
+    rankAssignment.rank(rankAssignment.dimensions[1], []);
+    expect(rankAssignment.rankingComplete).toBe(true);
+    expect(rankAssignment.score).toHaveLength(0);
+
+    rankAssignment.addItems(['item1', 'item2']);
+    expect(rankAssignment.rankingComplete).toBe(false);
+    expect(() => rankAssignment.score).toThrowError('Ranking not complete');
+    rankAssignment.rank(rankAssignment.dimensions[0], [
+      rankAssignment.items[0],
+      rankAssignment.items[1],
+    ]);
+    expect(rankAssignment.rankingComplete).toBe(false);
+
+    rankAssignment.rank(rankAssignment.dimensions[1], [
+      rankAssignment.items[1],
+      rankAssignment.items[0],
+    ]);
+    expect(rankAssignment.rankingComplete).toBe(true);
+    expect(rankAssignment.score).toHaveLength(2);
+
+    rankAssignment.addDimension(
+      new RankDimension(
+        'complexity',
+        'low',
+        'high',
+        'ascending',
+        new Ratio(0.5),
+      ),
+    );
+    expect(rankAssignment.rankingComplete).toBe(false);
+    expect(() => rankAssignment.score).toThrowError('Ranking not complete');
+    rankAssignment.rank(rankAssignment.dimensions[2], [
+      rankAssignment.items[0],
+      rankAssignment.items[1],
+    ]);
+    expect(rankAssignment.rankingComplete).toBe(true);
   });
 });
