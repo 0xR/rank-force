@@ -1,5 +1,6 @@
 class RankDimension {
   constructor(
+    readonly id: string,
     readonly name: string,
     readonly labelStart: string,
     readonly labelEnd: string,
@@ -82,10 +83,11 @@ class UserRanking {
 
 class RankAssignment {
   readonly items: Item[] = [];
+  readonly dimensions: RankDimension[] = [];
 
   private rankingsByUser: Map<User, UserRanking> = new Map();
 
-  constructor(readonly dimensions: RankDimension[]) {}
+  constructor() {}
 
   addItems(items: string[]) {
     const startId = this.items.length;
@@ -137,8 +139,8 @@ class RankAssignment {
     );
   }
 
-  addDimension(rankDimension: RankDimension) {
-    this.dimensions.push(rankDimension);
+  addDimension(...rankDimension: RankDimension[]) {
+    this.dimensions.push(...rankDimension);
   }
 }
 
@@ -154,12 +156,14 @@ describe('Domain', () => {
   it('should rank on a single dimension', () => {
     const user = new User('0', 'user 0');
     const rankDimension = new RankDimension(
+      '0',
       'importance',
       'low',
       'high',
       'ascending',
     );
-    const rankAssignment = new RankAssignment([rankDimension]);
+    const rankAssignment = new RankAssignment();
+    rankAssignment.addDimension(rankDimension);
     rankAssignment.addItems(['item1', 'item2', 'item3']);
     rankAssignment.rank(user, rankAssignment.dimensions[0], [
       rankAssignment.items[2],
@@ -176,12 +180,14 @@ describe('Domain', () => {
   it('should rank on a single descending dimension', () => {
     const user = new User('0', 'user 0');
     const rankDimension = new RankDimension(
+      '0',
       'importance',
       'high',
       'low',
       'descending',
     );
-    const rankAssignment = new RankAssignment([rankDimension]);
+    const rankAssignment = new RankAssignment();
+    rankAssignment.addDimension(rankDimension);
     rankAssignment.addItems(['item1', 'item2', 'item3']);
     rankAssignment.rank(user, rankAssignment.dimensions[0], [
       rankAssignment.items[2],
@@ -198,18 +204,21 @@ describe('Domain', () => {
   it('should rank on multiple dimensions', () => {
     const user = new User('0', 'user 0');
     const rankDimension1 = new RankDimension(
+      '0',
       'importance',
       'low',
       'high',
       'ascending',
     );
     const rankDimension2 = new RankDimension(
+      '0',
       'urgency',
       'low',
       'high',
       'ascending',
     );
-    const rankAssignment = new RankAssignment([rankDimension1, rankDimension2]);
+    const rankAssignment = new RankAssignment();
+    rankAssignment.addDimension(rankDimension1, rankDimension2);
     rankAssignment.addItems(['item1', 'item2', 'item3']);
     rankAssignment.rank(user, rankAssignment.dimensions[0], [
       rankAssignment.items[2],
@@ -233,12 +242,15 @@ describe('Domain', () => {
     const user1 = new User('0', 'user 0');
     const user2 = new User('1', 'user 1');
     const rankDimension1 = new RankDimension(
+      '0',
       'importance',
       'low',
       'high',
       'ascending',
     );
-    const rankAssignment = new RankAssignment([rankDimension1]);
+    const rankAssignment = new RankAssignment();
+    rankAssignment.addDimension(rankDimension1);
+
     rankAssignment.addItems(['item1', 'item2']);
     rankAssignment.rank(user1, rankAssignment.dimensions[0], [
       rankAssignment.items[0],
@@ -258,6 +270,7 @@ describe('Domain', () => {
   it('should rank supporting importance', () => {
     const user = new User('0', 'user 0');
     const rankDimension1 = new RankDimension(
+      '0',
       'importance',
       'low',
       'high',
@@ -265,13 +278,15 @@ describe('Domain', () => {
       new Ratio(1),
     );
     const rankDimension2 = new RankDimension(
+      '0',
       'urgency',
       'low',
       'high',
       'ascending',
       new Ratio(0.5),
     );
-    const rankAssignment = new RankAssignment([rankDimension1, rankDimension2]);
+    const rankAssignment = new RankAssignment();
+    rankAssignment.addDimension(rankDimension1, rankDimension2);
     rankAssignment.addItems(['item1', 'item2']);
     rankAssignment.rank(user, rankAssignment.dimensions[0], [
       rankAssignment.items[0],
@@ -291,6 +306,7 @@ describe('Domain', () => {
   it('should support adding items and dimensions', () => {
     const user = new User('0', 'user 0');
     const rankDimension1 = new RankDimension(
+      '0',
       'importance',
       'low',
       'high',
@@ -298,13 +314,15 @@ describe('Domain', () => {
       new Ratio(1),
     );
     const rankDimension2 = new RankDimension(
+      '0',
       'urgency',
       'low',
       'high',
       'ascending',
       new Ratio(0.5),
     );
-    const rankAssignment = new RankAssignment([rankDimension1, rankDimension2]);
+    const rankAssignment = new RankAssignment();
+    rankAssignment.addDimension(rankDimension1, rankDimension2);
 
     expect(rankAssignment.rankingComplete).toBe(false);
     expect(() => rankAssignment.score).toThrowError('Ranking not complete');
@@ -332,6 +350,7 @@ describe('Domain', () => {
 
     rankAssignment.addDimension(
       new RankDimension(
+        '0',
         'complexity',
         'low',
         'high',
@@ -349,7 +368,7 @@ describe('Domain', () => {
   });
 
   it('should give items unique ids', () => {
-    const rankAssignment = new RankAssignment([]);
+    const rankAssignment = new RankAssignment();
     rankAssignment.addItems(['item1', 'item2']);
     rankAssignment.addItems(['item3', 'item4']);
     expect(rankAssignment.items[0].id).toBe(0);
