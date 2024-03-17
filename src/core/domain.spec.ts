@@ -12,13 +12,12 @@ import { User } from './User.ts';
 
 function createRankAssigment() {
   const user = new User('0', 'user 0');
-  const rankAssignment = new RankAssignment();
-  rankAssignment.addItems(['item1', 'item2']);
-  rankAssignment.addDimension(
+  let rankAssignment = new RankAssignment();
+  rankAssignment = rankAssignment.addItems(['item1', 'item2']);
+  rankAssignment = rankAssignment.addDimension(
     new RankDimension('0', 'importance', 'low', 'high', 'ascending'),
   );
-
-  rankAssignment.rank(user, rankAssignment.dimensions[0], [
+  rankAssignment = rankAssignment.rank(user, rankAssignment.dimensions[0], [
     rankAssignment.items[0],
     rankAssignment.items[1],
   ]);
@@ -35,10 +34,10 @@ describe('Domain', () => {
       'high',
       'ascending',
     );
-    const rankAssignment = new RankAssignment();
-    rankAssignment.addDimension(rankDimension);
-    rankAssignment.addItems(['item1', 'item2', 'item3']);
-    rankAssignment.rank(user, rankAssignment.dimensions[0], [
+    let rankAssignment = new RankAssignment();
+    rankAssignment = rankAssignment.addDimension(rankDimension);
+    rankAssignment = rankAssignment.addItems(['item1', 'item2', 'item3']);
+    rankAssignment = rankAssignment.rank(user, rankAssignment.dimensions[0], [
       rankAssignment.items[2],
       rankAssignment.items[0],
       rankAssignment.items[1],
@@ -59,10 +58,10 @@ describe('Domain', () => {
       'low',
       'descending',
     );
-    const rankAssignment = new RankAssignment();
-    rankAssignment.addDimension(rankDimension);
-    rankAssignment.addItems(['item1', 'item2', 'item3']);
-    rankAssignment.rank(user, rankAssignment.dimensions[0], [
+    let rankAssignment = new RankAssignment();
+    rankAssignment = rankAssignment.addDimension(rankDimension);
+    rankAssignment = rankAssignment.addItems(['item1', 'item2', 'item3']);
+    rankAssignment = rankAssignment.rank(user, rankAssignment.dimensions[0], [
       rankAssignment.items[2],
       rankAssignment.items[0],
       rankAssignment.items[1],
@@ -90,16 +89,18 @@ describe('Domain', () => {
       'high',
       'ascending',
     );
-    const rankAssignment = new RankAssignment();
-    rankAssignment.addDimension(rankDimension1, rankDimension2);
-    rankAssignment.addItems(['item1', 'item2', 'item3']);
-    rankAssignment.rank(user, rankAssignment.dimensions[0], [
+    let rankAssignment = new RankAssignment();
+    rankAssignment = rankAssignment.addDimension(
+      rankDimension1,
+      rankDimension2,
+    );
+    rankAssignment = rankAssignment.addItems(['item1', 'item2', 'item3']);
+    rankAssignment = rankAssignment.rank(user, rankAssignment.dimensions[0], [
       rankAssignment.items[2],
       rankAssignment.items[0],
       rankAssignment.items[1],
     ]);
-
-    rankAssignment.rank(user, rankAssignment.dimensions[1], [
+    rankAssignment = rankAssignment.rank(user, rankAssignment.dimensions[1], [
       rankAssignment.items[1],
       rankAssignment.items[0],
       rankAssignment.items[2],
@@ -121,15 +122,14 @@ describe('Domain', () => {
       'high',
       'ascending',
     );
-    const rankAssignment = new RankAssignment();
-    rankAssignment.addDimension(rankDimension1);
-
-    rankAssignment.addItems(['item1', 'item2']);
-    rankAssignment.rank(user1, rankAssignment.dimensions[0], [
+    let rankAssignment = new RankAssignment();
+    rankAssignment = rankAssignment.addDimension(rankDimension1);
+    rankAssignment = rankAssignment.addItems(['item1', 'item2']);
+    rankAssignment = rankAssignment.rank(user1, rankAssignment.dimensions[0], [
       rankAssignment.items[0],
       rankAssignment.items[1],
     ]);
-    rankAssignment.rank(user2, rankAssignment.dimensions[0], [
+    rankAssignment = rankAssignment.rank(user2, rankAssignment.dimensions[0], [
       rankAssignment.items[1],
       rankAssignment.items[0],
     ]);
@@ -158,15 +158,17 @@ describe('Domain', () => {
       'ascending',
       new Ratio(0.5),
     );
-    const rankAssignment = new RankAssignment();
-    rankAssignment.addDimension(rankDimension1, rankDimension2);
-    rankAssignment.addItems(['item1', 'item2']);
-    rankAssignment.rank(user, rankAssignment.dimensions[0], [
+    let rankAssignment = new RankAssignment();
+    rankAssignment = rankAssignment.addDimension(
+      rankDimension1,
+      rankDimension2,
+    );
+    rankAssignment = rankAssignment.addItems(['item1', 'item2']);
+    rankAssignment = rankAssignment.rank(user, rankAssignment.dimensions[0], [
       rankAssignment.items[0],
       rankAssignment.items[1],
     ]);
-
-    rankAssignment.rank(user, rankAssignment.dimensions[1], [
+    rankAssignment = rankAssignment.rank(user, rankAssignment.dimensions[1], [
       rankAssignment.items[1],
       rankAssignment.items[0],
     ]);
@@ -194,34 +196,41 @@ describe('Domain', () => {
       'ascending',
       new Ratio(0.5),
     );
-    const rankAssignment = new RankAssignment();
-    rankAssignment.addDimension(rankDimension1, rankDimension2);
+    let rankAssignment = new RankAssignment();
+    rankAssignment = rankAssignment.addDimension(
+      rankDimension1,
+      rankDimension2,
+    );
 
     expect(rankAssignment.rankingComplete).toBe(false);
     expect(() => rankAssignment.score).toThrowError('Ranking not complete');
-    rankAssignment.rank(user, rankAssignment.dimensions[0], []);
-
-    rankAssignment.rank(user, rankAssignment.dimensions[1], []);
+    rankAssignment = rankAssignment.rank(
+      user,
+      rankAssignment.dimensions[0],
+      [],
+    );
+    rankAssignment = rankAssignment.rank(
+      user,
+      rankAssignment.dimensions[1],
+      [],
+    );
     expect(rankAssignment.rankingComplete).toBe(true);
     expect(rankAssignment.score).toHaveLength(0);
-
-    rankAssignment.addItems(['item1', 'item2']);
+    rankAssignment = rankAssignment.addItems(['item1', 'item2']);
     expect(rankAssignment.rankingComplete).toBe(false);
     expect(() => rankAssignment.score).toThrowError('Ranking not complete');
-    rankAssignment.rank(user, rankAssignment.dimensions[0], [
+    rankAssignment = rankAssignment.rank(user, rankAssignment.dimensions[0], [
       rankAssignment.items[0],
       rankAssignment.items[1],
     ]);
     expect(rankAssignment.rankingComplete).toBe(false);
-
-    rankAssignment.rank(user, rankAssignment.dimensions[1], [
+    rankAssignment = rankAssignment.rank(user, rankAssignment.dimensions[1], [
       rankAssignment.items[1],
       rankAssignment.items[0],
     ]);
     expect(rankAssignment.rankingComplete).toBe(true);
     expect(rankAssignment.score).toHaveLength(2);
-
-    rankAssignment.addDimension(
+    rankAssignment = rankAssignment.addDimension(
       new RankDimension(
         '0',
         'complexity',
@@ -233,7 +242,7 @@ describe('Domain', () => {
     );
     expect(rankAssignment.rankingComplete).toBe(false);
     expect(() => rankAssignment.score).toThrowError('Ranking not complete');
-    rankAssignment.rank(user, rankAssignment.dimensions[2], [
+    rankAssignment = rankAssignment.rank(user, rankAssignment.dimensions[2], [
       rankAssignment.items[0],
       rankAssignment.items[1],
     ]);
@@ -241,9 +250,9 @@ describe('Domain', () => {
   });
 
   it('should give items unique ids', () => {
-    const rankAssignment = new RankAssignment();
-    rankAssignment.addItems(['item1', 'item2']);
-    rankAssignment.addItems(['item3', 'item4']);
+    let rankAssignment = new RankAssignment();
+    rankAssignment = rankAssignment.addItems(['item1', 'item2']);
+    rankAssignment = rankAssignment.addItems(['item3', 'item4']);
     expect(rankAssignment.items[0].id).toBe(0);
     expect(rankAssignment.items[1].id).toBe(1);
     expect(rankAssignment.items[2].id).toBe(2);
@@ -311,9 +320,9 @@ describe('Domain', () => {
 
     await Promise.resolve();
 
-    const rankAssignment2 = rankAssignment1.copy();
-    rankAssignment2.addItems(['item3', 'item4']);
-    rankAssignment2.addDimension(
+    let rankAssignment2 = rankAssignment1.copy();
+    rankAssignment2 = rankAssignment2.addItems(['item3', 'item4']);
+    rankAssignment2 = rankAssignment2.addDimension(
       new RankDimension('1', 'complexity', 'low', 'high', 'ascending'),
     );
     const yDoc2 = deserializeJsonToYDoc(rankAssignment2.serialize());

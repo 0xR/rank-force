@@ -5,9 +5,9 @@ import { RankScore } from './RankScore.ts';
 import { Ratio } from './Ratio.ts';
 
 export class UserRanking {
-  private rankings: Map<RankDimension, RankScore[]> = new Map();
+  constructor(private rankings: Map<RankDimension, RankScore[]> = new Map()) {}
 
-  rank(dimension: RankDimension, items: Item[]) {
+  rank(dimension: RankDimension, items: Item[]): UserRanking {
     const indexRatioToScore =
       dimension.direction === 'descending'
         ? (indexRatio: number) => 1 - indexRatio
@@ -20,7 +20,7 @@ export class UserRanking {
           new Ratio(indexRatioToScore(index / (items.length - 1))),
         ),
     );
-    this.rankings.set(dimension, score);
+    return new UserRanking(new Map(this.rankings).set(dimension, score));
   }
 
   score(rankAssignment: RankAssignment) {
@@ -75,7 +75,7 @@ export class UserRanking {
     ranking: ReturnType<UserRanking['serialize']>,
     rankAssignment: RankAssignment,
   ) {
-    const userRanking = new UserRanking();
+    let userRanking = new UserRanking();
     ranking.rankings.forEach(({ dimension, ranking }) => {
       const rankDimension = rankAssignment.dimensions.find(
         (d) => d.id === dimension,
@@ -90,7 +90,7 @@ export class UserRanking {
         }
         return item;
       });
-      userRanking.rank(rankDimension, items);
+      userRanking = userRanking.rank(rankDimension, items);
     });
     return userRanking;
   }

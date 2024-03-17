@@ -6,21 +6,32 @@ import { User } from './User.ts';
 import { UserRanking } from './UserRanking.ts';
 
 export class RankAssignment {
-  readonly items: Item[] = [];
-  readonly dimensions: RankDimension[] = [];
+  constructor(
+    readonly items: Item[] = [],
+    readonly dimensions: RankDimension[] = [],
+    private rankingsByUser: Map<User, UserRanking> = new Map(),
+  ) {}
 
-  private rankingsByUser: Map<User, UserRanking> = new Map();
-
-  constructor() {}
-
-  addItems(items: string[]) {
+  addItems(items: string[]): RankAssignment {
     const startId = this.items.length;
-    this.items.push(
-      ...items.map((item, index) => new Item(startId + index, item)),
+    return new RankAssignment(
+      this.items.concat(
+        items.map((label, index) => new Item(index + startId, label)),
+      ),
+      this.dimensions,
+      this.rankingsByUser,
     );
   }
 
-  rank(user: User, dimension: RankDimension, items: Item[]) {
+  addDimension(...rankDimension: RankDimension[]): RankAssignment {
+    return new RankAssignment(
+      this.items,
+      this.dimensions.concat(rankDimension),
+      this.rankingsByUser,
+    );
+  }
+
+  rank(user: User, dimension: RankDimension, items: Item[]): RankAssignment {
     if (!this.dimensions.includes(dimension)) {
       throw new Error(`Dimension ${dimension.name} not found in assigment`);
     }
@@ -32,9 +43,14 @@ export class RankAssignment {
         throw new Error(`Item ${item.label} not found in assignment`);
       }
     });
-    const userRanking = this.rankingsByUser.get(user) ?? new UserRanking();
-    userRanking.rank(dimension, items);
-    this.rankingsByUser.set(user, userRanking);
+    let userRanking = this.rankingsByUser.get(user) ?? new UserRanking();
+    userRanking = userRanking.rank(dimension, items);
+
+    return new RankAssignment(
+      this.items,
+      this.dimensions,
+      new Map(this.rankingsByUser).set(user, userRanking),
+    );
   }
 
   get score() {
@@ -63,10 +79,6 @@ export class RankAssignment {
     );
   }
 
-  addDimension(...rankDimension: RankDimension[]) {
-    this.dimensions.push(...rankDimension);
-  }
-
   serialize() {
     return {
       items: this.items.map((item) => item.serialize()),
@@ -88,23 +100,22 @@ export class RankAssignment {
   }
 
   static deserialize(json: ReturnType<RankAssignment['serialize']>) {
-    const rankAssignment = new RankAssignment();
-    rankAssignment.items.push(
-      ...json.items.map((item) => Item.deserialize(item)),
+    const rankAssignment = new RankAssignment(
+      json.items.map((item) => Item.deserialize(item)),
+      json.dimensions.map((dimension) => RankDimension.deserialize(dimension)),
     );
-    rankAssignment.dimensions.push(
-      ...json.dimensions.map((dimension) =>
-        RankDimension.deserialize(dimension),
+
+    return new RankAssignment(
+      rankAssignment.items,
+      rankAssignment.dimensions,
+      new Map(
+        json.rankingsByUser.map(({ user, ranking }) => {
+          return [
+            User.deserialize(user),
+            UserRanking.deserialize(ranking, rankAssignment),
+          ];
+        }),
       ),
     );
-    rankAssignment.rankingsByUser = new Map(
-      json.rankingsByUser.map(({ user, ranking }) => {
-        return [
-          User.deserialize(user),
-          UserRanking.deserialize(ranking, rankAssignment),
-        ];
-      }),
-    );
-    return rankAssignment;
   }
 }
