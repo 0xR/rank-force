@@ -1,11 +1,29 @@
 import { expect } from 'vitest';
-import { deserializeJsonToYDoc } from '../persistence/yjs-serialization.ts';
+import {
+  deserializeJsonToYDoc,
+  sync,
+} from '../persistence/yjs-serialization.ts';
 import { Item } from './Item.ts';
 import { RankAssignment } from './RankAssignment.ts';
 import { RankDimension } from './RankDimension.ts';
 import { RankScore } from './RankScore.ts';
 import { Ratio } from './Ratio.ts';
 import { User } from './User.ts';
+
+function createRankAssigment() {
+  const user = new User('0', 'user 0');
+  const rankAssignment = new RankAssignment();
+  rankAssignment.addItems(['item1', 'item2']);
+  rankAssignment.addDimension(
+    new RankDimension('0', 'importance', 'low', 'high', 'ascending'),
+  );
+
+  rankAssignment.rank(user, rankAssignment.dimensions[0], [
+    rankAssignment.items[0],
+    rankAssignment.items[1],
+  ]);
+  return rankAssignment;
+}
 
 describe('Domain', () => {
   it('should rank on a single dimension', () => {
@@ -233,17 +251,7 @@ describe('Domain', () => {
   });
 
   it('should serialize to a yjs document', () => {
-    const user = new User('0', 'user 0');
-    const rankAssignment = new RankAssignment();
-    rankAssignment.addItems(['item1', 'item2']);
-    rankAssignment.addDimension(
-      new RankDimension('0', 'importance', 'low', 'high', 'ascending'),
-    );
-
-    rankAssignment.rank(user, rankAssignment.dimensions[0], [
-      rankAssignment.items[0],
-      rankAssignment.items[1],
-    ]);
+    const rankAssignment = createRankAssigment();
 
     const json = rankAssignment.serialize();
     const yDoc = deserializeJsonToYDoc(json);
@@ -294,5 +302,28 @@ describe('Domain', () => {
 
     const rankAssignment2 = RankAssignment.deserialize(json);
     expect(rankAssignment2).toEqual(rankAssignment);
+  });
+
+  // non-deterministic
+  it.skip('should merge 2 rank assignments', async () => {
+    const rankAssignment1 = createRankAssigment();
+    const yDoc1 = deserializeJsonToYDoc(rankAssignment1.serialize());
+
+    await Promise.resolve();
+
+    const rankAssignment2 = rankAssignment1.copy();
+    rankAssignment2.addItems(['item3', 'item4']);
+    rankAssignment2.addDimension(
+      new RankDimension('1', 'complexity', 'low', 'high', 'ascending'),
+    );
+    const yDoc2 = deserializeJsonToYDoc(rankAssignment2.serialize());
+
+    sync(yDoc1, yDoc2);
+    expect(yDoc1.toJSON()).toEqual(yDoc2.toJSON());
+    const mergedRankAssignment = RankAssignment.deserialize(
+      yDoc1.toJSON().root,
+    );
+    expect(mergedRankAssignment.items).toHaveLength(4);
+    expect(mergedRankAssignment.dimensions).toHaveLength(2);
   });
 });

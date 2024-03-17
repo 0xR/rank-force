@@ -1,4 +1,5 @@
 import * as Y from 'yjs';
+
 function jsonToYType<T>(
   value: T,
   yParent: Y.Map<unknown> | Y.Array<unknown>,
@@ -44,4 +45,17 @@ export function deserializeJsonToYDoc<T>(jsonObject: {
     jsonToYType(value, rootMap, key);
   });
   return doc;
+}
+
+export function sync(doc1: Y.Doc, doc2: Y.Doc) {
+  // Calculate the difference (delta) since the last update
+  const diffUpdate1 = Y.encodeStateAsUpdate(doc1, Y.encodeStateVector(doc2));
+  const diffUpdate2 = Y.encodeStateAsUpdate(doc2, Y.encodeStateVector(doc1));
+
+  // console.log('diff1', new TextDecoder().decode(diffUpdate1));
+  // console.log('diff2', new TextDecoder().decode(diffUpdate2));
+
+  // Apply the diff to doc2
+  Y.applyUpdate(doc2, diffUpdate1);
+  Y.applyUpdate(doc1, diffUpdate2);
 }

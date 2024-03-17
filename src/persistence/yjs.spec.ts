@@ -1,19 +1,6 @@
 import { expect } from 'vitest';
 import * as Y from 'yjs';
-import { deserializeJsonToYDoc } from './yjs-serialization.ts';
-
-function sync(doc1: Y.Doc, doc2: Y.Doc) {
-  // Calculate the difference (delta) since the last update
-  const diffUpdate1 = Y.encodeStateAsUpdate(doc1, Y.encodeStateVector(doc2));
-  const diffUpdate2 = Y.encodeStateAsUpdate(doc2, Y.encodeStateVector(doc1));
-
-  console.log('diff1', new TextDecoder().decode(diffUpdate1));
-  console.log('diff2', new TextDecoder().decode(diffUpdate2));
-
-  // Apply the diff to doc2
-  Y.applyUpdate(doc2, diffUpdate1);
-  Y.applyUpdate(doc1, diffUpdate2);
-}
+import { deserializeJsonToYDoc, sync } from './yjs-serialization.ts';
 
 describe('Yjs', () => {
   it('should work', () => {
