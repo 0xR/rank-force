@@ -1,3 +1,5 @@
+import { expect } from 'vitest';
+import { deserializeJsonToYDoc } from '../persistence/yjs-serialization.ts';
 import { Item } from './Item.ts';
 import { RankAssignment } from './RankAssignment.ts';
 import { RankDimension } from './RankDimension.ts';
@@ -228,5 +230,69 @@ describe('Domain', () => {
     expect(rankAssignment.items[1].id).toBe(1);
     expect(rankAssignment.items[2].id).toBe(2);
     expect(rankAssignment.items[3].id).toBe(3);
+  });
+
+  it('should serialize to a yjs document', () => {
+    const user = new User('0', 'user 0');
+    const rankAssignment = new RankAssignment();
+    rankAssignment.addItems(['item1', 'item2']);
+    rankAssignment.addDimension(
+      new RankDimension('0', 'importance', 'low', 'high', 'ascending'),
+    );
+
+    rankAssignment.rank(user, rankAssignment.dimensions[0], [
+      rankAssignment.items[0],
+      rankAssignment.items[1],
+    ]);
+
+    const json = rankAssignment.serialize();
+    const yDoc = deserializeJsonToYDoc(json);
+    expect(yDoc.toJSON().root).toEqual(json);
+    expect(json).toMatchInlineSnapshot(`
+      {
+        "dimensions": [
+          {
+            "direction": "ascending",
+            "id": "0",
+            "importance": 1,
+            "labelEnd": "high",
+            "labelStart": "low",
+            "name": "importance",
+          },
+        ],
+        "items": [
+          {
+            "id": 0,
+            "label": "item1",
+          },
+          {
+            "id": 1,
+            "label": "item2",
+          },
+        ],
+        "rankingsByUser": [
+          {
+            "ranking": {
+              "rankings": [
+                {
+                  "dimension": "0",
+                  "ranking": [
+                    0,
+                    1,
+                  ],
+                },
+              ],
+            },
+            "user": {
+              "id": "0",
+              "name": "user 0",
+            },
+          },
+        ],
+      }
+    `);
+
+    const rankAssignment2 = RankAssignment.deserialize(json);
+    expect(rankAssignment2).toEqual(rankAssignment);
   });
 });

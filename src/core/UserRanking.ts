@@ -8,11 +8,17 @@ export class UserRanking {
   private rankings: Map<RankDimension, RankScore[]> = new Map();
 
   rank(dimension: RankDimension, items: Item[]) {
-    const descendingItems =
-      dimension.direction === 'descending' ? items : items.toReversed();
-    const score = descendingItems.map(
+    const indexRatioToScore =
+      dimension.direction === 'descending'
+        ? (indexRatio: number) => 1 - indexRatio
+        : (indexRatio: number) => indexRatio;
+
+    const score = items.map(
       (item, index) =>
-        new RankScore(item, new Ratio(1 - index / (items.length - 1))),
+        new RankScore(
+          item,
+          new Ratio(indexRatioToScore(index / (items.length - 1))),
+        ),
     );
     this.rankings.set(dimension, score);
   }
@@ -52,5 +58,40 @@ export class UserRanking {
         (ranking) => ranking.length === rankAssignment.items.length,
       )
     );
+  }
+
+  serialize() {
+    return {
+      rankings: Array.from(this.rankings.entries()).map(
+        ([dimension, scores]) => ({
+          dimension: dimension.id,
+          ranking: scores.map((score) => score.item.id),
+        }),
+      ),
+    };
+  }
+
+  static deserialize(
+    ranking: ReturnType<UserRanking['serialize']>,
+    rankAssignment: RankAssignment,
+  ) {
+    const userRanking = new UserRanking();
+    ranking.rankings.forEach(({ dimension, ranking }) => {
+      const rankDimension = rankAssignment.dimensions.find(
+        (d) => d.id === dimension,
+      );
+      if (!rankDimension) {
+        throw new Error(`Dimension ${dimension} not found`);
+      }
+      const items = ranking.map((itemId) => {
+        const item = rankAssignment.items.find((item) => item.id === itemId);
+        if (!item) {
+          throw new Error(`Item ${itemId} not found`);
+        }
+        return item;
+      });
+      userRanking.rank(rankDimension, items);
+    });
+    return userRanking;
   }
 }

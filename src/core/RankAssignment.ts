@@ -66,4 +66,45 @@ export class RankAssignment {
   addDimension(...rankDimension: RankDimension[]) {
     this.dimensions.push(...rankDimension);
   }
+
+  serialize() {
+    return {
+      items: this.items.map((item) => item.serialize()),
+      dimensions: this.dimensions.map((dimension) => dimension.serialize()),
+      rankingsByUser: Array.from(this.rankingsByUser.entries()).map(
+        ([user, userRanking]) => {
+          return {
+            user: user.serialize(),
+            ranking: userRanking.serialize(),
+          };
+        },
+      ),
+    };
+  }
+
+  copy() {
+    const serialized = this.serialize();
+    return RankAssignment.deserialize(serialized);
+  }
+
+  static deserialize(json: ReturnType<RankAssignment['serialize']>) {
+    const rankAssignment = new RankAssignment();
+    rankAssignment.items.push(
+      ...json.items.map((item) => Item.deserialize(item)),
+    );
+    rankAssignment.dimensions.push(
+      ...json.dimensions.map((dimension) =>
+        RankDimension.deserialize(dimension),
+      ),
+    );
+    rankAssignment.rankingsByUser = new Map(
+      json.rankingsByUser.map(({ user, ranking }) => {
+        return [
+          User.deserialize(user),
+          UserRanking.deserialize(ranking, rankAssignment),
+        ];
+      }),
+    );
+    return rankAssignment;
+  }
 }
