@@ -2,23 +2,22 @@ import { useMemo, useState } from 'react';
 import { Item } from './core/Item.ts';
 import { RankAssignment } from './core/RankAssignment.ts';
 import { RankDimension } from './core/RankDimension.ts';
+import { User } from './core/User.ts';
+import { Sortable } from './Sortable.tsx';
 
 function Dimension({
   dimension,
   items,
+  user,
 }: {
   dimension: RankDimension;
   items: Item[];
+  user: User;
 }) {
-  const [rank, setRank] = useState(0);
   return (
     <div>
       <h1>{dimension.name}</h1>
-      <ul>
-        {items.map((item) => (
-          <li>{item.label}</li>
-        ))}
-      </ul>
+      <Sortable />
     </div>
   );
 }
@@ -33,22 +32,34 @@ function App() {
       'ascending',
     );
     const rankDimension2 = new RankDimension(
-      '0',
+      '1',
       'urgency',
       'low',
       'high',
       'ascending',
     );
-    const rankAssignment = new RankAssignment();
-    rankAssignment.addDimension(rankDimension1, rankDimension2);
-    rankAssignment.addItems(['item1', 'item2', 'item3']);
+    let rankAssignment = new RankAssignment();
+    rankAssignment = rankAssignment.addDimension(
+      rankDimension1,
+      rankDimension2,
+    );
+    rankAssignment = rankAssignment.addItems(['item1', 'item2', 'item3']);
     return rankAssignment;
+  }, []);
+
+  const user = useMemo(() => {
+    return new User('0', 'user1');
   }, []);
 
   return (
     <>
       {rankAssigment.dimensions.map((dimension) => (
-        <Dimension dimension={dimension} items={rankAssigment.items} />
+        <Dimension
+          key={dimension.id}
+          dimension={dimension}
+          items={rankAssigment.items}
+          user={user}
+        />
       ))}
     </>
   );
