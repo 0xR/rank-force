@@ -15,7 +15,7 @@ function createRankAssigment() {
   let rankAssignment = new RankAssignment();
   rankAssignment = rankAssignment.addItems('item1', 'item2');
   rankAssignment = rankAssignment.addDimension(
-    new RankDimension('0', 'importance', 'low', 'high', 'ascending'),
+    new RankDimension('importance', 'low', 'high', 'ascending', new Ratio(1)),
   );
   rankAssignment = rankAssignment.rank(user, rankAssignment.dimensions[0], [
     rankAssignment.items[0],
@@ -28,11 +28,11 @@ describe('Domain', () => {
   it('should rank on a single dimension', () => {
     const user = new User('0', 'user 0');
     const rankDimension = new RankDimension(
-      '0',
       'importance',
       'low',
       'high',
       'ascending',
+      new Ratio(1),
     );
     let rankAssignment = new RankAssignment();
     rankAssignment = rankAssignment.addDimension(rankDimension);
@@ -52,7 +52,6 @@ describe('Domain', () => {
   it('should rank on a single descending dimension', () => {
     const user = new User('0', 'user 0');
     const rankDimension = new RankDimension(
-      '0',
       'importance',
       'high',
       'low',
@@ -76,14 +75,12 @@ describe('Domain', () => {
   it('should rank on multiple dimensions', () => {
     const user = new User('0', 'user 0');
     const rankDimension1 = new RankDimension(
-      '0',
       'importance',
       'low',
       'high',
       'ascending',
     );
     const rankDimension2 = new RankDimension(
-      '0',
       'urgency',
       'low',
       'high',
@@ -116,7 +113,6 @@ describe('Domain', () => {
     const user1 = new User('0', 'user 0');
     const user2 = new User('1', 'user 1');
     const rankDimension1 = new RankDimension(
-      '0',
       'importance',
       'low',
       'high',
@@ -143,7 +139,6 @@ describe('Domain', () => {
   it('should rank supporting importance', () => {
     const user = new User('0', 'user 0');
     const rankDimension1 = new RankDimension(
-      '0',
       'importance',
       'low',
       'high',
@@ -151,7 +146,6 @@ describe('Domain', () => {
       new Ratio(1),
     );
     const rankDimension2 = new RankDimension(
-      '0',
       'urgency',
       'low',
       'high',
@@ -181,20 +175,20 @@ describe('Domain', () => {
   it('should support adding items and dimensions', () => {
     const user = new User('0', 'user 0');
     const rankDimension1 = new RankDimension(
-      '0',
       'importance',
       'low',
       'high',
       'ascending',
       new Ratio(1),
+      '0',
     );
     const rankDimension2 = new RankDimension(
-      '0',
       'urgency',
       'low',
       'high',
       'ascending',
-      new Ratio(0.5),
+      new Ratio(1),
+      '0',
     );
     let rankAssignment = new RankAssignment();
     rankAssignment = rankAssignment.addDimension(
@@ -232,7 +226,6 @@ describe('Domain', () => {
     expect(rankAssignment.score).toHaveLength(2);
     rankAssignment = rankAssignment.addDimension(
       new RankDimension(
-        '0',
         'complexity',
         'low',
         'high',
@@ -262,11 +255,11 @@ describe('Domain', () => {
   it('should remove incomplete rankings', () => {
     const user = new User('0', 'user 0');
     const rankDimension = new RankDimension(
-      '0',
       'importance',
       'low',
       'high',
       'ascending',
+      new Ratio(1),
     );
     let rankAssignment = new RankAssignment();
     rankAssignment = rankAssignment.addDimension(rankDimension);
@@ -349,7 +342,7 @@ describe('Domain', () => {
     let rankAssignment2 = rankAssignment1.copy();
     rankAssignment2 = rankAssignment2.addItems('item3', 'item4');
     rankAssignment2 = rankAssignment2.addDimension(
-      new RankDimension('1', 'complexity', 'low', 'high', 'ascending'),
+      new RankDimension('complexity', 'low', 'high', 'ascending', new Ratio(1)),
     );
     const yDoc2 = deserializeJsonToYDoc(rankAssignment2.serialize());
 
@@ -365,11 +358,11 @@ describe('Domain', () => {
   it('should allow ranking a single item', () => {
     const user = new User('0', 'user');
     const rankDimension = new RankDimension(
-      '0',
       'importance',
       'low',
       'high',
       'ascending',
+      new Ratio(1),
     );
     let rankAssignment = new RankAssignment();
     rankAssignment = rankAssignment.addDimension(rankDimension);

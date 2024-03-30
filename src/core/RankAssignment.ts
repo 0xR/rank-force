@@ -26,9 +26,21 @@ export class RankAssignment {
   }
 
   addDimension(...rankDimension: RankDimension[]): RankAssignment {
+    const startId = this.dimensions.length;
+    const dimensionsWithId = rankDimension.map(
+      (dimension, index) =>
+        new RankDimension(
+          dimension.name,
+          dimension.labelStart,
+          dimension.labelEnd,
+          dimension.direction,
+          dimension.importance,
+          (index + startId).toString(),
+        ),
+    );
     return new RankAssignment(
       this.items,
-      this.dimensions.concat(rankDimension),
+      this.dimensions.concat(dimensionsWithId),
       this.rankingsByUser,
     );
   }

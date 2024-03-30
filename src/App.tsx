@@ -3,6 +3,7 @@ import { Item } from './core/Item.ts';
 import { RankAssignment } from './core/RankAssignment.ts';
 import { RankDimension } from './core/RankDimension.ts';
 import { RankScore } from './core/RankScore.ts';
+import { Ratio } from './core/Ratio.ts';
 import { User } from './core/User.ts';
 import { Sortable } from './Sortable.tsx';
 
@@ -35,7 +36,7 @@ function Score({ score }: { score: RankScore[] }) {
   );
 }
 
-function ItemForm({ onChange }: { onChange: (itemLabel: string) => void }) {
+function ItemForm({ onSubmit }: { onSubmit: (itemLabel: string) => void }) {
   return (
     <form
       onSubmit={(e) => {
@@ -50,7 +51,7 @@ function ItemForm({ onChange }: { onChange: (itemLabel: string) => void }) {
         if (!itemLabel) {
           return;
         }
-        onChange(itemLabel);
+        onSubmit(itemLabel);
         form.reset();
       }}
     >
@@ -80,6 +81,71 @@ function ItemList({
   );
 }
 
+function DimensionForm({
+  onSubmit,
+}: {
+  onSubmit: (dimension: RankDimension) => void;
+}) {
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        const form = e.currentTarget;
+        const formData = new FormData(form);
+        const name = formData.get('name');
+        const labelStart = formData.get('labelStart');
+        const labelEnd = formData.get('labelEnd');
+        const direction = formData.get('direction');
+
+        if (
+          typeof name !== 'string' ||
+          typeof labelStart !== 'string' ||
+          typeof labelEnd !== 'string' ||
+          typeof direction !== 'string'
+        ) {
+          throw new Error('Expected a string');
+        }
+
+        if (!name || !labelStart || !labelEnd || !direction) {
+          return;
+        }
+
+        onSubmit(
+          new RankDimension(
+            name,
+            labelStart,
+            labelEnd,
+            direction as 'ascending' | 'descending',
+          ),
+        );
+        form.reset();
+      }}
+    >
+      <label>
+        Name: <input type="text" name={'name'} />
+      </label>
+      <label>
+        Label start: <input type="text" name={'labelStart'} />
+      </label>
+      <label>
+        Label end: <input type="text" name={'labelEnd'} />
+      </label>
+      <fieldset>
+        <legend>Direction</legend>
+        <label>
+          <input type="radio" name="direction" value="ascending" />
+          Ascending
+        </label>
+        <label>
+          <input type="radio" name="direction" value="descending" />
+          Descending
+        </label>
+      </fieldset>
+      <button type="submit">Add</button>
+    </form>
+  );
+}
+
 function DimensionList({
   dimensions,
   onRemove,
@@ -105,18 +171,18 @@ function DimensionList({
 function App() {
   const [rankAssigment, setRankAssignment] = useState(() => {
     const rankDimension1 = new RankDimension(
-      '0',
       'importance',
       'low',
       'high',
       'ascending',
+      new Ratio(1),
     );
     const rankDimension2 = new RankDimension(
-      '1',
       'urgency',
       'low',
       'high',
       'ascending',
+      new Ratio(1),
     );
     let rankAssignment = new RankAssignment();
     rankAssignment = rankAssignment.addDimension(
@@ -134,7 +200,7 @@ function App() {
   return (
     <>
       <ItemForm
-        onChange={(itemLabel) =>
+        onSubmit={(itemLabel) =>
           setRankAssignment(rankAssigment.addItems(itemLabel))
         }
       />
@@ -143,6 +209,11 @@ function App() {
         onRemove={(item) =>
           setRankAssignment(rankAssigment.removeItems([item]))
         }
+      />
+      <DimensionForm
+        onSubmit={(dimension) => {
+          setRankAssignment(rankAssigment.addDimension(dimension));
+        }}
       />
       <DimensionList
         dimensions={rankAssigment.dimensions}

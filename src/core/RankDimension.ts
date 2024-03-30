@@ -2,12 +2,12 @@ import { Ratio } from './Ratio.ts';
 
 export class RankDimension {
   constructor(
-    readonly id: string,
     readonly name: string,
     readonly labelStart: string,
     readonly labelEnd: string,
     readonly direction: 'ascending' | 'descending',
     readonly importance: Ratio = new Ratio(1),
+    readonly id: string = 'unset',
   ) {}
 
   serialize() {
@@ -23,12 +23,12 @@ export class RankDimension {
 
   static deserialize(dimension: ReturnType<RankDimension['serialize']>) {
     return new RankDimension(
-      dimension.id,
       dimension.name,
       dimension.labelStart,
       dimension.labelEnd,
       dimension.direction as 'ascending' | 'descending',
       new Ratio(dimension.importance),
+      dimension.id,
     );
   }
 }
