@@ -2,7 +2,7 @@ import { expect } from 'vitest';
 import {
   deserializeJsonToYDoc,
   sync,
-} from '@/app/persistence/yjs-serialization.ts';
+} from '../persistence/yjs-serialization.ts';
 import { Item } from './Item.ts';
 import { RankAssignment } from './RankAssignment.ts';
 import { RankDimension } from './RankDimension.ts';
