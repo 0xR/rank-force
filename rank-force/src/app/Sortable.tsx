@@ -13,7 +13,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Item } from './core/Item.ts';
+import { Item } from '../core/Item.ts';
 
 import { SortableItem } from './SortableItem';
 

@@ -1,6 +1,6 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Item } from './core/Item.ts';
+import { Item } from '../core/Item.ts';
 
 export function SortableItem({ item }: { item: Item }) {
   const { attributes, listeners, setNodeRef, transform, transition } =

@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react';
-import { Item } from './core/Item.ts';
-import { RankAssignment } from './core/RankAssignment.ts';
-import { RankDimension } from './core/RankDimension.ts';
-import { RankScore } from './core/RankScore.ts';
-import { Ratio } from './core/Ratio.ts';
-import { User } from './core/User.ts';
+import { Item } from '../core/Item.ts';
+import { RankAssignment } from '../core/RankAssignment.ts';
+import { RankDimension } from '../core/RankDimension.ts';
+import { RankScore } from '../core/RankScore.ts';
+import { Ratio } from '../core/Ratio.ts';
+import { User } from '../core/User.ts';
 import { Sortable } from './Sortable.tsx';
 
 function Dimension({
