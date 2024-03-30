@@ -91,7 +91,10 @@ function DimensionList({
     <ul>
       {dimensions.map((dimension) => (
         <li key={dimension.id}>
-          {dimension.name}{' '}
+          {dimension.name}: {dimension.labelStart} (
+          {dimension.direction === 'ascending' ? 'worse' : 'better'}) to{' '}
+          {dimension.labelEnd} (
+          {dimension.direction === 'ascending' ? 'better' : 'worse'}){' '}
           <button onClick={() => onRemove(dimension)}>Remove</button>
         </li>
       ))}
@@ -147,9 +150,6 @@ function App() {
           setRankAssignment(rankAssigment.removeDimensions(dimension))
         }
       />
-      <p>Status complete: {rankAssigment.rankingComplete ? 'yes' : 'no'}</p>
-      <p>score:</p>
-      {rankAssigment.score ? <Score score={rankAssigment.score} /> : <p>N/A</p>}
 
       {rankAssigment.dimensions.map((dimension) => (
         <Dimension
@@ -161,6 +161,8 @@ function App() {
           }}
         />
       ))}
+      <p>score:</p>
+      {rankAssigment.score ? <Score score={rankAssigment.score} /> : <p>N/A</p>}
     </>
   );
 }
