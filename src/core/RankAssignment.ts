@@ -12,7 +12,7 @@ export class RankAssignment {
     private rankingsByUser: Map<User, UserRanking> = new Map(),
   ) {}
 
-  addItems(items: string[]): RankAssignment {
+  addItems(...items: string[]): RankAssignment {
     const startId = this.items.length;
     return new RankAssignment(
       this.items.concat(

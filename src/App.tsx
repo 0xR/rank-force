@@ -101,7 +101,7 @@ function App() {
       rankDimension1,
       rankDimension2,
     );
-    rankAssignment = rankAssignment.addItems(['item1', 'item2', 'item3']);
+    rankAssignment = rankAssignment.addItems('item1', 'item2', 'item3');
     return rankAssignment;
   });
 
@@ -113,7 +113,7 @@ function App() {
     <>
       <ItemForm
         onChange={(itemLabel) =>
-          setRankAssignment(rankAssigment.addItems([itemLabel]))
+          setRankAssignment(rankAssigment.addItems(itemLabel))
         }
       />
       <ItemList
