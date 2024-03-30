@@ -18,7 +18,7 @@ function Dimension({
 }) {
   return (
     <div>
-      <h1>{dimension.name}</h1>
+      <h3>{dimension.name}</h3>
       <Sortable items={items} onChange={onChange} />
     </div>
   );
@@ -199,6 +199,7 @@ function App() {
 
   return (
     <>
+      <h2>Items</h2>
       <ItemForm
         onSubmit={(itemLabel) =>
           setRankAssignment(rankAssigment.addItems(itemLabel))
@@ -210,6 +211,7 @@ function App() {
           setRankAssignment(rankAssigment.removeItems([item]))
         }
       />
+      <h2>Dimensions</h2>
       <DimensionForm
         onSubmit={(dimension) => {
           setRankAssignment(rankAssigment.addDimension(dimension));
@@ -222,6 +224,7 @@ function App() {
         }
       />
 
+      <h2>Ranking</h2>
       {rankAssigment.dimensions.map((dimension) => (
         <Dimension
           key={dimension.id}
@@ -232,7 +235,7 @@ function App() {
           }}
         />
       ))}
-      <p>score:</p>
+      <h2>Score</h2>
       {rankAssigment.score ? <Score score={rankAssigment.score} /> : <p>N/A</p>}
     </>
   );
