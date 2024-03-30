@@ -1,6 +1,8 @@
 'use client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useMemo, useState } from 'react';
 import { Item } from '@/core/Item';
 import { RankAssignment } from '@/core/RankAssignment';
@@ -133,17 +135,16 @@ function DimensionForm({
       <label>
         Label end: <Input type="text" name={'labelEnd'} />
       </label>
-      <fieldset>
-        <legend>Direction</legend>
-        <label>
-          <input type="radio" name="direction" value="ascending" />
-          Ascending
-        </label>
-        <label>
-          <input type="radio" name="direction" value="descending" />
-          Descending
-        </label>
-      </fieldset>
+      <RadioGroup  name="direction">
+        <div className="flex items-center space-x-2">
+          <RadioGroupItem value="ascending" id="r1" />
+          <Label htmlFor="r1">Ascending</Label>
+        </div>
+        <div className="flex items-center space-x-2">
+          <RadioGroupItem value="descending" id="r2" />
+          <Label htmlFor="r2">Descending</Label>
+        </div>
+      </RadioGroup>
       <Button type="submit">Add</Button>
     </form>
   );
