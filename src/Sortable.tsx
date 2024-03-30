@@ -14,7 +14,7 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Item } from './core/Item.ts';
 
 import { SortableItem } from './SortableItem';
@@ -64,6 +64,14 @@ export function Sortable({
       coordinateGetter: sortableKeyboardCoordinates,
     }),
   );
+
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
+
+  useEffect(() => {
+    if (items1.length) return;
+    onChangeRef.current(items2);
+  }, [items1, items2]);
 
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
@@ -128,7 +136,7 @@ export function Sortable({
             return [null, null] as const;
           };
 
-          const [activeItems, setActiveItems] = getItemsAndSetter(activeItem);
+          const [, setActiveItems] = getItemsAndSetter(activeItem);
           const [overItems, setOverItems] = overItem
             ? getItemsAndSetter(overItem)
             : getItemsAndSetterByDroppableId(over.id);

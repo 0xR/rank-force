@@ -53,6 +53,13 @@ function App() {
 
   return (
     <>
+      <p>Status complete: {rankAssigment.rankingComplete ? 'yes' : 'no'}</p>
+      <p>
+        score:{' '}
+        {rankAssigment.rankingComplete
+          ? JSON.stringify(rankAssigment.score)
+          : 'N/A'}
+      </p>
       {rankAssigment.dimensions.map((dimension) => (
         <Dimension
           key={dimension.id}
