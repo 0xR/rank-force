@@ -68,39 +68,9 @@ export function Sortable({
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
 
-  useEffect(() => {
-    onChangeRef.current(items2);
-  }, [items1, items2]);
-
-  const handleDragEnd = useCallback(
-    (event: DragEndEvent) => {
-      const { active, over } = event;
-
-      if (!over) return;
-
-      const activeItem = (active.data.current as { item: Item } | undefined)
-        ?.item;
-      const overItem = (over.data.current as { item: Item } | undefined)?.item;
-
-      if (!activeItem) {
-        return;
-      }
-
-      const setItems = items1.includes(activeItem) ? setItems1 : setItems2;
-
-      if (active.id !== over.id) {
-        setItems((items: Item[]) => {
-          assertString(over.id);
-          assertString(active.id);
-          const oldIndex = items.indexOf(activeItem);
-          const newIndex = overItem ? items.indexOf(overItem) : items.length;
-
-          return arrayMove(items, oldIndex, newIndex);
-        });
-      }
-    },
-    [items1],
-  );
+  const handleDragEnd = useCallback(() => {
+    onChange(items2);
+  }, [items2, onChange]);
 
   return (
     <div>
