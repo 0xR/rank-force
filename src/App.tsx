@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Item } from './core/Item.ts';
 import { RankAssignment } from './core/RankAssignment.ts';
 import { RankDimension } from './core/RankDimension.ts';
+import { RankScore } from './core/RankScore.ts';
 import { User } from './core/User.ts';
 import { Sortable } from './Sortable.tsx';
 
@@ -19,6 +20,18 @@ function Dimension({
       <h1>{dimension.name}</h1>
       <Sortable items={items} onChange={onChange} />
     </div>
+  );
+}
+
+function Score({ score }: { score: RankScore[] }) {
+  return (
+    <ul>
+      {score.map((score) => (
+        <li key={score.item.id}>
+          {score.item.label} ({score.score.value})
+        </li>
+      ))}
+    </ul>
   );
 }
 
@@ -47,10 +60,6 @@ function App() {
     return rankAssignment;
   });
 
-  useEffect(() => {
-    console.log('RankAssignment updated', rankAssigment);
-  }, [rankAssigment]);
-
   const user = useMemo(() => {
     return new User('0', 'user1');
   }, []);
@@ -58,10 +67,9 @@ function App() {
   return (
     <>
       <p>Status complete: {rankAssigment.rankingComplete ? 'yes' : 'no'}</p>
-      <p>
-        score:{' '}
-        {rankAssigment.score ? JSON.stringify(rankAssigment.score) : 'N/A'}
-      </p>
+      <p>score:</p>
+      {rankAssigment.score ? <Score score={rankAssigment.score} /> : <p>N/A</p>}
+
       {rankAssigment.dimensions.map((dimension) => (
         <Dimension
           key={dimension.id}
