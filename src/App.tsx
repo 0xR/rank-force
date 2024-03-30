@@ -80,6 +80,25 @@ function ItemList({
   );
 }
 
+function DimensionList({
+  dimensions,
+  onRemove,
+}: {
+  dimensions: RankDimension[];
+  onRemove: (dimension: RankDimension) => void;
+}) {
+  return (
+    <ul>
+      {dimensions.map((dimension) => (
+        <li key={dimension.id}>
+          {dimension.name}{' '}
+          <button onClick={() => onRemove(dimension)}>Remove</button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 function App() {
   const [rankAssigment, setRankAssignment] = useState(() => {
     const rankDimension1 = new RankDimension(
@@ -120,6 +139,12 @@ function App() {
         items={rankAssigment.items}
         onRemove={(item) =>
           setRankAssignment(rankAssigment.removeItems([item]))
+        }
+      />
+      <DimensionList
+        dimensions={rankAssigment.dimensions}
+        onRemove={(dimension) =>
+          setRankAssignment(rankAssigment.removeDimensions(dimension))
         }
       />
       <p>Status complete: {rankAssigment.rankingComplete ? 'yes' : 'no'}</p>

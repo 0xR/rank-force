@@ -33,6 +33,14 @@ export class RankAssignment {
     );
   }
 
+  removeDimensions(...dimensions: RankDimension[]): RankAssignment {
+    return new RankAssignment(
+      this.items,
+      this.dimensions.filter((dimension) => !dimensions.includes(dimension)),
+      this.rankingsByUser,
+    );
+  }
+
   rank(user: User, dimension: RankDimension, items: Item[]): RankAssignment {
     if (!this.dimensions.includes(dimension)) {
       throw new Error(`Dimension ${dimension.name} not found in assigment`);
