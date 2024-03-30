@@ -167,10 +167,7 @@ export function Sortable({
           });
         }}
       >
-        <SortableContext
-          items={items1.map((item) => item.id.toString())}
-          strategy={verticalListSortingStrategy}
-        >
+        <SortableContext items={items1} strategy={verticalListSortingStrategy}>
           <Droppable id={'droppable'}>
             {items1.map((item) => (
               <SortableItem key={item.id} item={item} />
@@ -178,10 +175,7 @@ export function Sortable({
           </Droppable>
         </SortableContext>
 
-        <SortableContext
-          items={items2.map((item) => item.id.toString())}
-          strategy={verticalListSortingStrategy}
-        >
+        <SortableContext items={items2} strategy={verticalListSortingStrategy}>
           <Droppable id={'droppable2'}>
             {items2.map((item) => (
               <SortableItem key={item.id} item={item} />

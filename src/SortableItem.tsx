@@ -5,11 +5,9 @@ import { Item } from './core/Item.ts';
 export function SortableItem({ item }: { item: Item }) {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({
-      id: item.id.toString(),
+      id: item.id,
       data: { item },
     });
-
-  // console.log(item.id.toString(), transform, transition);
 
   const style = {
     transform: CSS.Transform.toString(transform),
