@@ -12,7 +12,7 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { Item } from '../core/Item';
 
 import { SortableItem } from './SortableItem';
@@ -100,10 +100,13 @@ export function Sortable({
   const handleDragEnd = useCallback(() => {
     onChange(items2);
   }, [items2, onChange]);
+  
+  const id = useId();
 
   return (
     <div>
       <DndContext
+        id={id}
         sensors={sensors}
         collisionDetection={closestCenter}
         onDragEnd={handleDragEnd}
