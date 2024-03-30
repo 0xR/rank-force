@@ -133,7 +133,7 @@ export function Sortable({
             ? getItemsAndSetter(overItem)
             : getItemsAndSetterByDroppableId(over.id);
 
-          if (activeItems === overItems || !setOverItems || !setActiveItems) {
+          if (!setOverItems || !setActiveItems) {
             return;
           }
 
@@ -141,7 +141,7 @@ export function Sortable({
           let newIndex: number;
 
           if (over.id === 'droppable' || over.id === 'droppable2') {
-            newIndex = overItems.length + 1;
+            newIndex = overItems.length;
           } else {
             const isBelowOverItem =
               over &&
@@ -151,8 +151,7 @@ export function Sortable({
 
             const modifier = isBelowOverItem ? 1 : 0;
 
-            newIndex =
-              overIndex >= 0 ? overIndex + modifier : overItems.length + 1;
+            newIndex = overIndex >= 0 ? overIndex + modifier : overItems.length;
           }
           setActiveItems((items) =>
             items.filter((item) => item !== activeItem),
