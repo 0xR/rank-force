@@ -8,22 +8,22 @@ import { Sortable } from './Sortable.tsx';
 function Dimension({
   dimension,
   items,
-  user,
+  onChange,
 }: {
   dimension: RankDimension;
   items: Item[];
-  user: User;
+  onChange: (items: Item[]) => void;
 }) {
   return (
     <div>
       <h1>{dimension.name}</h1>
-      <Sortable />
+      <Sortable items={items} onChange={onChange} />
     </div>
   );
 }
 
 function App() {
-  const rankAssigment = useMemo(() => {
+  const [rankAssigment, setRankAssignment] = useState(() => {
     const rankDimension1 = new RankDimension(
       '0',
       'importance',
@@ -45,7 +45,7 @@ function App() {
     );
     rankAssignment = rankAssignment.addItems(['item1', 'item2', 'item3']);
     return rankAssignment;
-  }, []);
+  });
 
   const user = useMemo(() => {
     return new User('0', 'user1');
@@ -58,7 +58,9 @@ function App() {
           key={dimension.id}
           dimension={dimension}
           items={rankAssigment.items}
-          user={user}
+          onChange={(items) => {
+            setRankAssignment(rankAssigment.rank(user, dimension, items));
+          }}
         />
       ))}
     </>
