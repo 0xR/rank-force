@@ -1,4 +1,5 @@
 'use client';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useMemo, useState } from 'react';
 import { Item } from '@/core/Item';
@@ -60,7 +61,7 @@ function ItemForm({ onSubmit }: { onSubmit: (itemLabel: string) => void }) {
       <label>
         Item to rank: <Input type="text" name={'label'} />
       </label>
-      <button type="submit">Add</button>
+      <Button type="submit">Add</Button>
     </form>
   );
 }
@@ -76,7 +77,7 @@ function ItemList({
     <ul>
       {items.map((item) => (
         <li key={item.id}>
-          {item.label} <button onClick={() => onRemove(item)}>Remove</button>
+          {item.label} <Button onClick={() => onRemove(item)}>Remove</Button>
         </li>
       ))}
     </ul>
@@ -143,7 +144,7 @@ function DimensionForm({
           Descending
         </label>
       </fieldset>
-      <button type="submit">Add</button>
+      <Button type="submit">Add</Button>
     </form>
   );
 }
@@ -163,7 +164,7 @@ function DimensionList({
           {dimension.direction === 'ascending' ? 'worse' : 'better'}) to{' '}
           {dimension.labelEnd} (
           {dimension.direction === 'ascending' ? 'better' : 'worse'}){' '}
-          <button onClick={() => onRemove(dimension)}>Remove</button>
+          <Button onClick={() => onRemove(dimension)}>Remove</Button>
         </li>
       ))}
     </ul>
