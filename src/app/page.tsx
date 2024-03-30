@@ -60,9 +60,9 @@ function ItemForm({ onSubmit }: { onSubmit: (itemLabel: string) => void }) {
         form.reset();
       }}
     >
-      <label>
+      <Label>
         Item to rank: <Input type="text" name={'label'} />
-      </label>
+      </Label>
       <Button type="submit">Add</Button>
     </form>
   );
@@ -126,15 +126,15 @@ function DimensionForm({
         form.reset();
       }}
     >
-      <label>
+      <Label>
         Name: <Input type="text" name={'name'} />
-      </label>
-      <label>
+      </Label>
+      <Label>
         Label start: <Input type="text" name={'labelStart'} />
-      </label>
-      <label>
+      </Label>
+      <Label>
         Label end: <Input type="text" name={'labelEnd'} />
-      </label>
+      </Label>
       <RadioGroup  name="direction">
         <div className="flex items-center space-x-2">
           <RadioGroupItem value="ascending" id="r1" />
