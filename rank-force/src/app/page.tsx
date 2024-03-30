@@ -1,113 +1,245 @@
-import Image from "next/image";
+'use client';
+import { useMemo, useState } from 'react';
+import { Item } from '@/core/Item';
+import { RankAssignment } from '@/core/RankAssignment';
+import { RankDimension } from '@/core/RankDimension';
+import { RankScore } from '@/core/RankScore';
+import { Ratio } from '@/core/Ratio';
+import { User } from '@/core/User';
+import { Sortable } from '@/app/Sortable';
 
-export default function Home() {
+function Dimension({
+  dimension,
+  items,
+  onChange,
+}: {
+  dimension: RankDimension;
+  items: Item[];
+  onChange: (items: Item[]) => void;
+}) {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-full sm:before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full sm:after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50 text-balance`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+    <div>
+      <h3>{dimension.name}</h3>
+      <Sortable items={items} onChange={onChange} />
+    </div>
   );
 }
+
+function Score({ score }: { score: RankScore[] }) {
+  return (
+    <ul>
+      {score.map((score) => (
+        <li key={score.item.id}>
+          {score.item.label} ({score.score.value})
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function ItemForm({ onSubmit }: { onSubmit: (itemLabel: string) => void }) {
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        const form = e.currentTarget;
+        const formData = new FormData(form);
+        const itemLabel = formData.get('label');
+
+        if (typeof itemLabel !== 'string') {
+          throw new Error('Expected a string');
+        }
+        if (!itemLabel) {
+          return;
+        }
+        onSubmit(itemLabel);
+        form.reset();
+      }}
+    >
+      <label>
+        Item to rank: <input type="text" name={'label'} />
+      </label>
+      <button type="submit">Add</button>
+    </form>
+  );
+}
+
+function ItemList({
+  items,
+  onRemove,
+}: {
+  items: Item[];
+  onRemove: (item: Item) => void;
+}) {
+  return (
+    <ul>
+      {items.map((item) => (
+        <li key={item.id}>
+          {item.label} <button onClick={() => onRemove(item)}>Remove</button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function DimensionForm({
+  onSubmit,
+}: {
+  onSubmit: (dimension: RankDimension) => void;
+}) {
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        const form = e.currentTarget;
+        const formData = new FormData(form);
+        const name = formData.get('name');
+        const labelStart = formData.get('labelStart');
+        const labelEnd = formData.get('labelEnd');
+        const direction = formData.get('direction');
+
+        if (
+          typeof name !== 'string' ||
+          typeof labelStart !== 'string' ||
+          typeof labelEnd !== 'string' ||
+          typeof direction !== 'string'
+        ) {
+          throw new Error('Expected a string');
+        }
+
+        if (!name || !labelStart || !labelEnd || !direction) {
+          return;
+        }
+
+        onSubmit(
+          new RankDimension(
+            name,
+            labelStart,
+            labelEnd,
+            direction as 'ascending' | 'descending',
+          ),
+        );
+        form.reset();
+      }}
+    >
+      <label>
+        Name: <input type="text" name={'name'} />
+      </label>
+      <label>
+        Label start: <input type="text" name={'labelStart'} />
+      </label>
+      <label>
+        Label end: <input type="text" name={'labelEnd'} />
+      </label>
+      <fieldset>
+        <legend>Direction</legend>
+        <label>
+          <input type="radio" name="direction" value="ascending" />
+          Ascending
+        </label>
+        <label>
+          <input type="radio" name="direction" value="descending" />
+          Descending
+        </label>
+      </fieldset>
+      <button type="submit">Add</button>
+    </form>
+  );
+}
+
+function DimensionList({
+  dimensions,
+  onRemove,
+}: {
+  dimensions: RankDimension[];
+  onRemove: (dimension: RankDimension) => void;
+}) {
+  return (
+    <ul>
+      {dimensions.map((dimension) => (
+        <li key={dimension.id}>
+          {dimension.name}: {dimension.labelStart} (
+          {dimension.direction === 'ascending' ? 'worse' : 'better'}) to{' '}
+          {dimension.labelEnd} (
+          {dimension.direction === 'ascending' ? 'better' : 'worse'}){' '}
+          <button onClick={() => onRemove(dimension)}>Remove</button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function Page() {
+  const [rankAssigment, setRankAssignment] = useState(() => {
+    const rankDimension1 = new RankDimension(
+      'importance',
+      'low',
+      'high',
+      'ascending',
+      new Ratio(1),
+    );
+    const rankDimension2 = new RankDimension(
+      'urgency',
+      'low',
+      'high',
+      'ascending',
+      new Ratio(1),
+    );
+    let rankAssignment = new RankAssignment();
+    rankAssignment = rankAssignment.addDimension(
+      rankDimension1,
+      rankDimension2,
+    );
+    rankAssignment = rankAssignment.addItems('item1', 'item2', 'item3');
+    return rankAssignment;
+  });
+
+  const user = useMemo(() => {
+    return new User('0', 'user1');
+  }, []);
+
+  return (
+    <>
+      <h2>Items</h2>
+      <ItemForm
+        onSubmit={(itemLabel) =>
+          setRankAssignment(rankAssigment.addItems(itemLabel))
+        }
+      />
+      <ItemList
+        items={rankAssigment.items}
+        onRemove={(item) =>
+          setRankAssignment(rankAssigment.removeItems([item]))
+        }
+      />
+      <h2>Dimensions</h2>
+      <DimensionForm
+        onSubmit={(dimension) => {
+          setRankAssignment(rankAssigment.addDimension(dimension));
+        }}
+      />
+      <DimensionList
+        dimensions={rankAssigment.dimensions}
+        onRemove={(dimension) =>
+          setRankAssignment(rankAssigment.removeDimensions(dimension))
+        }
+      />
+
+      <h2>Ranking</h2>
+      {rankAssigment.dimensions.map((dimension) => (
+        <Dimension
+          key={dimension.id}
+          dimension={dimension}
+          items={rankAssigment.items}
+          onChange={(items) => {
+            setRankAssignment(rankAssigment.rank(user, dimension, items));
+          }}
+        />
+      ))}
+      <h2>Score</h2>
+      {rankAssigment.score ? <Score score={rankAssigment.score} /> : <p>N/A</p>}
+    </>
+  );
+}
+
+export default Page;
