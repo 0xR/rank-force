@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Item } from './core/Item.ts';
 import { RankAssignment } from './core/RankAssignment.ts';
 import { RankDimension } from './core/RankDimension.ts';
@@ -47,6 +47,10 @@ function App() {
     return rankAssignment;
   });
 
+  useEffect(() => {
+    console.log('RankAssignment updated', rankAssigment);
+  }, [rankAssigment]);
+
   const user = useMemo(() => {
     return new User('0', 'user1');
   }, []);
@@ -56,9 +60,7 @@ function App() {
       <p>Status complete: {rankAssigment.rankingComplete ? 'yes' : 'no'}</p>
       <p>
         score:{' '}
-        {rankAssigment.rankingComplete
-          ? JSON.stringify(rankAssigment.score)
-          : 'N/A'}
+        {rankAssigment.score ? JSON.stringify(rankAssigment.score) : 'N/A'}
       </p>
       {rankAssigment.dimensions.map((dimension) => (
         <Dimension

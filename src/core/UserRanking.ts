@@ -23,6 +23,12 @@ export class UserRanking {
     return new UserRanking(new Map(this.rankings).set(dimension, score));
   }
 
+  unrank(dimension: RankDimension): UserRanking {
+    const rankingsCopy = new Map(this.rankings);
+    rankingsCopy.delete(dimension);
+    return new UserRanking(rankingsCopy);
+  }
+
   score(rankAssignment: RankAssignment) {
     return rankAssignment.items.map((item) => {
       const scoreValue = rankAssignment.dimensions.reduce(

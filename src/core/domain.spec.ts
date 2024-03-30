@@ -105,7 +105,7 @@ describe('Domain', () => {
       rankAssignment.items[0],
       rankAssignment.items[2],
     ]);
-    expect(rankAssignment.score.map((score) => score.score)).toEqual([
+    expect(rankAssignment.score?.map((score) => score.score)).toEqual([
       new Ratio(0.5),
       new Ratio(0.5),
       new Ratio(0.5),
@@ -134,7 +134,7 @@ describe('Domain', () => {
       rankAssignment.items[0],
     ]);
 
-    expect(rankAssignment.score.map((score) => score.score)).toEqual([
+    expect(rankAssignment.score?.map((score) => score.score)).toEqual([
       new Ratio(0.5),
       new Ratio(0.5),
     ]);
@@ -203,7 +203,7 @@ describe('Domain', () => {
     );
 
     expect(rankAssignment.rankingComplete).toBe(false);
-    expect(() => rankAssignment.score).toThrowError('Ranking not complete');
+    expect(rankAssignment.score).toBeUndefined();
     rankAssignment = rankAssignment.rank(
       user,
       rankAssignment.dimensions[0],
@@ -218,7 +218,7 @@ describe('Domain', () => {
     expect(rankAssignment.score).toHaveLength(0);
     rankAssignment = rankAssignment.addItems(['item1', 'item2']);
     expect(rankAssignment.rankingComplete).toBe(false);
-    expect(() => rankAssignment.score).toThrowError('Ranking not complete');
+    expect(rankAssignment.score).toBeUndefined();
     rankAssignment = rankAssignment.rank(user, rankAssignment.dimensions[0], [
       rankAssignment.items[0],
       rankAssignment.items[1],
@@ -241,7 +241,7 @@ describe('Domain', () => {
       ),
     );
     expect(rankAssignment.rankingComplete).toBe(false);
-    expect(() => rankAssignment.score).toThrowError('Ranking not complete');
+    expect(rankAssignment.score).toBeUndefined();
     rankAssignment = rankAssignment.rank(user, rankAssignment.dimensions[2], [
       rankAssignment.items[0],
       rankAssignment.items[1],
@@ -257,6 +257,32 @@ describe('Domain', () => {
     expect(rankAssignment.items[1].id).toBe('1');
     expect(rankAssignment.items[2].id).toBe('2');
     expect(rankAssignment.items[3].id).toBe('3');
+  });
+
+  it('should remove incomplete rankings', () => {
+    const user = new User('0', 'user 0');
+    const rankDimension = new RankDimension(
+      '0',
+      'importance',
+      'low',
+      'high',
+      'ascending',
+    );
+    let rankAssignment = new RankAssignment();
+    rankAssignment = rankAssignment.addDimension(rankDimension);
+    rankAssignment = rankAssignment.addItems(['item1', 'item2']);
+    rankAssignment = rankAssignment.rank(user, rankAssignment.dimensions[0], [
+      rankAssignment.items[0],
+      rankAssignment.items[1],
+    ]);
+
+    expect(rankAssignment.score).toBeDefined();
+
+    rankAssignment = rankAssignment.rank(user, rankAssignment.dimensions[0], [
+      rankAssignment.items[0],
+    ]);
+
+    expect(rankAssignment.score).toBeUndefined();
   });
 
   it('should serialize to a yjs document', () => {

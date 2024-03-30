@@ -37,27 +37,33 @@ export class RankAssignment {
     if (!this.dimensions.includes(dimension)) {
       throw new Error(`Dimension ${dimension.name} not found in assigment`);
     }
-    if (items.length !== this.items.length) {
-      throw new Error('Ranking length does not match item length');
-    }
+
+    const rankingByUserCopy = new Map(this.rankingsByUser);
+
     items.forEach((item) => {
       if (!this.items.includes(item)) {
         throw new Error(`Item ${item.label} not found in assignment`);
       }
     });
+
     let userRanking = this.rankingsByUser.get(user) ?? new UserRanking();
-    userRanking = userRanking.rank(dimension, items);
+
+    if (items.length === this.items.length) {
+      userRanking = userRanking.rank(dimension, items);
+    } else {
+      userRanking = userRanking.unrank(dimension);
+    }
 
     return new RankAssignment(
       this.items,
       this.dimensions,
-      new Map(this.rankingsByUser).set(user, userRanking),
+      rankingByUserCopy.set(user, userRanking),
     );
   }
 
   get score() {
     if (!this.rankingComplete) {
-      throw new Error('Ranking not complete');
+      return undefined;
     }
     const scoresForUsers = Array.from(this.rankingsByUser.values()).map(
       (userRanking) => userRanking.score(this),

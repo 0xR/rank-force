@@ -69,7 +69,6 @@ export function Sortable({
   onChangeRef.current = onChange;
 
   useEffect(() => {
-    if (items1.length) return;
     onChangeRef.current(items2);
   }, [items1, items2]);
 
