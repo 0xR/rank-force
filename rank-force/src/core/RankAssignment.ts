@@ -1,9 +1,9 @@
-import { Item } from './Item.ts';
-import { RankDimension } from './RankDimension.ts';
-import { RankScore } from './RankScore.ts';
-import { Ratio } from './Ratio.ts';
-import { User } from './User.ts';
-import { UserRanking } from './UserRanking.ts';
+import { Item } from './Item';
+import { RankDimension } from './RankDimension';
+import { RankScore } from './RankScore';
+import { Ratio } from './Ratio';
+import { User } from './User';
+import { UserRanking } from './UserRanking';
 
 export class RankAssignment {
   constructor(

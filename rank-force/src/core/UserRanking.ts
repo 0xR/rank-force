@@ -1,8 +1,8 @@
-import { Item } from './Item.ts';
-import { RankAssignment } from './RankAssignment.ts';
-import { RankDimension } from './RankDimension.ts';
-import { RankScore } from './RankScore.ts';
-import { Ratio } from './Ratio.ts';
+import { Item } from './Item';
+import { RankAssignment } from './RankAssignment';
+import { RankDimension } from './RankDimension';
+import { RankScore } from './RankScore';
+import { Ratio } from './Ratio';
 
 export class UserRanking {
   constructor(private rankings: Map<RankDimension, RankScore[]> = new Map()) {}

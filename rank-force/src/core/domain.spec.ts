@@ -2,13 +2,13 @@ import { expect } from 'vitest';
 import {
   deserializeJsonToYDoc,
   sync,
-} from '../persistence/yjs-serialization.ts';
-import { Item } from './Item.ts';
-import { RankAssignment } from './RankAssignment.ts';
-import { RankDimension } from './RankDimension.ts';
-import { RankScore } from './RankScore.ts';
-import { Ratio } from './Ratio.ts';
-import { User } from './User.ts';
+} from '../persistence/yjs-serialization';
+import { Item } from './Item';
+import { RankAssignment } from './RankAssignment';
+import { RankDimension } from './RankDimension';
+import { RankScore } from './RankScore';
+import { Ratio } from './Ratio';
+import { User } from './User';
 
 function createRankAssigment() {
   const user = new User('0', 'user 0');

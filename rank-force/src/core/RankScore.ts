@@ -1,5 +1,5 @@
-import { Item } from './Item.ts';
-import { Ratio } from './Ratio.ts';
+import { Item } from './Item';
+import { Ratio } from './Ratio';
 
 export class RankScore {
   constructor(

@@ -1,6 +1,6 @@
 import { expect } from 'vitest';
 import * as Y from 'yjs';
-import { deserializeJsonToYDoc, sync } from './yjs-serialization.ts';
+import { deserializeJsonToYDoc, sync } from './yjs-serialization';
 
 describe('Yjs', () => {
   it('should work', () => {

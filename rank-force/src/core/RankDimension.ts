@@ -1,4 +1,4 @@
-import { Ratio } from './Ratio.ts';
+import { Ratio } from './Ratio';
 
 export class RankDimension {
   constructor(
