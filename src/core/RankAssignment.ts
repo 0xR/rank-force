@@ -16,7 +16,9 @@ export class RankAssignment {
     const startId = this.items.length;
     return new RankAssignment(
       this.items.concat(
-        items.map((label, index) => new Item(index + startId, label)),
+        items.map(
+          (label, index) => new Item((index + startId).toString(), label),
+        ),
       ),
       this.dimensions,
       this.rankingsByUser,

@@ -1,6 +1,6 @@
 export class Item {
   constructor(
-    readonly id: number,
+    readonly id: string,
     readonly label: string,
   ) {}
 

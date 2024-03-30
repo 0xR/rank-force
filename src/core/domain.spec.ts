@@ -43,9 +43,9 @@ describe('Domain', () => {
       rankAssignment.items[1],
     ]);
     expect(rankAssignment.score).toEqual([
-      new RankScore(new Item(1, 'item2'), new Ratio(1)),
-      new RankScore(new Item(0, 'item1'), new Ratio(0.5)),
-      new RankScore(new Item(2, 'item3'), new Ratio(0)),
+      new RankScore(new Item('1', 'item2'), new Ratio(1)),
+      new RankScore(new Item('0', 'item1'), new Ratio(0.5)),
+      new RankScore(new Item('2', 'item3'), new Ratio(0)),
     ]);
   });
 
@@ -67,9 +67,9 @@ describe('Domain', () => {
       rankAssignment.items[1],
     ]);
     expect(rankAssignment.score).toEqual([
-      new RankScore(new Item(2, 'item3'), new Ratio(1)),
-      new RankScore(new Item(0, 'item1'), new Ratio(0.5)),
-      new RankScore(new Item(1, 'item2'), new Ratio(0)),
+      new RankScore(new Item('2', 'item3'), new Ratio(1)),
+      new RankScore(new Item('0', 'item1'), new Ratio(0.5)),
+      new RankScore(new Item('1', 'item2'), new Ratio(0)),
     ]);
   });
 
@@ -173,8 +173,8 @@ describe('Domain', () => {
       rankAssignment.items[0],
     ]);
     expect(rankAssignment.score).toEqual([
-      new RankScore(new Item(1, 'item2'), new Ratio(0.5)),
-      new RankScore(new Item(0, 'item1'), new Ratio(0.25)),
+      new RankScore(new Item('1', 'item2'), new Ratio(0.5)),
+      new RankScore(new Item('0', 'item1'), new Ratio(0.25)),
     ]);
   });
 
@@ -253,10 +253,10 @@ describe('Domain', () => {
     let rankAssignment = new RankAssignment();
     rankAssignment = rankAssignment.addItems(['item1', 'item2']);
     rankAssignment = rankAssignment.addItems(['item3', 'item4']);
-    expect(rankAssignment.items[0].id).toBe(0);
-    expect(rankAssignment.items[1].id).toBe(1);
-    expect(rankAssignment.items[2].id).toBe(2);
-    expect(rankAssignment.items[3].id).toBe(3);
+    expect(rankAssignment.items[0].id).toBe('0');
+    expect(rankAssignment.items[1].id).toBe('1');
+    expect(rankAssignment.items[2].id).toBe('2');
+    expect(rankAssignment.items[3].id).toBe('3');
   });
 
   it('should serialize to a yjs document', () => {
@@ -279,11 +279,11 @@ describe('Domain', () => {
         ],
         "items": [
           {
-            "id": 0,
+            "id": "0",
             "label": "item1",
           },
           {
-            "id": 1,
+            "id": "1",
             "label": "item2",
           },
         ],
@@ -294,8 +294,8 @@ describe('Domain', () => {
                 {
                   "dimension": "0",
                   "ranking": [
-                    0,
-                    1,
+                    "0",
+                    "1",
                   ],
                 },
               ],
