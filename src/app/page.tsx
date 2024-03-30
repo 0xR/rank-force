@@ -1,4 +1,5 @@
 'use client';
+import { Input } from '@/components/ui/input';
 import { useMemo, useState } from 'react';
 import { Item } from '@/core/Item';
 import { RankAssignment } from '@/core/RankAssignment';
@@ -57,7 +58,7 @@ function ItemForm({ onSubmit }: { onSubmit: (itemLabel: string) => void }) {
       }}
     >
       <label>
-        Item to rank: <input type="text" name={'label'} />
+        Item to rank: <Input type="text" name={'label'} />
       </label>
       <button type="submit">Add</button>
     </form>
@@ -123,13 +124,13 @@ function DimensionForm({
       }}
     >
       <label>
-        Name: <input type="text" name={'name'} />
+        Name: <Input type="text" name={'name'} />
       </label>
       <label>
-        Label start: <input type="text" name={'labelStart'} />
+        Label start: <Input type="text" name={'labelStart'} />
       </label>
       <label>
-        Label end: <input type="text" name={'labelEnd'} />
+        Label end: <Input type="text" name={'labelEnd'} />
       </label>
       <fieldset>
         <legend>Direction</legend>
