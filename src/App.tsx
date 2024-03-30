@@ -35,6 +35,51 @@ function Score({ score }: { score: RankScore[] }) {
   );
 }
 
+function ItemForm({ onChange }: { onChange: (itemLabel: string) => void }) {
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        const form = e.currentTarget;
+        const formData = new FormData(form);
+        const itemLabel = formData.get('label');
+
+        if (typeof itemLabel !== 'string') {
+          throw new Error('Expected a string');
+        }
+        if (!itemLabel) {
+          return;
+        }
+        onChange(itemLabel);
+        form.reset();
+      }}
+    >
+      <label>
+        Item to rank: <input type="text" name={'label'} />
+      </label>
+      <button type="submit">Add</button>
+    </form>
+  );
+}
+
+function ItemList({
+  items,
+  onRemove,
+}: {
+  items: Item[];
+  onRemove: (item: Item) => void;
+}) {
+  return (
+    <ul>
+      {items.map((item) => (
+        <li key={item.id}>
+          {item.label} <button onClick={() => onRemove(item)}>Remove</button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 function App() {
   const [rankAssigment, setRankAssignment] = useState(() => {
     const rankDimension1 = new RankDimension(
@@ -66,6 +111,17 @@ function App() {
 
   return (
     <>
+      <ItemForm
+        onChange={(itemLabel) =>
+          setRankAssignment(rankAssigment.addItems([itemLabel]))
+        }
+      />
+      <ItemList
+        items={rankAssigment.items}
+        onRemove={(item) =>
+          setRankAssignment(rankAssigment.removeItems([item]))
+        }
+      />
       <p>Status complete: {rankAssigment.rankingComplete ? 'yes' : 'no'}</p>
       <p>score:</p>
       {rankAssigment.score ? <Score score={rankAssigment.score} /> : <p>N/A</p>}

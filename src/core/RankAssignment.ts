@@ -126,4 +126,12 @@ export class RankAssignment {
       ),
     );
   }
+
+  removeItems(items: Item[]) {
+    return new RankAssignment(
+      this.items.filter((item) => !items.includes(item)),
+      this.dimensions,
+      this.rankingsByUser,
+    );
+  }
 }

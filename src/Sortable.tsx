@@ -12,7 +12,7 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Item } from './core/Item.ts';
 
 import { SortableItem } from './SortableItem';
@@ -47,6 +47,22 @@ function Droppable({
   );
 }
 
+function useChanged<T>(value: T): boolean {
+  const ref = useRef<T>(value);
+  const isFirstRender = useRef(true);
+  const changed = ref.current !== value;
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+    } else {
+      ref.current = value;
+    }
+  }, [value]);
+
+  return changed;
+}
+
 export function Sortable({
   items,
   onChange,
@@ -62,6 +78,21 @@ export function Sortable({
       coordinateGetter: sortableKeyboardCoordinates,
     }),
   );
+
+  const itemsPropChanged = useChanged(items);
+
+  useEffect(() => {
+    if (!itemsPropChanged) return;
+    const newItems = items.filter(
+      (item) => !items1.includes(item) && !items2.includes(item),
+    );
+    if (newItems.length) {
+      setItems1((items) => [...items, ...newItems]);
+    }
+    // remove items that are no longer in the list
+    setItems1((itemState) => itemState.filter((item) => items.includes(item)));
+    setItems2((itemState) => itemState.filter((item) => items.includes(item)));
+  }, [items, items1, items2, itemsPropChanged]);
 
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
