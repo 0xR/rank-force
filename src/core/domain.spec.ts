@@ -361,4 +361,24 @@ describe('Domain', () => {
     expect(mergedRankAssignment.items).toHaveLength(4);
     expect(mergedRankAssignment.dimensions).toHaveLength(2);
   });
+
+  it('should allow ranking a single item', () => {
+    const user = new User('0', 'user');
+    const rankDimension = new RankDimension(
+      '0',
+      'importance',
+      'low',
+      'high',
+      'ascending',
+    );
+    let rankAssignment = new RankAssignment();
+    rankAssignment = rankAssignment.addDimension(rankDimension);
+    rankAssignment = rankAssignment.addItems(['item1']);
+    rankAssignment = rankAssignment.rank(user, rankAssignment.dimensions[0], [
+      rankAssignment.items[0],
+    ]);
+    expect(rankAssignment.score).toEqual([
+      new RankScore(new Item('0', 'item1'), new Ratio(1)),
+    ]);
+  });
 });

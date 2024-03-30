@@ -17,7 +17,11 @@ export class UserRanking {
       (item, index) =>
         new RankScore(
           item,
-          new Ratio(indexRatioToScore(index / (items.length - 1))),
+          new Ratio(
+            indexRatioToScore(
+              items.length === 1 ? 1 : index / (items.length - 1),
+            ),
+          ),
         ),
     );
     return new UserRanking(new Map(this.rankings).set(dimension, score));
