@@ -1,9 +1,11 @@
 'use client';
+import { storeYjsData } from '@/app/actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { useMemo, useState } from 'react';
+import { deserializeJsonToYDoc } from '@/persistence/yjs-serialization';
+import { useEffect, useMemo, useState } from 'react';
 import { Item } from '@/core/Item';
 import { RankAssignment } from '@/core/RankAssignment';
 import { RankDimension } from '@/core/RankDimension';
@@ -172,8 +174,18 @@ function DimensionList({
   );
 }
 
-function Ranking({ debugString }: { debugString?: string }) {
+function Ranking({
+  defaultValue,
+  onChange,
+}: {
+  defaultValue?: Parameters<typeof RankAssignment.deserialize>[0];
+  onChange?: typeof storeYjsData;
+}) {
   const [rankAssigment, setRankAssignment] = useState(() => {
+    if (defaultValue) {
+      return RankAssignment.deserialize(defaultValue);
+    }
+
     const rankDimension1 = new RankDimension(
       'importance',
       'low',
@@ -197,13 +209,18 @@ function Ranking({ debugString }: { debugString?: string }) {
     return rankAssignment;
   });
 
+  useEffect(() => {
+    if (onChange) {
+      onChange('my-session-id', rankAssigment.serialize());
+    }
+  }, [rankAssigment]);
+
   const user = useMemo(() => {
     return new User('0', 'user1');
   }, []);
 
   return (
     <>
-      <pre>{debugString}</pre>
       <h2>Items</h2>
       <ItemForm
         onSubmit={(itemLabel) =>
