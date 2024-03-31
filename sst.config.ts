@@ -3,12 +3,21 @@
 export default $config({
   app(input) {
     return {
-      name: "rank-force",
-      removal: input?.stage === "production" ? "retain" : "remove",
-      home: "aws",
+      name: 'rank-force',
+      removal: input?.stage === 'prd' ? 'retain' : 'remove',
+      home: 'aws',
     };
   },
   async run() {
-    new sst.aws.Nextjs("MyWeb");
+    const table = new sst.aws.Dynamo('Table', {
+      fields: {
+        pk: 'string',
+        sk: 'string',
+      },
+      primaryIndex: { hashKey: 'pk', rangeKey: 'sk' },
+    });
+    new sst.aws.Nextjs('Web', {
+      link: [table],
+    });
   },
 });
