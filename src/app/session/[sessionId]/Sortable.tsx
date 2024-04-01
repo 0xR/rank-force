@@ -1,3 +1,4 @@
+import { useChanged } from '@/app/session/[sessionId]/UseChanged';
 import { Item } from '@/core/Item';
 import {
   closestCenter,
@@ -45,22 +46,6 @@ function Droppable({
       {children}
     </div>
   );
-}
-
-function useChanged<T>(value: T): boolean {
-  const ref = useRef<T>(value);
-  const isFirstRender = useRef(true);
-  const changed = ref.current !== value;
-
-  useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-    } else {
-      ref.current = value;
-    }
-  }, [value]);
-
-  return changed;
 }
 
 export function Sortable({

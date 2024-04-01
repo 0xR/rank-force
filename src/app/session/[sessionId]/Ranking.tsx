@@ -1,5 +1,6 @@
 'use client';
 import { Sortable } from '@/app/session/[sessionId]/Sortable';
+import { useChanged } from '@/app/session/[sessionId]/UseChanged';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -209,11 +210,13 @@ function Ranking({
     return rankAssignment;
   });
 
+  const rankAssignmentChanged = useChanged(rankAssigment);
+
   useEffect(() => {
-    if (onChange) {
+    if (rankAssignmentChanged && onChange) {
       onChange(rankAssigment.serialize());
     }
-  }, [rankAssigment]);
+  }, [onChange, rankAssigment]);
 
   const user = useMemo(() => {
     return new User('0', 'user1');
