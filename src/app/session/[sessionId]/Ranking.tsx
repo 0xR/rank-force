@@ -1,18 +1,16 @@
 'use client';
-import { storeYjsData } from '@/app/actions';
+import { Sortable } from '@/app/session/[sessionId]/Sortable';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { deserializeJsonToYDoc } from '@/persistence/yjs-serialization';
-import { useEffect, useMemo, useState } from 'react';
 import { Item } from '@/core/Item';
 import { RankAssignment } from '@/core/RankAssignment';
 import { RankDimension } from '@/core/RankDimension';
 import { RankScore } from '@/core/RankScore';
 import { Ratio } from '@/core/Ratio';
 import { User } from '@/core/User';
-import { Sortable } from '@/app/Sortable';
+import { useEffect, useMemo, useState } from 'react';
 
 function Dimension({
   dimension,
@@ -179,11 +177,13 @@ function Ranking({
   onChange,
 }: {
   defaultValue?: Parameters<typeof RankAssignment.deserialize>[0];
-  onChange?: typeof storeYjsData;
+  onChange?: (data: unknown) => void;
 }) {
   const [rankAssigment, setRankAssignment] = useState(() => {
     if (defaultValue) {
-      return RankAssignment.deserialize(defaultValue);
+      try {
+        return RankAssignment.deserialize(defaultValue);
+      } catch (e) {}
     }
 
     const rankDimension1 = new RankDimension(
@@ -211,7 +211,7 @@ function Ranking({
 
   useEffect(() => {
     if (onChange) {
-      onChange('my-session-id', rankAssigment.serialize());
+      onChange(rankAssigment.serialize());
     }
   }, [rankAssigment]);
 
