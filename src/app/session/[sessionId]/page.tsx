@@ -18,7 +18,10 @@ export default async function Page({
   params: { sessionId: string };
 }) {
   try {
-    decodeTime(sessionId);
+    const decodedTime = decodeTime(sessionId);
+    if (decodedTime > Date.now()) {
+      redirect('/');
+    }
   } catch (error) {
     redirect('/');
   }
