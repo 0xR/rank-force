@@ -128,15 +128,15 @@ function DimensionForm({
       }}
     >
       <Label>
-        Name: <Input type="text" name={'name'} />
+        Name: <Input type="text" name={'name'} required />
       </Label>
       <Label>
-        Label start: <Input type="text" name={'labelStart'} />
+        Label start: <Input type="text" name={'labelStart'} required />
       </Label>
       <Label>
-        Label end: <Input type="text" name={'labelEnd'} />
+        Label end: <Input type="text" name={'labelEnd'} required />
       </Label>
-      <RadioGroup name="direction">
+      <RadioGroup name="direction" defaultValue="ascending">
         <div className="flex items-center space-x-2">
           <RadioGroupItem value="ascending" id="r1" />
           <Label htmlFor="r1">Ascending</Label>
