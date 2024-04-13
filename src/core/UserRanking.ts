@@ -33,6 +33,10 @@ export class UserRanking {
     return new UserRanking(rankingsCopy);
   }
 
+  rankingByDimension(dimension: RankDimension) {
+    return this.rankings.get(dimension) || [];
+  }
+
   score(rankAssignment: RankAssignment) {
     return rankAssignment.items.map((item) => {
       const scoreValue = rankAssignment.dimensions.reduce(

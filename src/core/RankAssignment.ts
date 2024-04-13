@@ -6,10 +6,11 @@ import { User } from './User';
 import { UserRanking } from './UserRanking';
 
 export class RankAssignment {
+  readonly usersById = new Map<string, User>();
   constructor(
     readonly items: Item[] = [],
     readonly dimensions: RankDimension[] = [],
-    private rankingsByUser: Map<User, UserRanking> = new Map(),
+    readonly rankingsByUser: Map<User, UserRanking> = new Map(),
   ) {}
 
   addItems(...items: string[]): RankAssignment {
@@ -57,6 +58,7 @@ export class RankAssignment {
     if (!this.dimensions.includes(dimension)) {
       throw new Error(`Dimension ${dimension.name} not found in assigment`);
     }
+    this.usersById.set(user.id, user);
 
     const rankingByUserCopy = new Map(this.rankingsByUser);
 
@@ -68,11 +70,7 @@ export class RankAssignment {
 
     let userRanking = this.rankingsByUser.get(user) ?? new UserRanking();
 
-    if (items.length === this.items.length) {
-      userRanking = userRanking.rank(dimension, items);
-    } else {
-      userRanking = userRanking.unrank(dimension);
-    }
+    userRanking = userRanking.rank(dimension, items);
 
     return new RankAssignment(
       this.items,

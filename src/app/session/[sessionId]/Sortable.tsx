@@ -1,5 +1,6 @@
 import { useChanged } from '@/app/session/[sessionId]/UseChanged';
 import { Item } from '@/core/Item';
+import { UserRanking } from '@/core/UserRanking';
 import {
   closestCenter,
   DndContext,
@@ -51,9 +52,11 @@ function Droppable({
 export function Sortable({
   items,
   onChange,
+  userRanking,
 }: {
   items: Item[];
   onChange: (items: Item[]) => void;
+  userRanking?: UserRanking;
 }) {
   const [items1, setItems1] = useState(items);
   const [items2, setItems2] = useState<Item[]>([]);

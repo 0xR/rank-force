@@ -11,21 +11,24 @@ import { RankDimension } from '@/core/RankDimension';
 import { RankScore } from '@/core/RankScore';
 import { Ratio } from '@/core/Ratio';
 import { User } from '@/core/User';
+import { UserRanking } from '@/core/UserRanking';
 import { useEffect, useMemo, useState } from 'react';
 
 function Dimension({
   dimension,
   items,
   onChange,
+  userRanking,
 }: {
   dimension: RankDimension;
   items: Item[];
   onChange: (items: Item[]) => void;
+  userRanking?: UserRanking;
 }) {
   return (
     <div>
       <h3>{dimension.name}</h3>
-      <Sortable items={items} onChange={onChange} />
+      <Sortable items={items} onChange={onChange} userRanking={userRanking} />
     </div>
   );
 }
@@ -216,14 +219,18 @@ function Ranking({
     if (rankAssignmentChanged && onChange) {
       onChange(rankAssigment.serialize());
     }
-  }, [onChange, rankAssigment]);
+  }, [onChange, rankAssigment, rankAssignmentChanged]);
 
   const user = useMemo(() => {
-    return new User('0', 'user1');
-  }, []);
+    return rankAssigment.usersById.get('0') ?? new User('0', 'User');
+  }, [rankAssigment]);
+
+  const ranking = rankAssigment.rankingsByUser.get(user);
 
   return (
     <>
+      <h2>state</h2>
+      <pre>{JSON.stringify(rankAssigment, null, 2)}</pre>
       <h2>Items</h2>
       <ItemForm
         onSubmit={(itemLabel) =>
@@ -255,6 +262,7 @@ function Ranking({
           key={dimension.id}
           dimension={dimension}
           items={rankAssigment.items}
+          userRanking={ranking}
           onChange={(items) => {
             setRankAssignment(rankAssigment.rank(user, dimension, items));
           }}

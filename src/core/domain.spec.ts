@@ -1,8 +1,5 @@
 import { expect } from 'vitest';
-import {
-  deserializeJsonToYDoc,
-  sync,
-} from '../persistence/yjs-serialization';
+import { deserializeJsonToYDoc, sync } from '../persistence/yjs-serialization';
 import { Item } from './Item';
 import { RankAssignment } from './RankAssignment';
 import { RankDimension } from './RankDimension';
@@ -252,7 +249,7 @@ describe('Domain', () => {
     expect(rankAssignment.items[3].id).toBe('3');
   });
 
-  it('should remove incomplete rankings', () => {
+  it('should support incomplete rankings', () => {
     const user = new User('0', 'user 0');
     const rankDimension = new RankDimension(
       'importance',
@@ -275,7 +272,14 @@ describe('Domain', () => {
       rankAssignment.items[0],
     ]);
 
+    // incomplete ranking ignored in the score
     expect(rankAssignment.score).toBeUndefined();
+    // but the ranking is still stored
+    expect(
+      rankAssignment.rankingsByUser
+        .get(user)
+        ?.rankingByDimension(rankAssignment.dimensions[0]),
+    ).toHaveLength(1);
   });
 
   it('should serialize to a yjs document', () => {
