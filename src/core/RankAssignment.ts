@@ -1,3 +1,4 @@
+import { ulid } from 'ulid';
 import { Item } from './Item';
 import { RankDimension } from './RankDimension';
 import { RankScore } from './RankScore';
@@ -14,34 +15,17 @@ export class RankAssignment {
   ) {}
 
   addItems(...items: string[]): RankAssignment {
-    const startId = this.items.length;
     return new RankAssignment(
-      this.items.concat(
-        items.map(
-          (label, index) => new Item((index + startId).toString(), label),
-        ),
-      ),
+      this.items.concat(items.map((label) => new Item(label))),
       this.dimensions,
       this.rankingsByUser,
     );
   }
 
-  addDimension(...rankDimension: RankDimension[]): RankAssignment {
-    const startId = this.dimensions.length;
-    const dimensionsWithId = rankDimension.map(
-      (dimension, index) =>
-        new RankDimension(
-          dimension.name,
-          dimension.labelStart,
-          dimension.labelEnd,
-          dimension.direction,
-          dimension.importance,
-          (index + startId).toString(),
-        ),
-    );
+  addDimension(...rankDimensions: RankDimension[]): RankAssignment {
     return new RankAssignment(
       this.items,
-      this.dimensions.concat(dimensionsWithId),
+      this.dimensions.concat(rankDimensions),
       this.rankingsByUser,
     );
   }

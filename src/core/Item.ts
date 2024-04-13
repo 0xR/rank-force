@@ -1,7 +1,9 @@
+import { ulid } from 'ulid';
+
 export class Item {
   constructor(
-    readonly id: string,
     readonly label: string,
+    readonly id: string = ulid(),
   ) {}
 
   serialize() {
@@ -12,6 +14,6 @@ export class Item {
   }
 
   static deserialize(item: ReturnType<Item['serialize']>) {
-    return new Item(item.id, item.label);
+    return new Item(item.label, item.id);
   }
 }

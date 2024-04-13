@@ -1,7 +1,9 @@
+import { ulid } from 'ulid';
+
 export class User {
   constructor(
-    readonly id: string,
     readonly name: string,
+    readonly id: string = ulid(),
   ) {}
 
   serialize() {
@@ -12,6 +14,6 @@ export class User {
   }
 
   static deserialize(user: ReturnType<User['serialize']>) {
-    return new User(user.id, user.name);
+    return new User(user.name, user.id);
   }
 }

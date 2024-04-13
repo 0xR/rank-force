@@ -222,7 +222,7 @@ function Ranking({
   }, [onChange, rankAssigment, rankAssignmentChanged]);
 
   const user = useMemo(() => {
-    return rankAssigment.usersById.get('0') ?? new User('0', 'User');
+    return rankAssigment.usersById.get('0') ?? new User('User', '0');
   }, [rankAssigment]);
 
   const ranking = rankAssigment.rankingsByUser.get(user);

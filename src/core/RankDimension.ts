@@ -1,3 +1,4 @@
+import { ulid } from 'ulid';
 import { Ratio } from './Ratio';
 
 export class RankDimension {
@@ -7,7 +8,7 @@ export class RankDimension {
     readonly labelEnd: string,
     readonly direction: 'ascending' | 'descending',
     readonly importance: Ratio = new Ratio(1),
-    readonly id: string = 'unset',
+    readonly id: string = ulid(),
   ) {}
 
   serialize() {
