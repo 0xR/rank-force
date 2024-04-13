@@ -7,20 +7,6 @@ import { RankScore } from './RankScore';
 import { Ratio } from './Ratio';
 import { User } from './User';
 
-function createRankAssigment() {
-  const user = new User('user 0');
-  let rankAssignment = new RankAssignment();
-  rankAssignment = rankAssignment.addItems('item1', 'item2');
-  rankAssignment = rankAssignment.addDimension(
-    new RankDimension('importance', 'low', 'high', 'ascending', new Ratio(1)),
-  );
-  rankAssignment = rankAssignment.rank(user, rankAssignment.dimensions[0], [
-    rankAssignment.items[0],
-    rankAssignment.items[1],
-  ]);
-  return rankAssignment;
-}
-
 describe('Domain', () => {
   it('should rank on a single dimension', () => {
     const user = new User('user 0');
