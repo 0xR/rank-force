@@ -1,11 +1,45 @@
+import { UserRanking } from '@/core/UserRanking';
 import { expect } from 'vitest';
-import { deserializeJsonToYDoc, sync } from '../persistence/yjs-serialization';
 import { Item } from './Item';
-import { RankAssignment } from './RankAssignment';
+import { RankAssignment, Store } from './RankAssignment';
 import { RankDimension } from './RankDimension';
 import { RankScore } from './RankScore';
 import { Ratio } from './Ratio';
 import { User } from './User';
+
+class TestStore implements Store {
+  constructor(
+    public items: Item[] = [],
+    public dimensions: RankDimension[] = [],
+    public rankingsByUser: Map<User, UserRanking> = new Map(),
+  ) {}
+
+  addItems(...items: Item[]) {
+    this.items.concat(items);
+  }
+
+  addDimension(...dimensions: RankDimension[]) {
+    this.dimensions.concat(dimensions);
+  }
+
+  removeDimensions(...dimensions: RankDimension[]) {
+    this.dimensions = this.dimensions.filter(
+      (dimension) => !dimensions.includes(dimension),
+    );
+  }
+
+  toRankAssignment() {
+    return new RankAssignment(this);
+  }
+
+  removeItems(...items: Item[]) {
+    this.items = this.items.filter((item) => !items.includes(item));
+  }
+
+  setUserRanking(user: User, userRanking: UserRanking) {
+    this.rankingsByUser.set(user, userRanking);
+  }
+}
 
 describe('Domain', () => {
   it('should rank on a single dimension', () => {

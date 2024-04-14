@@ -1,5 +1,5 @@
 import { Item } from './Item';
-import { RankAssignment } from './RankAssignment';
+import { RankAssignment, Store } from './RankAssignment';
 import { RankDimension } from './RankDimension';
 import { RankScore } from './RankScore';
 import { Ratio } from './Ratio';
@@ -37,39 +37,32 @@ export class UserRanking {
     return this.rankings.get(dimension) || [];
   }
 
-  score(rankAssignment: RankAssignment) {
-    return rankAssignment.items.map((item) => {
-      const scoreValue = rankAssignment.dimensions.reduce(
-        (score, dimension) => {
-          const ranking = this.rankings.get(dimension);
-          if (!ranking) {
-            throw new Error(
-              `Ranking not found for dimension ${dimension.name}`,
-            );
-          }
-          const rankScore = ranking.find(
-            (rankScore) => rankScore.item === item,
-          );
-          if (!rankScore) {
-            throw new Error(`Ranking not found for item ${item.label}`);
-          }
-          return (
-            score +
-            (rankScore.score.value * dimension.importance.value) /
-              rankAssignment.dimensions.length
-          );
-        },
-        0,
-      );
+  score(store: Store) {
+    return store.items.map((item) => {
+      const scoreValue = store.dimensions.reduce((score, dimension) => {
+        const ranking = this.rankings.get(dimension);
+        if (!ranking) {
+          throw new Error(`Ranking not found for dimension ${dimension.name}`);
+        }
+        const rankScore = ranking.find((rankScore) => rankScore.item === item);
+        if (!rankScore) {
+          throw new Error(`Ranking not found for item ${item.label}`);
+        }
+        return (
+          score +
+          (rankScore.score.value * dimension.importance.value) /
+            store.dimensions.length
+        );
+      }, 0);
       return new RankScore(item, new Ratio(scoreValue));
     });
   }
 
-  rankingComplete(rankAssignment: RankAssignment) {
+  rankingComplete(store: Store) {
     return (
-      this.rankings.size === rankAssignment.dimensions.length &&
+      this.rankings.size === store.dimensions.length &&
       Array.from(this.rankings.values()).every(
-        (ranking) => ranking.length === rankAssignment.items.length,
+        (ranking) => ranking.length === store.items.length,
       )
     );
   }
@@ -87,18 +80,16 @@ export class UserRanking {
 
   static deserialize(
     ranking: ReturnType<UserRanking['serialize']>,
-    rankAssignment: RankAssignment,
+    store: Store,
   ) {
     let userRanking = new UserRanking();
     ranking.rankings.forEach(({ dimension, ranking }) => {
-      const rankDimension = rankAssignment.dimensions.find(
-        (d) => d.id === dimension,
-      );
+      const rankDimension = store.dimensions.find((d) => d.id === dimension);
       if (!rankDimension) {
         throw new Error(`Dimension ${dimension} not found`);
       }
       const items = ranking.map((itemId) => {
-        const item = rankAssignment.items.find((item) => item.id === itemId);
+        const item = store.items.find((item) => item.id === itemId);
         if (!item) {
           throw new Error(`Item ${itemId} not found`);
         }
