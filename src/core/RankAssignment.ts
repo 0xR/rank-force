@@ -16,8 +16,6 @@ export interface Store {
 
   removeDimensions(...dimensions: RankDimension[]): void;
 
-  toRankAssignment(): RankAssignment;
-
   removeItems(...items: Item[]): void;
 
   setUserRanking(user: User, userRanking: UserRanking): void;
