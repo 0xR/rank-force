@@ -5,11 +5,13 @@ import { Ratio } from './Ratio';
 import { User } from './User';
 import { UserRanking } from './UserRanking';
 
-export interface Store {
+export interface State {
   readonly items: Item[];
   readonly dimensions: RankDimension[];
   readonly rankingsByUser: Map<User, UserRanking>;
+}
 
+export interface Mutators {
   addItems(...items: Item[]): void;
 
   addDimension(...dimensions: RankDimension[]): void;
@@ -21,9 +23,28 @@ export interface Store {
   setUserRanking(user: User, userRanking: UserRanking): void;
 }
 
+export type Store = State & Mutators;
+
 export class RankAssignment {
   readonly usersById = new Map<string, User>();
-  constructor(private store: Store) {}
+  constructor(private store: Store) {
+    this.usersById = new Map();
+    store.rankingsByUser.forEach((_, user) => {
+      this.usersById.set(user.id, user);
+    });
+  }
+
+  get items() {
+    return this.store.items;
+  }
+
+  get dimensions() {
+    return this.store.dimensions;
+  }
+
+  get rankingsByUser() {
+    return this.store.rankingsByUser;
+  }
 
   addItems(...items: string[]) {
     this.store.addItems(...items.map((label) => new Item(label)));
@@ -41,7 +62,6 @@ export class RankAssignment {
     if (!this.store.dimensions.includes(dimension)) {
       throw new Error(`Dimension ${dimension.name} not found in assigment`);
     }
-    this.usersById.set(user.id, user);
 
     items.forEach((item) => {
       if (!this.store.items.includes(item)) {

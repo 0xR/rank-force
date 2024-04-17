@@ -1,6 +1,5 @@
 'use client';
 import { Sortable } from '@/app/session/[sessionId]/Sortable';
-import { useChanged } from '@/app/session/[sessionId]/UseChanged';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,10 +8,10 @@ import { Item } from '@/core/Item';
 import { RankAssignment } from '@/core/RankAssignment';
 import { RankDimension } from '@/core/RankDimension';
 import { RankScore } from '@/core/RankScore';
-import { Ratio } from '@/core/Ratio';
 import { User } from '@/core/User';
 import { UserRanking } from '@/core/UserRanking';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
+import { useSharedStore } from './store';
 
 function Dimension({
   dimension,
@@ -176,51 +175,28 @@ function DimensionList({
   );
 }
 
+function useRankAssignment() {
+  const store = useSharedStore();
+  return useMemo(() => new RankAssignment(store), [store]);
+}
+
 function Ranking({
-  defaultValue,
+  // defaultValue,
   onChange,
 }: {
-  defaultValue?: Parameters<typeof RankAssignment.deserialize>[0];
+  // defaultValue?: Parameters<typeof RankAssignment.deserialize>[0];
   onChange?: (data: unknown) => void;
 }) {
-  const [rankAssigment, setRankAssignment] = useState(() => {
-    if (defaultValue) {
-      try {
-        return RankAssignment.deserialize(defaultValue);
-      } catch (e) {}
-    }
+  const rankAssigment = useRankAssignment();
 
-    const rankDimension1 = new RankDimension(
-      'importance',
-      'low',
-      'high',
-      'ascending',
-      new Ratio(1),
-    );
-    const rankDimension2 = new RankDimension(
-      'urgency',
-      'low',
-      'high',
-      'ascending',
-      new Ratio(1),
-    );
-    let rankAssignment = new RankAssignment();
-    rankAssignment = rankAssignment.addDimension(
-      rankDimension1,
-      rankDimension2,
-    );
-    rankAssignment = rankAssignment.addItems('item1', 'item2', 'item3');
-    return rankAssignment;
-  });
-
-  const rankAssignmentChanged = useChanged(rankAssigment);
-
-  useEffect(() => {
-    if (rankAssignmentChanged && onChange) {
-      onChange(rankAssigment.serialize());
-    }
-  }, [onChange, rankAssigment, rankAssignmentChanged]);
-
+  // const rankAssignmentChanged = useChanged(rankAssigment);
+  //
+  // useEffect(() => {
+  //   if (rankAssignmentChanged && onChange) {
+  //     onChange(rankAssigment.serialize());
+  //   }
+  // }, [onChange, rankAssigment, rankAssignmentChanged]);
+  //
   const user = useMemo(() => {
     return rankAssigment.usersById.get('0') ?? new User('User', '0');
   }, [rankAssigment]);
@@ -232,28 +208,20 @@ function Ranking({
       <h2>state</h2>
       <pre>{JSON.stringify(rankAssigment, null, 2)}</pre>
       <h2>Items</h2>
-      <ItemForm
-        onSubmit={(itemLabel) =>
-          setRankAssignment(rankAssigment.addItems(itemLabel))
-        }
-      />
+      <ItemForm onSubmit={(itemLabel) => rankAssigment.addItems(itemLabel)} />
       <ItemList
         items={rankAssigment.items}
-        onRemove={(item) =>
-          setRankAssignment(rankAssigment.removeItems([item]))
-        }
+        onRemove={(item) => rankAssigment.removeItems(item)}
       />
       <h2>Dimensions</h2>
       <DimensionForm
         onSubmit={(dimension) => {
-          setRankAssignment(rankAssigment.addDimension(dimension));
+          rankAssigment.addDimension(dimension);
         }}
       />
       <DimensionList
         dimensions={rankAssigment.dimensions}
-        onRemove={(dimension) =>
-          setRankAssignment(rankAssigment.removeDimensions(dimension))
-        }
+        onRemove={(dimension) => rankAssigment.removeDimensions(dimension)}
       />
 
       <h2>Ranking</h2>
@@ -264,7 +232,7 @@ function Ranking({
           items={rankAssigment.items}
           userRanking={ranking}
           onChange={(items) => {
-            setRankAssignment(rankAssigment.rank(user, dimension, items));
+            rankAssigment.rank(user, dimension, items);
           }}
         />
       ))}

@@ -58,5 +58,5 @@ export default async function Page({
 
   const firstItem = response.Items?.[0];
 
-  return <Ranking defaultValue={firstItem?.data} onChange={onChange} />;
+  return <Ranking onChange={onChange} />;
 }
