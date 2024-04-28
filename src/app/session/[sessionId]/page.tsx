@@ -1,5 +1,6 @@
 import { documentClient } from '@/app/db-client';
 import Ranking from '@/app/session/[sessionId]/Ranking';
+import { mergeYjsUpdates } from '@/app/session/[sessionId]/yjs';
 import { PutCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
 import { redirect } from 'next/navigation';
 
@@ -37,8 +38,11 @@ export default async function Page({
     }),
   );
 
-  const onChange = async (data: unknown) => {
+  const currentData = response.Items?.[0]?.data as string | undefined;
+
+  const onChange = async (data: string) => {
     'use server';
+    const newData = currentData ? mergeYjsUpdates(currentData, data) : data;
     try {
       await documentClient.send(
         new PutCommand({
@@ -46,7 +50,7 @@ export default async function Page({
           Item: {
             pk: sessionId,
             sk: 'YJS_DATA', // sk might not be needed but it's set as "YJS_DATA" for consistency
-            data,
+            data: newData,
           },
         }),
       );
@@ -56,7 +60,5 @@ export default async function Page({
     }
   };
 
-  const firstItem = response.Items?.[0];
-
-  return <Ranking onChange={onChange} />;
+  return <Ranking onChange={onChange} defaultValue={currentData} />;
 }

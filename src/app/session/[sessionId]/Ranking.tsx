@@ -1,5 +1,7 @@
 'use client';
 import { Sortable } from '@/app/session/[sessionId]/Sortable';
+import { useChanged } from '@/app/session/[sessionId]/UseChanged';
+import { yDocFromUint8Array } from '@/app/session/[sessionId]/yjs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,8 +12,10 @@ import { RankDimension } from '@/core/RankDimension';
 import { RankScore } from '@/core/RankScore';
 import { User } from '@/core/User';
 import { UserRanking } from '@/core/UserRanking';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSharedStore } from './store';
+import * as Y from 'yjs';
+import { fromUint8Array, toUint8Array } from 'js-base64';
 
 function Dimension({
   dimension,
@@ -66,7 +70,7 @@ function ItemForm({ onSubmit }: { onSubmit: (itemLabel: string) => void }) {
       <Label>
         Item to rank: <Input type="text" name={'label'} />
       </Label>
-      <Button type="submit">Add</Button>
+      <Button type="submit">Add item</Button>
     </form>
   );
 }
@@ -175,28 +179,24 @@ function DimensionList({
   );
 }
 
-function useRankAssignment() {
-  const store = useSharedStore();
+function useRankAssignment(
+  defaultValue?: Uint8Array,
+  onChange?: (data: Uint8Array) => void,
+) {
+  const store = useSharedStore(defaultValue, onChange);
   return useMemo(() => new RankAssignment(store), [store]);
 }
 
 function Ranking({
-  // defaultValue,
+  defaultValue,
   onChange,
 }: {
-  // defaultValue?: Parameters<typeof RankAssignment.deserialize>[0];
-  onChange?: (data: unknown) => void;
+  // data: unknown
+  defaultValue?: Uint8Array;
+  onChange?: (data: Uint8Array) => void;
 }) {
-  const rankAssigment = useRankAssignment();
+  const rankAssigment = useRankAssignment(defaultValue, onChange);
 
-  // const rankAssignmentChanged = useChanged(rankAssigment);
-  //
-  // useEffect(() => {
-  //   if (rankAssignmentChanged && onChange) {
-  //     onChange(rankAssigment.serialize());
-  //   }
-  // }, [onChange, rankAssigment, rankAssignmentChanged]);
-  //
   const user = useMemo(() => {
     return rankAssigment.usersById.get('0') ?? new User('User', '0');
   }, [rankAssigment]);
@@ -206,7 +206,6 @@ function Ranking({
   return (
     <>
       <h2>state</h2>
-      <pre>{JSON.stringify(rankAssigment, null, 2)}</pre>
       <h2>Items</h2>
       <ItemForm onSubmit={(itemLabel) => rankAssigment.addItems(itemLabel)} />
       <ItemList
@@ -242,4 +241,37 @@ function Ranking({
   );
 }
 
-export default Ranking;
+export default function RankingPage({
+  onChange,
+  defaultValue,
+}: {
+  onChange?: (data: string) => void;
+  defaultValue?: string;
+}) {
+  const uint8Array = useMemo(() => {
+    if (!defaultValue) {
+      return;
+    }
+    return new Uint8Array(
+      Array.from(atob(defaultValue), (c) => c.charCodeAt(0)),
+    );
+  }, [defaultValue]);
+  return (
+    <Ranking
+      onChange={(data) => {
+        'use client';
+        if (!onChange) {
+          return;
+        }
+        const base64 = btoa(
+          data.reduce(
+            (dataString, byte) => dataString + String.fromCharCode(byte),
+            '',
+          ),
+        );
+        onChange(base64);
+      }}
+      defaultValue={uint8Array}
+    />
+  );
+}

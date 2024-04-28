@@ -11,7 +11,8 @@ class TestStore implements Store {
   constructor(
     public items: Item[] = [],
     public dimensions: RankDimension[] = [],
-    public rankingsByUser: Map<User, UserRanking> = new Map(),
+    readonly users: User[] = [],
+    readonly rankingsByUser: Record<string, UserRanking> = {},
   ) {}
 
   addItems(...items: Item[]) {
@@ -37,7 +38,10 @@ class TestStore implements Store {
   }
 
   setUserRanking(user: User, userRanking: UserRanking) {
-    this.rankingsByUser.set(user, userRanking);
+    if (this.users.includes(user) === false) {
+      this.users.push(user);
+    }
+    this.rankingsByUser[user.id] = userRanking;
   }
 }
 
@@ -304,9 +308,9 @@ describe('Domain', () => {
     expect(rankAssignment.score).toBeUndefined();
     // but the ranking is still stored
     expect(
-      testStore.rankingsByUser
-        .get(user)
-        ?.rankingByDimension(testStore.dimensions[0]),
+      testStore.rankingsByUser[user.id]?.rankingByDimension(
+        testStore.dimensions[0],
+      ),
     ).toHaveLength(1);
   });
 
@@ -329,6 +333,28 @@ describe('Domain', () => {
     rankAssignment = testStore.toRankAssignment();
     expect(rankAssignment.score).toEqual([
       new RankScore(testStore.items[0], new Ratio(1)),
+    ]);
+  });
+
+  it('should serialize and desialize the rank assignment', () => {
+    const user = new User('user 0');
+    const rankDimension = new RankDimension(
+      'importance',
+      'low',
+      'high',
+      'ascending',
+      new Ratio(1),
+    );
+    const testStore = new TestStore();
+    let rankAssignment = new RankAssignment(testStore);
+    rankAssignment.addDimension(rankDimension);
+    rankAssignment = testStore.toRankAssignment();
+    rankAssignment.addItems('item1', 'item2', 'item3');
+    rankAssignment = testStore.toRankAssignment();
+    rankAssignment.rank(user, testStore.dimensions[0], [
+      testStore.items[2],
+      testStore.items[0],
+      testStore.items[1],
     ]);
   });
 });

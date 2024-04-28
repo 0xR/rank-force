@@ -8,7 +8,8 @@ import { UserRanking } from './UserRanking';
 export interface State {
   readonly items: Item[];
   readonly dimensions: RankDimension[];
-  readonly rankingsByUser: Map<User, UserRanking>;
+  readonly users: User[];
+  readonly rankingsByUser: Record<string, UserRanking>;
 }
 
 export interface Mutators {
@@ -27,10 +28,15 @@ export type Store = State & Mutators;
 
 export class RankAssignment {
   readonly usersById = new Map<string, User>();
+  readonly rankingsByUser = new Map<User, UserRanking>();
+
   constructor(private store: Store) {
     this.usersById = new Map();
-    store.rankingsByUser.forEach((_, user) => {
+    this.store.users.forEach((user) => {
       this.usersById.set(user.id, user);
+    });
+    Object.entries(store.rankingsByUser).forEach(([userId, userRanking]) => {
+      this.rankingsByUser.set(this.usersById.get(userId)!, userRanking);
     });
   }
 
@@ -40,10 +46,6 @@ export class RankAssignment {
 
   get dimensions() {
     return this.store.dimensions;
-  }
-
-  get rankingsByUser() {
-    return this.store.rankingsByUser;
   }
 
   addItems(...items: string[]) {
@@ -69,7 +71,7 @@ export class RankAssignment {
       }
     });
 
-    let userRanking = this.store.rankingsByUser.get(user) ?? new UserRanking();
+    let userRanking = this.store.rankingsByUser[user.id] ?? new UserRanking();
 
     userRanking = userRanking.rank(dimension, items);
 
@@ -80,7 +82,7 @@ export class RankAssignment {
     if (!this.rankingComplete) {
       return undefined;
     }
-    const scoresForUsers = Array.from(this.store.rankingsByUser.values()).map(
+    const scoresForUsers = Array.from(this.rankingsByUser.values()).map(
       (userRanking) => userRanking.score(this.store),
     );
     const scores = this.store.items.map((item, index) => {
@@ -94,10 +96,10 @@ export class RankAssignment {
   }
 
   get rankingComplete() {
-    if (this.store.rankingsByUser.size === 0) {
+    if (this.rankingsByUser.size === 0) {
       return false;
     }
-    return Array.from(this.store.rankingsByUser.values()).every((userRanking) =>
+    return Array.from(this.rankingsByUser.values()).every((userRanking) =>
       userRanking.rankingComplete(this.store),
     );
   }
