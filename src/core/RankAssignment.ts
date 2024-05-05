@@ -1,3 +1,4 @@
+import { instanceToPlain, plainToInstance } from 'class-transformer';
 import { Item } from './Item';
 import { RankDimension } from './RankDimension';
 import { RankScore } from './RankScore';
@@ -10,6 +11,36 @@ export interface State {
   readonly dimensions: RankDimension[];
   readonly users: User[];
   readonly rankingsByUser: Record<string, UserRanking>;
+}
+
+export function stateToPlainObject(state: State): Record<string, any> {
+  return {
+    items: state.items.map((item) => instanceToPlain(item)),
+    dimensions: state.dimensions.map((dimension) => instanceToPlain(dimension)),
+    users: state.users.map((user) => instanceToPlain(user)),
+    rankingsByUser: Object.fromEntries(
+      Object.entries(state.rankingsByUser).map(([userId, userRanking]) => [
+        userId,
+        instanceToPlain(userRanking),
+      ]),
+    ),
+  };
+}
+
+export function stateFromPlainObject(obj: Record<string, any>): State {
+  return {
+    items: obj.items.map((item: any) => plainToInstance(Item, item)),
+    dimensions: obj.dimensions.map((dimension: any) =>
+      plainToInstance(RankDimension, dimension),
+    ),
+    users: obj.users.map((user: any) => plainToInstance(User, user)),
+    rankingsByUser: Object.fromEntries(
+      Object.entries(obj.rankingsByUser).map(([userId, userRanking]: any) => [
+        userId,
+        plainToInstance(UserRanking, userRanking),
+      ]),
+    ),
+  };
 }
 
 export interface Mutators {

@@ -1,7 +1,14 @@
+import 'reflect-metadata';
 import { UserRanking } from '@/core/UserRanking';
 import { expect } from 'vitest';
 import { Item } from './Item';
-import { RankAssignment, Store } from './RankAssignment';
+import {
+  RankAssignment,
+  State,
+  stateFromPlainObject,
+  stateToPlainObject,
+  Store,
+} from './RankAssignment';
 import { RankDimension } from './RankDimension';
 import { RankScore } from './RankScore';
 import { Ratio } from './Ratio';
@@ -14,6 +21,15 @@ class TestStore implements Store {
     readonly users: User[] = [],
     readonly rankingsByUser: Record<string, UserRanking> = {},
   ) {}
+
+  static fromState(state: State) {
+    return new TestStore(
+      state.items,
+      state.dimensions,
+      state.users,
+      state.rankingsByUser,
+    );
+  }
 
   addItems(...items: Item[]) {
     this.items.push(...items);
@@ -336,7 +352,7 @@ describe('Domain', () => {
     ]);
   });
 
-  it('should serialize and desialize the rank assignment', () => {
+  it('should serialize and deserialize from teststore', () => {
     const user = new User('user 0');
     const rankDimension = new RankDimension(
       'importance',
@@ -356,5 +372,21 @@ describe('Domain', () => {
       testStore.items[0],
       testStore.items[1],
     ]);
+
+    rankAssignment.rank(user, testStore.dimensions[0], [
+      testStore.items[2],
+      testStore.items[0],
+      testStore.items[1],
+    ]);
+
+    rankAssignment = testStore.toRankAssignment();
+
+    const plain = stateToPlainObject(testStore);
+    const serialized = JSON.stringify(plain, null, 2);
+    const deserialized = JSON.parse(serialized);
+
+    const testStore2 = TestStore.fromState(stateFromPlainObject(deserialized));
+    const rankAssignment2 = new RankAssignment(testStore2);
+    expect(rankAssignment).toEqual(rankAssignment2);
   });
 });
