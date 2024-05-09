@@ -1,8 +1,23 @@
+import { Item } from '@/core/Item';
 import { State, Store } from '@/core/RankAssignment';
+import { RankDimension } from '@/core/RankDimension';
+import { User } from '@/core/User';
+import { plainToInstance } from 'class-transformer';
 import { useMemo } from 'react';
 import * as Y from 'yjs';
 import { create } from 'zustand';
 import yjs from 'zustand-middleware-yjs';
+
+export function stateFromPlainObject(obj: Record<string, any>): State {
+  return {
+    items: obj.items.map((item: any) => plainToInstance(Item, item)),
+    dimensions: obj.dimensions.map((dimension: any) =>
+      plainToInstance(RankDimension, dimension),
+    ),
+    users: obj.users.map((user: any) => plainToInstance(User, user)),
+    rankingsByUser: obj.rankingsByUser,
+  };
+}
 
 export const useSharedStore = (
   defaultValue?: Uint8Array,
@@ -27,7 +42,7 @@ export const useSharedStore = (
   const useStore = useMemo(() => {
     let ydocData = yDoc.getMap('shared');
     const defaultValues: State = ydocData.size
-      ? (ydocData.toJSON() as State)
+      ? stateFromPlainObject(ydocData.toJSON())
       : {
           items: [],
           users: [],

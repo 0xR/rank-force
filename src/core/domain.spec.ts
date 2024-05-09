@@ -1,10 +1,10 @@
 import 'reflect-metadata';
+import { stateFromPlainObject } from '@/app/session/[sessionId]/store';
 import { expect } from 'vitest';
 import { Item } from './Item';
 import {
   RankAssignment,
   State,
-  stateFromPlainObject,
   stateToPlainObject,
   Store,
 } from './RankAssignment';

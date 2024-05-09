@@ -1,4 +1,4 @@
-import { instanceToPlain, plainToInstance } from 'class-transformer';
+import { instanceToPlain } from 'class-transformer';
 import { Item } from './Item';
 import { RankDimension } from './RankDimension';
 import { RankScore } from './RankScore';
@@ -19,17 +19,6 @@ export function stateToPlainObject(state: State): Record<string, any> {
     dimensions: state.dimensions.map((dimension) => instanceToPlain(dimension)),
     users: state.users.map((user) => instanceToPlain(user)),
     rankingsByUser: state.rankingsByUser,
-  };
-}
-
-export function stateFromPlainObject(obj: Record<string, any>): State {
-  return {
-    items: obj.items.map((item: any) => plainToInstance(Item, item)),
-    dimensions: obj.dimensions.map((dimension: any) =>
-      plainToInstance(RankDimension, dimension),
-    ),
-    users: obj.users.map((user: any) => plainToInstance(User, user)),
-    rankingsByUser: obj.rankingsByUser,
   };
 }
 
