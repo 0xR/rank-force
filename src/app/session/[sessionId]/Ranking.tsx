@@ -27,7 +27,14 @@ function Dimension({
   return (
     <div>
       <h3>{dimension.name}</h3>
-      <Sortable items={items} onChange={onChange} userRanking={userRanking} />
+      <Sortable
+        items={items}
+        onChange={onChange}
+        initialRanking={
+          userRanking?.rankingByDimension(dimension).map(({ item }) => item) ??
+          []
+        }
+      />
     </div>
   );
 }
@@ -194,7 +201,7 @@ function Ranking({
   const rankAssigment = useRankAssignment(defaultValue, onChange);
 
   const user = useMemo(() => {
-    return rankAssigment.usersById.get('0') ?? new User('User', '0');
+    return rankAssigment.firstUser ?? new User('User');
   }, [rankAssigment]);
 
   const ranking = rankAssigment.rankingsByUser.get(user);

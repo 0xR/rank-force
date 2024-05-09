@@ -1,6 +1,5 @@
 import { useChanged } from '@/app/session/[sessionId]/UseChanged';
 import { Item } from '@/core/Item';
-import { UserRanking } from '@/core/UserRanking';
 import {
   closestCenter,
   DndContext,
@@ -36,7 +35,7 @@ function Droppable({
     id,
   });
   return (
-    <div
+    <ul
       style={{
         border: '1px solid black',
         height: '100px',
@@ -45,21 +44,23 @@ function Droppable({
       ref={setNodeRef}
     >
       {children}
-    </div>
+    </ul>
   );
 }
 
 export function Sortable({
   items,
   onChange,
-  userRanking,
+  initialRanking,
 }: {
   items: Item[];
   onChange: (items: Item[]) => void;
-  userRanking?: UserRanking;
+  initialRanking: Item[];
 }) {
-  const [items1, setItems1] = useState(items);
-  const [items2, setItems2] = useState<Item[]>([]);
+  const [items1, setItems1] = useState(() => {
+    return items.filter((item) => !initialRanking.includes(item));
+  });
+  const [items2, setItems2] = useState<Item[]>(initialRanking);
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {

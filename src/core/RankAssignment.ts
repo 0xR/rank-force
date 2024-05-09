@@ -1,4 +1,3 @@
-import { instanceToPlain } from 'class-transformer';
 import { Item } from './Item';
 import { RankDimension } from './RankDimension';
 import { RankScore } from './RankScore';
@@ -11,15 +10,6 @@ export interface State {
   readonly dimensions: RankDimension[];
   readonly users: User[];
   readonly rankingsByUser: Record<string, Record<string, string[]>>;
-}
-
-export function stateToPlainObject(state: State): Record<string, any> {
-  return {
-    items: state.items.map((item) => instanceToPlain(item)),
-    dimensions: state.dimensions.map((dimension) => instanceToPlain(dimension)),
-    users: state.users.map((user) => instanceToPlain(user)),
-    rankingsByUser: state.rankingsByUser,
-  };
 }
 
 export interface Mutators {
@@ -85,6 +75,10 @@ export class RankAssignment {
 
   get dimensions() {
     return this.store.dimensions;
+  }
+
+  get firstUser(): User | undefined {
+    return this.store.users[0];
   }
 
   addItems(...items: string[]) {

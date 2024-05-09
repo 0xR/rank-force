@@ -15,8 +15,8 @@ export function SortableItem({ item }: { item: Item }) {
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+    <li ref={setNodeRef} style={style} {...attributes} {...listeners}>
       {item.label}
-    </div>
+    </li>
   );
 }

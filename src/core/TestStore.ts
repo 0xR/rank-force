@@ -2,6 +2,7 @@ import { Item } from '@/core/Item';
 import { RankAssignment, State, Store } from '@/core/RankAssignment';
 import { RankDimension } from '@/core/RankDimension';
 import { User } from '@/core/User';
+import { instanceToPlain } from 'class-transformer';
 
 export class TestStore implements Store {
   constructor(
@@ -50,5 +51,16 @@ export class TestStore implements Store {
 
   removeItems(...items: Item[]) {
     this.items = this.items.filter((item) => !items.includes(item));
+  }
+
+  toPlainObject(): Record<string, any> {
+    return {
+      items: this.items.map((item) => instanceToPlain(item)),
+      dimensions: this.dimensions.map((dimension) =>
+        instanceToPlain(dimension),
+      ),
+      users: this.users.map((user) => instanceToPlain(user)),
+      rankingsByUser: this.rankingsByUser,
+    };
   }
 }

@@ -1,8 +1,10 @@
+import { createCompleteRankingAssignment } from '@/core/mock-factories';
+import { deserializeJsonToYDoc } from '@/persistence/yjs-serialization';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import React from 'react';
-import { screen, render, fireEvent } from '@testing-library/react';
-import Ranking from './Ranking';
 import { vi } from 'vitest';
 import * as Y from 'yjs';
+import Ranking from './Ranking';
 
 global.ResizeObserver = vi.fn().mockImplementation(() => ({
   observe: vi.fn(),
@@ -38,5 +40,20 @@ describe('Ranking', () => {
       ],
       rankingsByUser: {},
     });
+  });
+
+  it('should show ranked items based on initial state', async () => {
+    let { testStore, rankAssignment } = createCompleteRankingAssignment();
+    const plain = testStore.toPlainObject();
+    const doc = deserializeJsonToYDoc(plain);
+
+    const update = Y.encodeStateAsUpdate(doc);
+    const updateBase64 = Buffer.from(update).toString('base64');
+
+    render(<Ranking defaultValue={updateBase64} />);
+    const lists = screen.getAllByRole('list').slice(-3);
+    within(lists[1]).getByText('item1');
+    within(lists[1]).getByText('item2');
+    within(lists[1]).getByText('item3');
   });
 });

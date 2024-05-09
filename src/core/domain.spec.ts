@@ -3,7 +3,7 @@ import { stateFromPlainObject } from '@/app/session/[sessionId]/store';
 import { createCompleteRankingAssignment } from '@/core/mock-factories';
 import { TestStore } from '@/core/TestStore';
 import { expect } from 'vitest';
-import { RankAssignment, stateToPlainObject } from './RankAssignment';
+import { RankAssignment } from './RankAssignment';
 import { RankDimension } from './RankDimension';
 import { RankScore } from './RankScore';
 import { Ratio } from './Ratio';
@@ -303,7 +303,7 @@ describe('Domain', () => {
 
     rankAssignment = testStore.toRankAssignment();
 
-    const plain = stateToPlainObject(testStore);
+    const plain = testStore.toPlainObject();
     const serialized = JSON.stringify(plain, null, 2);
     const deserialized = JSON.parse(serialized);
 
