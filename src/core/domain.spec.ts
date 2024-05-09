@@ -1,5 +1,4 @@
 import 'reflect-metadata';
-import { UserRanking } from '@/core/UserRanking';
 import { expect } from 'vitest';
 import { Item } from './Item';
 import {
@@ -19,8 +18,17 @@ class TestStore implements Store {
     public items: Item[] = [],
     public dimensions: RankDimension[] = [],
     readonly users: User[] = [],
-    readonly rankingsByUser: Record<string, UserRanking> = {},
+    readonly rankingsByUser: Record<string, Record<string, string[]>> = {},
   ) {}
+
+  addUsers(...users: User[]): void {
+    this.users.push(...users);
+  }
+  setUserRanking(userId: string, dimensionId: string, itemIds: string[]): void {
+    const userRanking = this.rankingsByUser[userId] ?? {};
+    userRanking[dimensionId] = itemIds;
+    this.rankingsByUser[userId] = userRanking;
+  }
 
   static fromState(state: State) {
     return new TestStore(
@@ -51,13 +59,6 @@ class TestStore implements Store {
 
   removeItems(...items: Item[]) {
     this.items = this.items.filter((item) => !items.includes(item));
-  }
-
-  setUserRanking(user: User, userRanking: UserRanking) {
-    if (this.users.includes(user) === false) {
-      this.users.push(user);
-    }
-    this.rankingsByUser[user.id] = userRanking;
   }
 }
 
@@ -242,7 +243,7 @@ describe('Domain', () => {
       'high',
       'ascending',
       new Ratio(1),
-      '0',
+      '1',
     );
     const testStore = new TestStore();
     let rankAssignment = new RankAssignment(testStore);
@@ -324,9 +325,7 @@ describe('Domain', () => {
     expect(rankAssignment.score).toBeUndefined();
     // but the ranking is still stored
     expect(
-      testStore.rankingsByUser[user.id]?.rankingByDimension(
-        testStore.dimensions[0],
-      ),
+      testStore.rankingsByUser[user.id]?.[testStore.dimensions[0].id],
     ).toHaveLength(1);
   });
 

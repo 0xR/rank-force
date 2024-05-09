@@ -1,6 +1,4 @@
 import { State, Store } from '@/core/RankAssignment';
-import { User } from '@/core/User';
-import { UserRanking } from '@/core/UserRanking';
 import { useMemo } from 'react';
 import * as Y from 'yjs';
 import { create } from 'zustand';
@@ -49,6 +47,11 @@ export const useSharedStore = (
           set((state) => ({
             dimensions: [...state.dimensions, ...dimensions],
           })),
+        addUsers(...users) {
+          set((state) => {
+            return { users: [...state.users, ...users] };
+          });
+        },
         removeDimensions: (...dimensions) =>
           set((state) => ({
             dimensions: state.dimensions.filter((d) => !dimensions.includes(d)),
@@ -57,14 +60,15 @@ export const useSharedStore = (
           set((state) => ({
             items: state.items.filter((i) => !items.includes(i)),
           })),
-        setUserRanking: (user: User, userRanking: UserRanking) =>
-          set(({ users, rankingsByUser }) => {
+        setUserRanking: (userId, dimensionId, itemIds) =>
+          set(({ rankingsByUser }) => {
+            const userRanking = rankingsByUser[userId] ?? {};
+            userRanking[dimensionId] = itemIds;
             return {
               rankingsByUser: {
                 ...rankingsByUser,
-                [user.id]: userRanking,
+                [userId]: userRanking,
               },
-              users: users.includes(user) ? users : [...users, user],
             };
           }),
       })),

@@ -1,3 +1,4 @@
+import { User } from '@/core/User';
 import {
   instanceToPlain,
   plainToInstance,
@@ -45,34 +46,39 @@ export class UserRanking {
     },
   )
   private rankings: Map<RankDimension, RankScore[]> = new Map();
-  constructor(rankings: Map<RankDimension, RankScore[]> = new Map()) {
-    this.rankings = rankings;
-  }
 
-  rank(dimension: RankDimension, items: Item[]): UserRanking {
-    const indexRatioToScore =
-      dimension.direction === 'descending'
-        ? (indexRatio: number) => 1 - indexRatio
-        : (indexRatio: number) => indexRatio;
+  constructor(
+    private store: Store,
+    public readonly user: User,
+    rankings: Map<RankDimension, Item[]> = new Map(),
+  ) {
+    for (const [dimension, items] of rankings.entries()) {
+      const indexRatioToScore =
+        dimension.direction === 'descending'
+          ? (indexRatio: number) => 1 - indexRatio
+          : (indexRatio: number) => indexRatio;
 
-    const score = items.map(
-      (item, index) =>
-        new RankScore(
-          item,
-          new Ratio(
-            indexRatioToScore(
-              items.length === 1 ? 1 : index / (items.length - 1),
+      const score = items.map(
+        (item, index) =>
+          new RankScore(
+            item,
+            new Ratio(
+              indexRatioToScore(
+                items.length === 1 ? 1 : index / (items.length - 1),
+              ),
             ),
           ),
-        ),
-    );
-    return new UserRanking(new Map(this.rankings).set(dimension, score));
+      );
+      this.rankings.set(dimension, score);
+    }
   }
 
-  unrank(dimension: RankDimension): UserRanking {
-    const rankingsCopy = new Map(this.rankings);
-    rankingsCopy.delete(dimension);
-    return new UserRanking(rankingsCopy);
+  rank(dimension: RankDimension, items: Item[]) {
+    this.store.setUserRanking(
+      this.user.id,
+      dimension.id,
+      items.map((item) => item.id),
+    );
   }
 
   rankingByDimension(dimension: RankDimension) {
@@ -107,38 +113,5 @@ export class UserRanking {
         (ranking) => ranking.length === store.items.length,
       )
     );
-  }
-
-  serialize() {
-    return {
-      rankings: Array.from(this.rankings.entries()).map(
-        ([dimension, scores]) => ({
-          dimension: dimension.id,
-          ranking: scores.map((score) => score.item.id),
-        }),
-      ),
-    };
-  }
-
-  static deserialize(
-    ranking: ReturnType<UserRanking['serialize']>,
-    store: Store,
-  ) {
-    let userRanking = new UserRanking();
-    ranking.rankings.forEach(({ dimension, ranking }) => {
-      const rankDimension = store.dimensions.find((d) => d.id === dimension);
-      if (!rankDimension) {
-        throw new Error(`Dimension ${dimension} not found`);
-      }
-      const items = ranking.map((itemId) => {
-        const item = store.items.find((item) => item.id === itemId);
-        if (!item) {
-          throw new Error(`Item ${itemId} not found`);
-        }
-        return item;
-      });
-      userRanking = userRanking.rank(rankDimension, items);
-    });
-    return userRanking;
   }
 }

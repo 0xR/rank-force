@@ -10,7 +10,7 @@ export interface State {
   readonly items: Item[];
   readonly dimensions: RankDimension[];
   readonly users: User[];
-  readonly rankingsByUser: Record<string, UserRanking>;
+  readonly rankingsByUser: Record<string, Record<string, string[]>>;
 }
 
 export function stateToPlainObject(state: State): Record<string, any> {
@@ -18,12 +18,7 @@ export function stateToPlainObject(state: State): Record<string, any> {
     items: state.items.map((item) => instanceToPlain(item)),
     dimensions: state.dimensions.map((dimension) => instanceToPlain(dimension)),
     users: state.users.map((user) => instanceToPlain(user)),
-    rankingsByUser: Object.fromEntries(
-      Object.entries(state.rankingsByUser).map(([userId, userRanking]) => [
-        userId,
-        instanceToPlain(userRanking),
-      ]),
-    ),
+    rankingsByUser: state.rankingsByUser,
   };
 }
 
@@ -34,12 +29,7 @@ export function stateFromPlainObject(obj: Record<string, any>): State {
       plainToInstance(RankDimension, dimension),
     ),
     users: obj.users.map((user: any) => plainToInstance(User, user)),
-    rankingsByUser: Object.fromEntries(
-      Object.entries(obj.rankingsByUser).map(([userId, userRanking]: any) => [
-        userId,
-        plainToInstance(UserRanking, userRanking),
-      ]),
-    ),
+    rankingsByUser: obj.rankingsByUser,
   };
 }
 
@@ -50,9 +40,11 @@ export interface Mutators {
 
   removeDimensions(...dimensions: RankDimension[]): void;
 
+  addUsers(...users: User[]): void;
+
   removeItems(...items: Item[]): void;
 
-  setUserRanking(user: User, userRanking: UserRanking): void;
+  setUserRanking(userId: string, dimennsionId: string, itemIds: string[]): void;
 }
 
 export type Store = State & Mutators;
@@ -66,9 +58,36 @@ export class RankAssignment {
     this.store.users.forEach((user) => {
       this.usersById.set(user.id, user);
     });
-    Object.entries(store.rankingsByUser).forEach(([userId, userRanking]) => {
-      this.rankingsByUser.set(this.usersById.get(userId)!, userRanking);
-    });
+    Object.entries(store.rankingsByUser).forEach(
+      ([userId, itemIdsByDimensionId]) => {
+        const rankingMap = new Map<RankDimension, Item[]>();
+        Object.entries(itemIdsByDimensionId).forEach(
+          ([dimensionId, itemIds]) => {
+            const dimension = this.store.dimensions.find(
+              (d) => d.id === dimensionId,
+            );
+            if (!dimension) {
+              throw new Error(
+                `Dimension ${dimensionId} not found in assignment`,
+              );
+            }
+            const items = itemIds.map((itemId) =>
+              this.store.items.find((i) => i.id === itemId),
+            );
+            if (items.some((item) => !item)) {
+              throw new Error(`Item not found in assignment`);
+            }
+            rankingMap.set(dimension, items as Item[]);
+          },
+        );
+        const userRanking = new UserRanking(
+          this.store,
+          this.usersById.get(userId)!,
+          rankingMap,
+        );
+        this.rankingsByUser.set(this.usersById.get(userId)!, userRanking);
+      },
+    );
   }
 
   get items() {
@@ -92,6 +111,10 @@ export class RankAssignment {
   }
 
   rank(user: User, dimension: RankDimension, items: Item[]) {
+    if (this.usersById.get(user.id) === undefined) {
+      this.store.addUsers(user);
+      this.usersById.set(user.id, user);
+    }
     if (!this.store.dimensions.includes(dimension)) {
       throw new Error(`Dimension ${dimension.name} not found in assigment`);
     }
@@ -102,11 +125,12 @@ export class RankAssignment {
       }
     });
 
-    let userRanking = this.store.rankingsByUser[user.id] ?? new UserRanking();
+    const userRanking =
+      this.rankingsByUser.get(user) ?? new UserRanking(this.store, user);
 
-    userRanking = userRanking.rank(dimension, items);
+    userRanking.rank(dimension, items);
 
-    this.store.setUserRanking(user, userRanking);
+    this.rankingsByUser.set(user, userRanking);
   }
 
   get score() {

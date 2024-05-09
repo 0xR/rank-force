@@ -1,7 +1,5 @@
 'use client';
 import { Sortable } from '@/app/session/[sessionId]/Sortable';
-import { useChanged } from '@/app/session/[sessionId]/UseChanged';
-import { yDocFromUint8Array } from '@/app/session/[sessionId]/yjs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,10 +10,8 @@ import { RankDimension } from '@/core/RankDimension';
 import { RankScore } from '@/core/RankScore';
 import { User } from '@/core/User';
 import { UserRanking } from '@/core/UserRanking';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useSharedStore } from './store';
-import * as Y from 'yjs';
-import { fromUint8Array, toUint8Array } from 'js-base64';
 
 function Dimension({
   dimension,
