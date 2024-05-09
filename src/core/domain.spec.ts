@@ -1,66 +1,13 @@
 import 'reflect-metadata';
 import { stateFromPlainObject } from '@/app/session/[sessionId]/store';
+import { createCompleteRankingAssignment } from '@/core/mock-factories';
+import { TestStore } from '@/core/TestStore';
 import { expect } from 'vitest';
-import { Item } from './Item';
-import {
-  RankAssignment,
-  State,
-  stateToPlainObject,
-  Store,
-} from './RankAssignment';
+import { RankAssignment, stateToPlainObject } from './RankAssignment';
 import { RankDimension } from './RankDimension';
 import { RankScore } from './RankScore';
 import { Ratio } from './Ratio';
 import { User } from './User';
-
-class TestStore implements Store {
-  constructor(
-    public items: Item[] = [],
-    public dimensions: RankDimension[] = [],
-    readonly users: User[] = [],
-    readonly rankingsByUser: Record<string, Record<string, string[]>> = {},
-  ) {}
-
-  addUsers(...users: User[]): void {
-    this.users.push(...users);
-  }
-  setUserRanking(userId: string, dimensionId: string, itemIds: string[]): void {
-    const userRanking = this.rankingsByUser[userId] ?? {};
-    userRanking[dimensionId] = itemIds;
-    this.rankingsByUser[userId] = userRanking;
-  }
-
-  static fromState(state: State) {
-    return new TestStore(
-      state.items,
-      state.dimensions,
-      state.users,
-      state.rankingsByUser,
-    );
-  }
-
-  addItems(...items: Item[]) {
-    this.items.push(...items);
-  }
-
-  addDimension(...dimensions: RankDimension[]) {
-    this.dimensions.push(...dimensions);
-  }
-
-  removeDimensions(...dimensions: RankDimension[]) {
-    this.dimensions = this.dimensions.filter(
-      (dimension) => !dimensions.includes(dimension),
-    );
-  }
-
-  toRankAssignment() {
-    return new RankAssignment(this);
-  }
-
-  removeItems(...items: Item[]) {
-    this.items = this.items.filter((item) => !items.includes(item));
-  }
-}
 
 describe('Domain', () => {
   it('should rank on a single dimension', () => {
@@ -352,31 +299,7 @@ describe('Domain', () => {
   });
 
   it('should serialize and deserialize from teststore', () => {
-    const user = new User('user 0');
-    const rankDimension = new RankDimension(
-      'importance',
-      'low',
-      'high',
-      'ascending',
-      new Ratio(1),
-    );
-    const testStore = new TestStore();
-    let rankAssignment = new RankAssignment(testStore);
-    rankAssignment.addDimension(rankDimension);
-    rankAssignment = testStore.toRankAssignment();
-    rankAssignment.addItems('item1', 'item2', 'item3');
-    rankAssignment = testStore.toRankAssignment();
-    rankAssignment.rank(user, testStore.dimensions[0], [
-      testStore.items[2],
-      testStore.items[0],
-      testStore.items[1],
-    ]);
-
-    rankAssignment.rank(user, testStore.dimensions[0], [
-      testStore.items[2],
-      testStore.items[0],
-      testStore.items[1],
-    ]);
+    let { testStore, rankAssignment } = createCompleteRankingAssignment();
 
     rankAssignment = testStore.toRankAssignment();
 
