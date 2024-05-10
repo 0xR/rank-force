@@ -1,4 +1,3 @@
-import { RankAssignment } from '@/core/RankAssignment';
 import { RankDimension } from '@/core/RankDimension';
 import { Ratio } from '@/core/Ratio';
 import { TestStore } from '@/core/TestStore';
@@ -14,17 +13,14 @@ export function createCompleteRankingAssignment() {
     new Ratio(1),
   );
   const testStore = new TestStore();
-  let rankAssignment = new RankAssignment(testStore);
-  rankAssignment.addDimension(rankDimension);
-  rankAssignment = testStore.toRankAssignment();
-  rankAssignment.addItems('item1', 'item2', 'item3');
-  rankAssignment = testStore.toRankAssignment();
-  rankAssignment.rank(user, testStore.dimensions[0], [
+  testStore.rankAssignment.addDimension(rankDimension);
+  testStore.rankAssignment.addItems('item1', 'item2', 'item3');
+  testStore.rankAssignment.rank(user, testStore.dimensions[0], [
     testStore.items[2],
     testStore.items[0],
     testStore.items[1],
   ]);
-  return { testStore, rankAssignment };
+  return testStore;
 }
 
 export function createDimension() {

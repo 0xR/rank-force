@@ -6,7 +6,6 @@ import {
 } from '@/core/mock-factories';
 import { TestStore } from '@/core/TestStore';
 import { expect } from 'vitest';
-import { RankAssignment } from './RankAssignment';
 import { RankDimension } from './RankDimension';
 import { RankScore } from './RankScore';
 import { Ratio } from './Ratio';
@@ -23,18 +22,14 @@ describe('Domain', () => {
       new Ratio(1),
     );
     const testStore = new TestStore();
-    let rankAssignment = new RankAssignment(testStore);
-    rankAssignment.addDimension(rankDimension);
-    rankAssignment = testStore.toRankAssignment();
-    rankAssignment.addItems('item1', 'item2', 'item3');
-    rankAssignment = testStore.toRankAssignment();
-    rankAssignment.rank(user, testStore.dimensions[0], [
+    testStore.rankAssignment.addDimension(rankDimension);
+    testStore.rankAssignment.addItems('item1', 'item2', 'item3');
+    testStore.rankAssignment.rank(user, testStore.dimensions[0], [
       testStore.items[2],
       testStore.items[0],
       testStore.items[1],
     ]);
-    rankAssignment = testStore.toRankAssignment();
-    expect(rankAssignment.score).toEqual([
+    expect(testStore.rankAssignment.score).toEqual([
       new RankScore(testStore.items[1], new Ratio(1)),
       new RankScore(testStore.items[0], new Ratio(0.5)),
       new RankScore(testStore.items[2], new Ratio(0)),
@@ -50,18 +45,14 @@ describe('Domain', () => {
       'descending',
     );
     const testStore = new TestStore();
-    let rankAssignment = new RankAssignment(testStore);
-    rankAssignment.addDimension(rankDimension);
-    rankAssignment = testStore.toRankAssignment();
-    rankAssignment.addItems('item1', 'item2', 'item3');
-    rankAssignment = testStore.toRankAssignment();
-    rankAssignment.rank(user, testStore.dimensions[0], [
+    testStore.rankAssignment.addDimension(rankDimension);
+    testStore.rankAssignment.addItems('item1', 'item2', 'item3');
+    testStore.rankAssignment.rank(user, testStore.dimensions[0], [
       testStore.items[2],
       testStore.items[0],
       testStore.items[1],
     ]);
-    rankAssignment = testStore.toRankAssignment();
-    expect(rankAssignment.score).toEqual([
+    expect(testStore.rankAssignment.score).toEqual([
       new RankScore(testStore.items[2], new Ratio(1)),
       new RankScore(testStore.items[0], new Ratio(0.5)),
       new RankScore(testStore.items[1], new Ratio(0)),
@@ -83,28 +74,21 @@ describe('Domain', () => {
       'ascending',
     );
     const testStore = new TestStore();
-    let rankAssignment = new RankAssignment(testStore);
-    rankAssignment.addDimension(rankDimension1, rankDimension2);
-    rankAssignment = testStore.toRankAssignment();
-    rankAssignment.addItems('item1', 'item2', 'item3');
-    rankAssignment = testStore.toRankAssignment();
-    rankAssignment.rank(user, testStore.dimensions[0], [
+    testStore.rankAssignment.addDimension(rankDimension1, rankDimension2);
+    testStore.rankAssignment.addItems('item1', 'item2', 'item3');
+    testStore.rankAssignment.rank(user, testStore.dimensions[0], [
       testStore.items[2],
       testStore.items[0],
       testStore.items[1],
     ]);
-    rankAssignment = testStore.toRankAssignment();
-    rankAssignment.rank(user, testStore.dimensions[1], [
+    testStore.rankAssignment.rank(user, testStore.dimensions[1], [
       testStore.items[1],
       testStore.items[0],
       testStore.items[2],
     ]);
-    rankAssignment = testStore.toRankAssignment();
-    expect(rankAssignment.score?.map((score) => score.score)).toEqual([
-      new Ratio(0.5),
-      new Ratio(0.5),
-      new Ratio(0.5),
-    ]);
+    expect(testStore.rankAssignment.score?.map((score) => score.score)).toEqual(
+      [new Ratio(0.5), new Ratio(0.5), new Ratio(0.5)],
+    );
   });
 
   it('should rank for multiple users', () => {
@@ -117,26 +101,20 @@ describe('Domain', () => {
       'ascending',
     );
     const testStore = new TestStore();
-    let rankAssignment = new RankAssignment(testStore);
-    rankAssignment.addDimension(rankDimension1);
-    rankAssignment = testStore.toRankAssignment();
-    rankAssignment.addItems('item1', 'item2');
-    rankAssignment = testStore.toRankAssignment();
-    rankAssignment.rank(user1, testStore.dimensions[0], [
+    testStore.rankAssignment.addDimension(rankDimension1);
+    testStore.rankAssignment.addItems('item1', 'item2');
+    testStore.rankAssignment.rank(user1, testStore.dimensions[0], [
       testStore.items[0],
       testStore.items[1],
     ]);
-    rankAssignment = testStore.toRankAssignment();
-    rankAssignment.rank(user2, testStore.dimensions[0], [
+    testStore.rankAssignment.rank(user2, testStore.dimensions[0], [
       testStore.items[1],
       testStore.items[0],
     ]);
-    rankAssignment = testStore.toRankAssignment();
 
-    expect(rankAssignment.score?.map((score) => score.score)).toEqual([
-      new Ratio(0.5),
-      new Ratio(0.5),
-    ]);
+    expect(testStore.rankAssignment.score?.map((score) => score.score)).toEqual(
+      [new Ratio(0.5), new Ratio(0.5)],
+    );
   });
 
   it('should rank supporting importance', () => {
@@ -156,22 +134,17 @@ describe('Domain', () => {
       new Ratio(0.5),
     );
     const testStore = new TestStore();
-    let rankAssignment = new RankAssignment(testStore);
-    rankAssignment.addDimension(rankDimension1, rankDimension2);
-    rankAssignment = testStore.toRankAssignment();
-    rankAssignment.addItems('item1', 'item2');
-    rankAssignment = testStore.toRankAssignment();
-    rankAssignment.rank(user, testStore.dimensions[0], [
+    testStore.rankAssignment.addDimension(rankDimension1, rankDimension2);
+    testStore.rankAssignment.addItems('item1', 'item2');
+    testStore.rankAssignment.rank(user, testStore.dimensions[0], [
       testStore.items[0],
       testStore.items[1],
     ]);
-    rankAssignment = testStore.toRankAssignment();
-    rankAssignment.rank(user, testStore.dimensions[1], [
+    testStore.rankAssignment.rank(user, testStore.dimensions[1], [
       testStore.items[1],
       testStore.items[0],
     ]);
-    rankAssignment = testStore.toRankAssignment();
-    expect(rankAssignment.score).toEqual([
+    expect(testStore.rankAssignment.score).toEqual([
       new RankScore(testStore.items[1], new Ratio(0.5)),
       new RankScore(testStore.items[0], new Ratio(0.25)),
     ]);
@@ -196,36 +169,29 @@ describe('Domain', () => {
       '1',
     );
     const testStore = new TestStore();
-    let rankAssignment = new RankAssignment(testStore);
-    rankAssignment.addDimension(rankDimension1, rankDimension2);
-    rankAssignment = testStore.toRankAssignment();
+    testStore.rankAssignment.addDimension(rankDimension1, rankDimension2);
 
-    expect(rankAssignment.rankingComplete).toBe(false);
-    expect(rankAssignment.score).toBeUndefined();
-    rankAssignment.rank(user, testStore.dimensions[0], []);
-    rankAssignment = testStore.toRankAssignment();
-    rankAssignment.rank(user, testStore.dimensions[1], []);
-    rankAssignment = testStore.toRankAssignment();
-    expect(rankAssignment.rankingComplete).toBe(true);
-    expect(rankAssignment.score).toHaveLength(0);
-    rankAssignment.addItems('item1', 'item2');
-    rankAssignment = testStore.toRankAssignment();
-    expect(rankAssignment.rankingComplete).toBe(false);
-    expect(rankAssignment.score).toBeUndefined();
-    rankAssignment.rank(user, testStore.dimensions[0], [
+    expect(testStore.rankAssignment.rankingComplete).toBe(false);
+    expect(testStore.rankAssignment.score).toBeUndefined();
+    testStore.rankAssignment.rank(user, testStore.dimensions[0], []);
+    testStore.rankAssignment.rank(user, testStore.dimensions[1], []);
+    expect(testStore.rankAssignment.rankingComplete).toBe(true);
+    expect(testStore.rankAssignment.score).toHaveLength(0);
+    testStore.rankAssignment.addItems('item1', 'item2');
+    expect(testStore.rankAssignment.rankingComplete).toBe(false);
+    expect(testStore.rankAssignment.score).toBeUndefined();
+    testStore.rankAssignment.rank(user, testStore.dimensions[0], [
       testStore.items[0],
       testStore.items[1],
     ]);
-    rankAssignment = testStore.toRankAssignment();
-    expect(rankAssignment.rankingComplete).toBe(false);
-    rankAssignment.rank(user, testStore.dimensions[1], [
+    expect(testStore.rankAssignment.rankingComplete).toBe(false);
+    testStore.rankAssignment.rank(user, testStore.dimensions[1], [
       testStore.items[1],
       testStore.items[0],
     ]);
-    rankAssignment = testStore.toRankAssignment();
-    expect(rankAssignment.rankingComplete).toBe(true);
-    expect(rankAssignment.score).toHaveLength(2);
-    rankAssignment.addDimension(
+    expect(testStore.rankAssignment.rankingComplete).toBe(true);
+    expect(testStore.rankAssignment.score).toHaveLength(2);
+    testStore.rankAssignment.addDimension(
       new RankDimension(
         'complexity',
         'low',
@@ -234,15 +200,13 @@ describe('Domain', () => {
         new Ratio(0.5),
       ),
     );
-    rankAssignment = testStore.toRankAssignment();
-    expect(rankAssignment.rankingComplete).toBe(false);
-    expect(rankAssignment.score).toBeUndefined();
-    rankAssignment.rank(user, testStore.dimensions[2], [
+    expect(testStore.rankAssignment.rankingComplete).toBe(false);
+    expect(testStore.rankAssignment.score).toBeUndefined();
+    testStore.rankAssignment.rank(user, testStore.dimensions[2], [
       testStore.items[0],
       testStore.items[1],
     ]);
-    rankAssignment = testStore.toRankAssignment();
-    expect(rankAssignment.rankingComplete).toBe(true);
+    expect(testStore.rankAssignment.rankingComplete).toBe(true);
   });
 
   it('should support incomplete rankings', () => {
@@ -255,24 +219,21 @@ describe('Domain', () => {
       new Ratio(1),
     );
     const testStore = new TestStore();
-    let rankAssignment = new RankAssignment(testStore);
-    rankAssignment.addDimension(rankDimension);
-    rankAssignment = testStore.toRankAssignment();
-    rankAssignment.addItems('item1', 'item2');
-    rankAssignment = testStore.toRankAssignment();
-    rankAssignment.rank(user, testStore.dimensions[0], [
+    testStore.rankAssignment.addDimension(rankDimension);
+    testStore.rankAssignment.addItems('item1', 'item2');
+    testStore.rankAssignment.rank(user, testStore.dimensions[0], [
       testStore.items[0],
       testStore.items[1],
     ]);
-    rankAssignment = testStore.toRankAssignment();
 
-    expect(rankAssignment.score).toBeDefined();
+    expect(testStore.rankAssignment.score).toBeDefined();
 
-    rankAssignment.rank(user, testStore.dimensions[0], [testStore.items[0]]);
-    rankAssignment = testStore.toRankAssignment();
+    testStore.rankAssignment.rank(user, testStore.dimensions[0], [
+      testStore.items[0],
+    ]);
 
     // incomplete ranking ignored in the score
-    expect(rankAssignment.score).toBeUndefined();
+    expect(testStore.rankAssignment.score).toBeUndefined();
     // but the ranking is still stored
     expect(
       testStore.rankingsByUser[user.id]?.[testStore.dimensions[0].id],
@@ -289,14 +250,12 @@ describe('Domain', () => {
       new Ratio(1),
     );
     const testStore = new TestStore();
-    let rankAssignment = new RankAssignment(testStore);
-    rankAssignment.addDimension(rankDimension);
-    rankAssignment = testStore.toRankAssignment();
-    rankAssignment.addItems('item1');
-    rankAssignment = testStore.toRankAssignment();
-    rankAssignment.rank(user, testStore.dimensions[0], [testStore.items[0]]);
-    rankAssignment = testStore.toRankAssignment();
-    expect(rankAssignment.score).toEqual([
+    testStore.rankAssignment.addDimension(rankDimension);
+    testStore.rankAssignment.addItems('item1');
+    testStore.rankAssignment.rank(user, testStore.dimensions[0], [
+      testStore.items[0],
+    ]);
+    expect(testStore.rankAssignment.score).toEqual([
       new RankScore(testStore.items[0], new Ratio(1)),
     ]);
   });
@@ -321,16 +280,13 @@ describe('Domain', () => {
   });
 
   it('should serialize and deserialize from teststore', () => {
-    let { testStore, rankAssignment } = createCompleteRankingAssignment();
-
-    rankAssignment = testStore.toRankAssignment();
+    const testStore = createCompleteRankingAssignment();
 
     const plain = testStore.toPlainObject();
     const serialized = JSON.stringify(plain, null, 2);
     const deserialized = JSON.parse(serialized);
 
     const testStore2 = TestStore.fromState(stateFromPlainObject(deserialized));
-    const rankAssignment2 = new RankAssignment(testStore2);
-    expect(rankAssignment).toEqual(rankAssignment2);
+    expect(testStore.rankAssignment).toEqual(testStore2.rankAssignment);
   });
 });

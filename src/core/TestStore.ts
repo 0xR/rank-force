@@ -50,10 +50,6 @@ export class TestStore implements Store {
     return new RankAssignment(this);
   }
 
-  toRankAssignment() {
-    return new RankAssignment(this);
-  }
-
   removeItems(...items: Item[]) {
     this.items = this.items.filter((item) => !items.includes(item));
   }

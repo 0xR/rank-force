@@ -43,7 +43,7 @@ describe('Ranking', () => {
   });
 
   it('should show ranked items based on initial state', async () => {
-    let { testStore, rankAssignment } = createCompleteRankingAssignment();
+    const testStore = createCompleteRankingAssignment();
     const plain = testStore.toPlainObject();
     const doc = deserializeJsonToYDoc(plain);
 
