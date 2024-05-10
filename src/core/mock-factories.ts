@@ -26,3 +26,14 @@ export function createCompleteRankingAssignment() {
   ]);
   return { testStore, rankAssignment };
 }
+
+export function createDimension() {
+  const rankDimension = new RankDimension(
+    'importance',
+    'low',
+    'high',
+    'ascending',
+    new Ratio(1),
+  );
+  return rankDimension;
+}

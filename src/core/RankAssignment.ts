@@ -1,32 +1,10 @@
+import { Store } from '@/core/State';
 import { Item } from './Item';
 import { RankDimension } from './RankDimension';
 import { RankScore } from './RankScore';
 import { Ratio } from './Ratio';
 import { User } from './User';
 import { UserRanking } from './UserRanking';
-
-export interface State {
-  readonly items: Item[];
-  readonly dimensions: RankDimension[];
-  readonly users: User[];
-  readonly rankingsByUser: Record<string, Record<string, string[]>>;
-}
-
-export interface Mutators {
-  addItems(...items: Item[]): void;
-
-  addDimension(...dimensions: RankDimension[]): void;
-
-  removeDimensions(...dimensions: RankDimension[]): void;
-
-  addUsers(...users: User[]): void;
-
-  removeItems(...items: Item[]): void;
-
-  setUserRanking(userId: string, dimennsionId: string, itemIds: string[]): void;
-}
-
-export type Store = State & Mutators;
 
 export class RankAssignment {
   readonly usersById = new Map<string, User>();
@@ -144,5 +122,8 @@ export class RankAssignment {
 
   removeItems(...items: Item[]) {
     this.store.removeItems(...items);
+    for (const userRanking of this.rankingsByUser.values()) {
+      userRanking.removeItems(...items);
+    }
   }
 }

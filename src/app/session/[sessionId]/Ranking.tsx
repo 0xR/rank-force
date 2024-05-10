@@ -10,7 +10,7 @@ import { RankDimension } from '@/core/RankDimension';
 import { RankScore } from '@/core/RankScore';
 import { User } from '@/core/User';
 import { UserRanking } from '@/core/UserRanking';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSharedStore } from './store';
 
 function Dimension({
@@ -244,21 +244,47 @@ function Ranking({
   );
 }
 
+// hook to log server data if it is changed, poll every 10 seconds
+function useServerData(
+  defaultValue: string | undefined,
+  getServerData: () => Promise<string | undefined>,
+) {
+  const [serverData, setServerData] = useState<string | undefined>(
+    defaultValue,
+  );
+
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      const newServerData = await getServerData();
+      if (!newServerData) {
+        return;
+      }
+      if (serverData !== newServerData) {
+        console.log('got new server data');
+        setServerData(newServerData);
+      }
+    }, 10000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return useMemo(() => {
+    if (!serverData) {
+      return;
+    }
+    return new Uint8Array(Array.from(atob(serverData), (c) => c.charCodeAt(0)));
+  }, [serverData]);
+}
+
 export default function RankingPage({
   onChange,
   defaultValue,
+  getServerData,
 }: {
   onChange?: (data: string) => void;
   defaultValue?: string;
+  getServerData: () => Promise<string | undefined>;
 }) {
-  const uint8Array = useMemo(() => {
-    if (!defaultValue) {
-      return;
-    }
-    return new Uint8Array(
-      Array.from(atob(defaultValue), (c) => c.charCodeAt(0)),
-    );
-  }, [defaultValue]);
+  const serverData = useServerData(defaultValue, getServerData);
   return (
     <Ranking
       onChange={(data) => {
@@ -274,7 +300,7 @@ export default function RankingPage({
         );
         onChange(base64);
       }}
-      defaultValue={uint8Array}
+      defaultValue={serverData}
     />
   );
 }

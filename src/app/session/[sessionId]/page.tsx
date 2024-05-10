@@ -25,7 +25,21 @@ export default async function Page({
     await storeData(sessionId, data);
   };
 
-  const currentData = await getCurrentData(sessionId);
+  let currentData = await getCurrentData(sessionId);
 
-  return <Ranking onChange={onChange} defaultValue={currentData} />;
+  return (
+    <Ranking
+      onChange={onChange}
+      defaultValue={currentData}
+      getServerData={async () => {
+        'use server';
+        const newData = await getCurrentData(sessionId);
+        if (newData === currentData) {
+          return;
+        }
+        currentData = newData;
+        return newData;
+      }}
+    />
+  );
 }

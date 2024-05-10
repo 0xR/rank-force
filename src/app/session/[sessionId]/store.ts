@@ -1,6 +1,6 @@
 import { Item } from '@/core/Item';
-import { State, Store } from '@/core/RankAssignment';
 import { RankDimension } from '@/core/RankDimension';
+import { State, Store } from '@/core/State';
 import { User } from '@/core/User';
 import { plainToInstance } from 'class-transformer';
 import { useMemo } from 'react';

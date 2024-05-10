@@ -1,3 +1,4 @@
+import { Store } from '@/core/State';
 import { User } from '@/core/User';
 import {
   instanceToPlain,
@@ -6,7 +7,6 @@ import {
   TransformationType,
 } from 'class-transformer';
 import { Item } from './Item';
-import { Store } from './RankAssignment';
 import { RankDimension } from './RankDimension';
 import { RankScore } from './RankScore';
 import { Ratio } from './Ratio';
@@ -113,5 +113,21 @@ export class UserRanking {
         (ranking) => ranking.length === store.items.length,
       )
     );
+  }
+
+  removeItems(...items: Item[]) {
+    for (const [dimension, rankScores] of this.rankings.entries()) {
+      const withoutItems = rankScores.filter(
+        (rankScore) => !items.includes(rankScore.item),
+      );
+      if (withoutItems.length === rankScores.length) {
+        continue;
+      }
+      this.store.setUserRanking(
+        this.user.id,
+        dimension.id,
+        withoutItems.map((rankScore) => rankScore.item.id),
+      );
+    }
   }
 }

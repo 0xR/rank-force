@@ -1,6 +1,9 @@
 import 'reflect-metadata';
 import { stateFromPlainObject } from '@/app/session/[sessionId]/store';
-import { createCompleteRankingAssignment } from '@/core/mock-factories';
+import {
+  createCompleteRankingAssignment,
+  createDimension,
+} from '@/core/mock-factories';
 import { TestStore } from '@/core/TestStore';
 import { expect } from 'vitest';
 import { RankAssignment } from './RankAssignment';
@@ -296,6 +299,25 @@ describe('Domain', () => {
     expect(rankAssignment.score).toEqual([
       new RankScore(testStore.items[0], new Ratio(1)),
     ]);
+  });
+
+  it('should allow removing an item that is ranked', () => {
+    const user = new User('user', '0');
+    const rankDimension = createDimension();
+    const testStore = new TestStore();
+    testStore.rankAssignment.addDimension(rankDimension);
+
+    testStore.rankAssignment.addItems('item1');
+    testStore.rankAssignment.addItems('item2');
+
+    testStore.rankAssignment.rank(user, testStore.dimensions[0], [
+      testStore.items[0],
+      testStore.items[1],
+    ]);
+
+    testStore.rankAssignment.removeItems(testStore.rankAssignment.items[0]);
+
+    expect(testStore.rankAssignment.score).toHaveLength(1);
   });
 
   it('should serialize and deserialize from teststore', () => {

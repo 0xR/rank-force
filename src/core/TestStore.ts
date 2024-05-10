@@ -1,6 +1,7 @@
 import { Item } from '@/core/Item';
-import { RankAssignment, State, Store } from '@/core/RankAssignment';
+import { RankAssignment } from '@/core/RankAssignment';
 import { RankDimension } from '@/core/RankDimension';
+import { State, Store } from '@/core/State';
 import { User } from '@/core/User';
 import { instanceToPlain } from 'class-transformer';
 
@@ -43,6 +44,10 @@ export class TestStore implements Store {
     this.dimensions = this.dimensions.filter(
       (dimension) => !dimensions.includes(dimension),
     );
+  }
+
+  get rankAssignment() {
+    return new RankAssignment(this);
   }
 
   toRankAssignment() {
