@@ -1,18 +1,14 @@
 import Page from '@/app/session/[sessionId]/page';
-import { render } from '@testing-library/react';
-
-vi.mock('sst', () => ({
-  Resource: {
-    Table: {
-      name: 'mock-table-name',
-    },
-  },
-}));
+import { render, screen } from '@testing-library/react';
+import { ulid } from 'ulid';
 
 it('should render', async () => {
+  const sessionId = ulid();
   render(
     await Page({
-      params: { sessionId: '01HXE9KWN5N17PGZD2HDDQB1EH' },
+      params: { sessionId },
     }),
   );
+
+  screen.debug();
 });
