@@ -6,6 +6,7 @@ import {
   QueryCommand,
 } from '@aws-sdk/lib-dynamodb';
 import { Resource } from 'sst';
+import 'server-only';
 
 const documentClient = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 

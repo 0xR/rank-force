@@ -33,12 +33,7 @@ export default async function Page({
       defaultValue={currentData}
       getServerData={async () => {
         'use server';
-        const newData = await getCurrentData(sessionId);
-        if (newData === currentData) {
-          return;
-        }
-        currentData = newData;
-        return newData;
+        return await getCurrentData(sessionId);
       }}
     />
   );

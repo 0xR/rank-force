@@ -1,5 +1,6 @@
 'use client';
 import { Sortable } from '@/app/session/[sessionId]/Sortable';
+import { useUser } from '@/app/session/[sessionId]/useUser';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,7 +9,6 @@ import { Item } from '@/core/Item';
 import { RankAssignment } from '@/core/RankAssignment';
 import { RankDimension } from '@/core/RankDimension';
 import { RankScore } from '@/core/RankScore';
-import { User } from '@/core/User';
 import { UserRanking } from '@/core/UserRanking';
 import { useEffect, useMemo, useState } from 'react';
 import { useSharedStore } from './store';
@@ -199,10 +199,7 @@ function Ranking({
   onChange?: (data: Uint8Array) => void;
 }) {
   const rankAssigment = useRankAssignment(defaultValue, onChange);
-
-  const user = useMemo(() => {
-    return rankAssigment.firstUser ?? new User('User');
-  }, [rankAssigment]);
+  const user = useUser(rankAssigment);
 
   const ranking = rankAssigment.rankingsByUser.get(user);
 
