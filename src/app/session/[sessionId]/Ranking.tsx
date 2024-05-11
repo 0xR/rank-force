@@ -1,5 +1,9 @@
 'use client';
 import { Sortable } from '@/app/session/[sessionId]/Sortable';
+import {
+  StateProvider,
+  useStoreContext,
+} from '@/app/session/[sessionId]/StateProvider';
 import { useUser } from '@/app/session/[sessionId]/useUser';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,8 +14,7 @@ import { RankAssignment } from '@/core/RankAssignment';
 import { RankDimension } from '@/core/RankDimension';
 import { RankScore } from '@/core/RankScore';
 import { UserRanking } from '@/core/UserRanking';
-import { useEffect, useMemo, useState } from 'react';
-import { useSharedStore } from './store';
+import { useMemo } from 'react';
 
 function Dimension({
   dimension,
@@ -182,23 +185,13 @@ function DimensionList({
   );
 }
 
-function useRankAssignment(
-  defaultValue?: Uint8Array,
-  onChange?: (data: Uint8Array) => void,
-) {
-  const store = useSharedStore(defaultValue, onChange);
+function useRankAssignment() {
+  const store = useStoreContext();
   return useMemo(() => new RankAssignment(store), [store]);
 }
 
-function Ranking({
-  defaultValue,
-  onChange,
-}: {
-  // data: unknown
-  defaultValue?: Uint8Array;
-  onChange?: (data: Uint8Array) => void;
-}) {
-  const rankAssigment = useRankAssignment(defaultValue, onChange);
+function Ranking() {
+  const rankAssigment = useRankAssignment();
   const user = useUser(rankAssigment);
 
   const ranking = rankAssigment.rankingsByUser.get(user);
@@ -241,37 +234,6 @@ function Ranking({
   );
 }
 
-// hook to log server data if it is changed, poll every 10 seconds
-function useServerData(
-  defaultValue: string | undefined,
-  getServerData: () => Promise<string | undefined>,
-) {
-  const [serverData, setServerData] = useState<string | undefined>(
-    defaultValue,
-  );
-
-  useEffect(() => {
-    const interval = setInterval(async () => {
-      const newServerData = await getServerData();
-      if (!newServerData) {
-        return;
-      }
-      if (serverData !== newServerData) {
-        console.log('got new server data');
-        setServerData(newServerData);
-      }
-    }, 10000);
-    return () => clearInterval(interval);
-  }, []);
-
-  return useMemo(() => {
-    if (!serverData) {
-      return;
-    }
-    return new Uint8Array(Array.from(atob(serverData), (c) => c.charCodeAt(0)));
-  }, [serverData]);
-}
-
 export default function RankingPage({
   onChange,
   defaultValue,
@@ -281,23 +243,13 @@ export default function RankingPage({
   defaultValue?: string;
   getServerData: () => Promise<string | undefined>;
 }) {
-  const serverData = useServerData(defaultValue, getServerData);
   return (
-    <Ranking
-      onChange={(data) => {
-        'use client';
-        if (!onChange) {
-          return;
-        }
-        const base64 = btoa(
-          data.reduce(
-            (dataString, byte) => dataString + String.fromCharCode(byte),
-            '',
-          ),
-        );
-        onChange(base64);
-      }}
-      defaultValue={serverData}
-    />
+    <StateProvider
+      defaultValue={defaultValue}
+      getServerData={getServerData}
+      onChange={onChange}
+    >
+      <Ranking />
+    </StateProvider>
   );
 }
