@@ -1,7 +1,14 @@
 'use client';
 import { useSharedStore } from '@/app/session/[sessionId]/store';
 import { Store } from '@/core/State';
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
 function useServerData(
   defaultValue: string | undefined,
@@ -48,18 +55,23 @@ export function StateProvider({
 }) {
   const serverData = useServerData(defaultValue, getServerData);
 
-  const store = useSharedStore(serverData, (data) => {
-    if (!onChange) {
-      return;
-    }
-    const base64 = btoa(
-      data.reduce(
-        (dataString, byte) => dataString + String.fromCharCode(byte),
-        '',
-      ),
-    );
-    onChange(base64);
-  });
+  const onChangeBytes = useCallback(
+    (data: Uint8Array) => {
+      if (!onChange) {
+        return;
+      }
+      const base64 = btoa(
+        data.reduce(
+          (dataString, byte) => dataString + String.fromCharCode(byte),
+          '',
+        ),
+      );
+      onChange(base64);
+    },
+    [onChange],
+  );
+
+  const store = useSharedStore(serverData, onChangeBytes);
   return (
     <SharedStoreContext.Provider value={store}>
       {children}
