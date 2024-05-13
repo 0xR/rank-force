@@ -1,20 +1,15 @@
 'use client';
 import { Sortable } from '@/app/session/[sessionId]/Sortable';
-import {
-  StateProvider,
-  useStoreContext,
-} from '@/app/session/[sessionId]/StateProvider';
+import { useRankAssignment } from '@/app/session/[sessionId]/UseRankAssignment';
 import { useUser } from '@/app/session/[sessionId]/useUser';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Item } from '@/core/Item';
-import { RankAssignment } from '@/core/RankAssignment';
 import { RankDimension } from '@/core/RankDimension';
 import { RankScore } from '@/core/RankScore';
 import { UserRanking } from '@/core/UserRanking';
-import { useMemo } from 'react';
 
 function Dimension({
   dimension,
@@ -185,14 +180,13 @@ function DimensionList({
   );
 }
 
-function useRankAssignment() {
-  const store = useStoreContext();
-  return useMemo(() => new RankAssignment(store), [store]);
-}
-
-function Ranking() {
+export function Ranking() {
   const rankAssigment = useRankAssignment();
   const user = useUser(rankAssigment);
+
+  if (!user) {
+    return null;
+  }
 
   const ranking = rankAssigment.rankingsByUser.get(user);
 
@@ -231,25 +225,5 @@ function Ranking() {
       <h2>Score</h2>
       {rankAssigment.score ? <Score score={rankAssigment.score} /> : <p>N/A</p>}
     </>
-  );
-}
-
-export default function RankingPage({
-  onChange,
-  defaultValue,
-  getServerData,
-}: {
-  onChange?: (data: string) => void;
-  defaultValue?: string;
-  getServerData: () => Promise<string | undefined>;
-}) {
-  return (
-    <StateProvider
-      defaultValue={defaultValue}
-      getServerData={getServerData}
-      onChange={onChange}
-    >
-      <Ranking />
-    </StateProvider>
   );
 }

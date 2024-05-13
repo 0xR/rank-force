@@ -126,4 +126,8 @@ export class RankAssignment {
       userRanking.removeItems(...items);
     }
   }
+
+  addUser(user: User) {
+    this.store.addUsers(user);
+  }
 }
