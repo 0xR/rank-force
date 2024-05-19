@@ -1,5 +1,10 @@
-import { Ranking } from '@/app/session/[sessionId]/Ranking';
+import { createRoutePaths } from '@/app/session/[sessionId]/ranking/route-paths';
+import { redirect } from 'next/navigation';
 
-export default async function Page() {
-  return <Ranking />;
+export default function ({
+  params: { sessionId },
+}: {
+  params: { sessionId: string };
+}) {
+  redirect(createRoutePaths(sessionId).ranking);
 }

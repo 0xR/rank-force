@@ -1,4 +1,4 @@
-import { NavigationMenuDemo } from '@/app/session/[sessionId]/Navigation';
+import { NavigationMenuDemo } from '@/app/session/[sessionId]/ranking/Navigation';
 import {
   getCurrentData,
   storeData,

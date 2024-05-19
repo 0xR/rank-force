@@ -1,4 +1,4 @@
-import { useChanged } from '@/app/session/[sessionId]/UseChanged';
+import { useChanged } from '@/app/session/[sessionId]/ranking/UseChanged';
 import { Item } from '@/core/Item';
 import {
   closestCenter,

@@ -1,4 +1,5 @@
 'use client';
+import { createRoutePaths } from '@/app/session/[sessionId]/ranking/route-paths';
 import { RankAssignment } from '@/core/RankAssignment';
 import { User } from '@/core/User';
 import { useLocalStorage } from '@uidotdev/usehooks';
@@ -7,7 +8,6 @@ import { useCallback, useEffect, useMemo } from 'react';
 
 export function useUserState(rankAssigment: RankAssignment) {
   const params = useParams();
-  const router = useRouter();
   const [userId, setUserId] = useLocalStorage<string | null>(
     `rank-force-${params.sessionId}-userid`,
     null,
@@ -30,6 +30,7 @@ export function useUserState(rankAssigment: RankAssignment) {
 
 export function useUser(rankAssignment: RankAssignment) {
   const router = useRouter();
+  const { sessionId } = useParams();
   const [user] = useUserState(rankAssignment);
   const pathname = usePathname();
   useEffect(() => {
@@ -39,7 +40,7 @@ export function useUser(rankAssignment: RankAssignment) {
     if (pathname.match(new RegExp('/user/?$'))) {
       return;
     }
-    router.push(pathname + '/user');
+    router.push(createRoutePaths(sessionId).user);
   }, [user]);
 
   return user;

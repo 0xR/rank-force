@@ -1,7 +1,7 @@
 'use client';
-import { Sortable } from '@/app/session/[sessionId]/Sortable';
-import { useRankAssignment } from '@/app/session/[sessionId]/UseRankAssignment';
-import { useUser } from '@/app/session/[sessionId]/useUser';
+import { Sortable } from '@/app/session/[sessionId]/ranking/Sortable';
+import { useRankAssignment } from '@/app/session/[sessionId]/ranking/UseRankAssignment';
+import { useUser } from '@/app/session/[sessionId]/ranking/useUser';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';

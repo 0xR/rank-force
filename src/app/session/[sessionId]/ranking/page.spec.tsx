@@ -1,4 +1,4 @@
-import Page from '@/app/session/[sessionId]/page';
+import Page from '@/app/session/[sessionId]/ranking/page';
 import { render, screen } from '@testing-library/react';
 import { ulid } from 'ulid';
 

@@ -1,6 +1,6 @@
 'use client';
-import { useRankAssignment } from '@/app/session/[sessionId]/UseRankAssignment';
-import { useUserState } from '@/app/session/[sessionId]/useUser';
+import { useRankAssignment } from '@/app/session/[sessionId]/ranking/UseRankAssignment';
+import { useUserState } from '@/app/session/[sessionId]/ranking/useUser';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
