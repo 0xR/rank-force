@@ -1,5 +1,5 @@
 'use client';
-import { createRoutePaths } from '@/app/session/[sessionId]/ranking/route-paths';
+import { createRoutePaths } from '@/app/session/[sessionId]/shared/route-paths';
 import { RankAssignment } from '@/core/RankAssignment';
 import { User } from '@/core/User';
 import { useLocalStorage } from '@uidotdev/usehooks';

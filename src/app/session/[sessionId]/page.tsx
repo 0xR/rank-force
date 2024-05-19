@@ -1,4 +1,4 @@
-import { createRoutePaths } from '@/app/session/[sessionId]/ranking/route-paths';
+import { createRoutePaths } from '@/app/session/[sessionId]/shared/route-paths';
 import { redirect } from 'next/navigation';
 
 export default function ({
