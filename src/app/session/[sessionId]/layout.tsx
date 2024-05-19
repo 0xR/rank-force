@@ -1,3 +1,4 @@
+import { NavigationMenuDemo } from '@/app/session/[sessionId]/Navigation';
 import {
   getCurrentData,
   storeData,
@@ -38,6 +39,7 @@ export default async function Page({
         return await getCurrentData(sessionId);
       }}
     >
+      <NavigationMenuDemo />
       {children}
     </StateProvider>
   );

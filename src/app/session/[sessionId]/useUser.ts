@@ -1,3 +1,4 @@
+'use client';
 import { RankAssignment } from '@/core/RankAssignment';
 import { User } from '@/core/User';
 import { useLocalStorage } from '@uidotdev/usehooks';
