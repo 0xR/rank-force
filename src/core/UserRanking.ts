@@ -45,7 +45,7 @@ export class UserRanking {
       toPlainOnly: true,
     },
   )
-  private rankings: Map<RankDimension, RankScore[]> = new Map();
+  readonly rankings: Map<RankDimension, RankScore[]> = new Map();
 
   constructor(
     private store: Store,
