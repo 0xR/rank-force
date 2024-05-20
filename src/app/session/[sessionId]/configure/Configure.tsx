@@ -5,8 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Typography } from '@/components/ui/typography';
 import { Item } from '@/core/Item';
 import { RankDimension } from '@/core/RankDimension';
+import React from 'react';
 
 function ItemForm({ onSubmit }: { onSubmit: (itemLabel: string) => void }) {
   return (
@@ -149,14 +151,13 @@ export function Configure() {
 
   return (
     <>
-      <h2>state</h2>
-      <h2>Items</h2>
+      <Typography variant="h2">Items</Typography>
       <ItemForm onSubmit={(itemLabel) => rankAssigment.addItems(itemLabel)} />
       <ItemList
         items={rankAssigment.items}
         onRemove={(item) => rankAssigment.removeItems(item)}
       />
-      <h2>Dimensions</h2>
+      <Typography variant="h2">Dimensions</Typography>
       <DimensionForm
         onSubmit={(dimension) => {
           rankAssigment.addDimension(dimension);

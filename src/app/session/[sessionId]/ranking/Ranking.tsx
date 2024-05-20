@@ -4,6 +4,7 @@ import { createRoutePaths } from '@/app/session/[sessionId]/shared/route-paths';
 import { useRankAssignment } from '@/app/session/[sessionId]/shared/UseRankAssignment';
 import { useUser } from '@/app/session/[sessionId]/shared/useUser';
 import { Button } from '@/components/ui/button';
+import { Typography } from '@/components/ui/typography';
 import { Item } from '@/core/Item';
 import { RankDimension } from '@/core/RankDimension';
 import { UserRanking } from '@/core/UserRanking';
@@ -23,7 +24,7 @@ function Dimension({
 }) {
   return (
     <div>
-      <h3>{dimension.name}</h3>
+      <Typography variant="h3">{dimension.name}</Typography>
       <Sortable
         items={items}
         onChange={onChange}
@@ -49,7 +50,7 @@ export function Ranking() {
 
   return (
     <>
-      <h2>Ranking</h2>
+      <Typography variant="h2">Ranking</Typography>
       {rankAssigment.dimensions.length === 0 ? (
         <>
           <p>No dimensions defined yet</p>

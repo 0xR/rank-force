@@ -2,6 +2,7 @@
 import { useRankAssignment } from '@/app/session/[sessionId]/shared/UseRankAssignment';
 import { useUser } from '@/app/session/[sessionId]/shared/useUser';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Typography } from '@/components/ui/typography';
 import { RankScore } from '@/core/RankScore';
 
 function ScoreList({ score }: { score: RankScore[] }) {
@@ -27,7 +28,7 @@ export function Score() {
   let rankingByUserEntries = Array.from(rankAssigment.rankingsByUser.entries());
   return (
     <>
-      <h2>Score</h2>
+      <Typography variant="h1">Score</Typography>
       {rankAssigment.score || true ? (
         <>
           <ScoreList score={rankAssigment.score ?? []} />
@@ -47,7 +48,7 @@ export function Score() {
                 {Array.from(userRanking.rankings.entries()).map(
                   ([dimension, rankScores]) => (
                     <div key={dimension.id}>
-                      <h3>{dimension.name}</h3>
+                      <Typography variant="h2">{dimension.name}</Typography>
                       <ScoreList score={rankScores} />
                     </div>
                   ),
