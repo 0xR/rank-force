@@ -69,6 +69,10 @@ export class RankAssignment {
 
   removeDimensions(...dimensions: RankDimension[]) {
     this.store.removeDimensions(...dimensions);
+
+    Array.from(this.rankingsByUser.values()).forEach((userRanking) => {
+      userRanking.removeDimensions(...dimensions);
+    });
   }
 
   rank(user: User, dimension: RankDimension, items: Item[]) {

@@ -279,6 +279,25 @@ describe('Domain', () => {
     expect(testStore.rankAssignment.score).toHaveLength(1);
   });
 
+  it('should allow removing a dimension is ranked', () => {
+    const user = new User('user', '0');
+    const rankDimension = createDimension();
+    const testStore = new TestStore();
+    testStore.rankAssignment.addDimension(rankDimension);
+
+    testStore.rankAssignment.addItems('item1');
+    testStore.rankAssignment.addItems('item2');
+
+    testStore.rankAssignment.rank(user, testStore.dimensions[0], [
+      testStore.items[0],
+      testStore.items[1],
+    ]);
+
+    testStore.rankAssignment.removeDimensions(rankDimension);
+
+    expect(testStore.rankAssignment.score).toHaveLength(2);
+  });
+
   it('should serialize and deserialize from teststore', () => {
     const testStore = createCompleteRankingAssignment();
 

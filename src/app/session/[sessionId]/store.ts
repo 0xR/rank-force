@@ -78,7 +78,11 @@ export const useSharedStore = (
         setUserRanking: (userId, dimensionId, itemIds) =>
           set(({ rankingsByUser }) => {
             const userRanking = rankingsByUser[userId] ?? {};
-            userRanking[dimensionId] = itemIds;
+            if (itemIds) {
+              userRanking[dimensionId] = itemIds;
+            } else {
+              delete userRanking[dimensionId];
+            }
             return {
               rankingsByUser: {
                 ...rankingsByUser,

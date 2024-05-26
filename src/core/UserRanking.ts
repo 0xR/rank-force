@@ -130,4 +130,10 @@ export class UserRanking {
       );
     }
   }
+
+  removeDimensions(...rankDimensions: RankDimension[]) {
+    for (const rankDimension of rankDimensions) {
+      this.store.setUserRanking(this.user.id, rankDimension.id, undefined);
+    }
+  }
 }

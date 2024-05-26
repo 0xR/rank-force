@@ -6,6 +6,7 @@ export interface State {
   readonly items: Item[];
   readonly dimensions: RankDimension[];
   readonly users: User[];
+  // userId -> dimensionId -> itemIds
   readonly rankingsByUser: Record<string, Record<string, string[]>>;
 }
 
@@ -20,7 +21,11 @@ export interface Mutators {
 
   removeItems(...items: Item[]): void;
 
-  setUserRanking(userId: string, dimennsionId: string, itemIds: string[]): void;
+  setUserRanking(
+    userId: string,
+    dimennsionId: string,
+    itemIds: string[] | undefined,
+  ): void;
 }
 
 export type Store = State & Mutators;

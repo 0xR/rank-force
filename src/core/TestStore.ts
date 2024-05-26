@@ -19,7 +19,11 @@ export class TestStore implements Store {
 
   setUserRanking(userId: string, dimensionId: string, itemIds: string[]): void {
     const userRanking = this.rankingsByUser[userId] ?? {};
-    userRanking[dimensionId] = itemIds;
+    if (itemIds) {
+      userRanking[dimensionId] = itemIds;
+    } else {
+      delete userRanking[dimensionId];
+    }
     this.rankingsByUser[userId] = userRanking;
   }
 
