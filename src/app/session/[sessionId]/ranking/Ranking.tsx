@@ -32,6 +32,7 @@ function Dimension({
           userRanking?.rankingByDimension(dimension).map(({ item }) => item) ??
           []
         }
+        rankDimension={dimension}
       />
     </div>
   );

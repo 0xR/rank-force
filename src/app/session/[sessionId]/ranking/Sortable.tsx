@@ -1,5 +1,7 @@
 import { useChanged } from '@/app/session/[sessionId]/ranking/UseChanged';
+import { Typography } from '@/components/ui/typography';
 import { Item } from '@/core/Item';
+import { RankDimension } from '@/core/RankDimension';
 import {
   closestCenter,
   DndContext,
@@ -52,10 +54,12 @@ export function Sortable({
   items,
   onChange,
   initialRanking,
+  rankDimension,
 }: {
   items: Item[];
   onChange: (items: Item[]) => void;
   initialRanking: Item[];
+  rankDimension: RankDimension;
 }) {
   const [items1, setItems1] = useState(() => {
     return items.filter((item) => !initialRanking.includes(item));
@@ -172,6 +176,7 @@ export function Sortable({
           </Droppable>
         </SortableContext>
 
+        <Typography variant="h3">{rankDimension.labelEnd}</Typography>
         <SortableContext items={items2} strategy={verticalListSortingStrategy}>
           <Droppable id={'droppable2'}>
             {items2.map((item) => (
@@ -179,6 +184,7 @@ export function Sortable({
             ))}
           </Droppable>
         </SortableContext>
+        <Typography variant="h3">{rankDimension.labelStart}</Typography>
       </DndContext>
     </div>
   );

@@ -8,7 +8,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Typography } from '@/components/ui/typography';
 import { Item } from '@/core/Item';
 import { RankDimension } from '@/core/RankDimension';
-import React from 'react';
+import React, { FormEvent } from 'react';
 
 function ItemForm({ onSubmit }: { onSubmit: (itemLabel: string) => void }) {
   return (
@@ -60,8 +60,12 @@ function DimensionForm({
 }: {
   onSubmit: (dimension: RankDimension) => void;
 }) {
+  const [direction, setDirection] = React.useState<'ascending' | 'descending'>(
+    'ascending',
+  );
   return (
     <form
+      className="flex flex-col gap-2"
       onSubmit={(e) => {
         e.preventDefault();
         const form = e.currentTarget;
@@ -99,12 +103,22 @@ function DimensionForm({
         Name: <Input type="text" name={'name'} required />
       </Label>
       <Label>
-        Label start: <Input type="text" name={'labelStart'} required />
+        Label top ({direction === 'ascending' ? 'better' : 'worse'}):{' '}
+        <Input type="text" name={'labelEnd'} required />
       </Label>
       <Label>
-        Label end: <Input type="text" name={'labelEnd'} required />
+        Label bottom ({direction === 'ascending' ? 'worse' : 'better'}):{' '}
+        <Input type="text" name={'labelStart'} required />
       </Label>
-      <RadioGroup name="direction" defaultValue="ascending">
+      <RadioGroup
+        name="direction"
+        defaultValue={direction}
+        onChange={(e: FormEvent) => {
+          setDirection(
+            (e.target as HTMLInputElement).value as 'ascending' | 'descending',
+          );
+        }}
+      >
         <div className="flex items-center space-x-2">
           <RadioGroupItem value="ascending" id="r1" />
           <Label htmlFor="r1">Ascending</Label>

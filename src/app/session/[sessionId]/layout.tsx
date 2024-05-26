@@ -40,7 +40,12 @@ export default async function Page({
       }}
     >
       <NavigationMenuDemo />
-      {children}
+      <div
+        className="flex flex-col gap-5 bg-gray-100 max-w-7xl mx-auto p-5
+      "
+      >
+        {children}
+      </div>
     </StateProvider>
   );
 }

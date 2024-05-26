@@ -29,11 +29,11 @@ export function Score() {
   return (
     <>
       <Typography variant="h1">Score</Typography>
-      {rankAssigment.score || true ? (
+      {rankAssigment.score ? (
         <>
           <ScoreList score={rankAssigment.score ?? []} />
           <Tabs
-            defaultValue={rankingByUserEntries.at(0)?.at(0)?.id}
+            defaultValue={rankingByUserEntries.at(0)?.[0]?.id}
             className="w-[400px]"
           >
             <TabsList>
