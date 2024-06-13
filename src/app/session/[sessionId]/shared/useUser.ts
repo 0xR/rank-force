@@ -1,23 +1,26 @@
-'use client';
 import { createRoutePaths } from '@/app/session/[sessionId]/shared/route-paths';
 import { RankAssignment } from '@/core/RankAssignment';
 import { User } from '@/core/User';
-import { useLocalStorage } from '@uidotdev/usehooks';
 import { useParams, usePathname, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo } from 'react';
+import { useLocalStorage } from 'usehooks-ts';
 
 export function useUserState(rankAssigment: RankAssignment) {
   const params = useParams();
   const [userId, setUserId] = useLocalStorage<string | null>(
     `rank-force-${params.sessionId}-userid`,
     null,
+    {
+      initializeWithValue: false,
+    },
   );
+
   const user = useMemo(() => {
     if (!userId) {
       return undefined;
     }
     return rankAssigment.usersById.get(userId);
-  }, [rankAssigment]);
+  }, [rankAssigment, userId]);
 
   const setUserName = useCallback((name: string) => {
     const user = new User(name);
