@@ -1,5 +1,5 @@
 import { Store } from '@/core/State';
-import { Item } from './Item';
+import { Item, itemsIncludes } from './Item';
 import { RankDimension } from './RankDimension';
 import { RankScore } from './RankScore';
 import { Ratio } from './Ratio';
@@ -85,7 +85,7 @@ export class RankAssignment {
     }
 
     items.forEach((item) => {
-      if (!this.store.items.includes(item)) {
+      if (!itemsIncludes(this.store.items, item)) {
         throw new Error(`Item ${item.label} not found in assignment`);
       }
     });

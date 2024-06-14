@@ -17,3 +17,5 @@ export class Item {
     return new Item(item.label, item.id);
   }
 }
+export const itemsIncludes = (items: Item[], item: Item) =>
+  items.some((i) => i.id === item.id);

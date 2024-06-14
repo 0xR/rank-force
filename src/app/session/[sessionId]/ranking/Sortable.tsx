@@ -1,6 +1,6 @@
 import { useChanged } from '@/app/session/[sessionId]/ranking/UseChanged';
 import { Typography } from '@/components/ui/typography';
-import { Item } from '@/core/Item';
+import { Item, itemsIncludes } from '@/core/Item';
 import { RankDimension } from '@/core/RankDimension';
 import {
   closestCenter,
@@ -62,7 +62,7 @@ export function Sortable({
   rankDimension: RankDimension;
 }) {
   const [items1, setItems1] = useState(() => {
-    return items.filter((item) => !initialRanking.includes(item));
+    return items.filter((item) => !itemsIncludes(initialRanking, item));
   });
   const [items2, setItems2] = useState<Item[]>(initialRanking);
   const sensors = useSensors(
@@ -77,14 +77,18 @@ export function Sortable({
   useEffect(() => {
     if (!itemsPropChanged) return;
     const newItems = items.filter(
-      (item) => !items1.includes(item) && !items2.includes(item),
+      (item) => !itemsIncludes(items1, item) && !itemsIncludes(items2, item),
     );
     if (newItems.length) {
       setItems1((items) => [...items, ...newItems]);
     }
     // remove items that are no longer in the list
-    setItems1((itemState) => itemState.filter((item) => items.includes(item)));
-    setItems2((itemState) => itemState.filter((item) => items.includes(item)));
+    setItems1((itemState) =>
+      itemState.filter((item) => itemsIncludes(items, item)),
+    );
+    setItems2((itemState) =>
+      itemState.filter((item) => itemsIncludes(items, item)),
+    );
   }, [items, items1, items2, itemsPropChanged]);
 
   const onChangeRef = useRef(onChange);
@@ -119,8 +123,10 @@ export function Sortable({
           assertString(over.id);
 
           const getItemsAndSetter = (item: Item) => {
-            if (items1.includes(item)) return [items1, setItems1] as const;
-            if (items2.includes(item)) return [items2, setItems2] as const;
+            if (itemsIncludes(items1, item))
+              return [items1, setItems1] as const;
+            if (itemsIncludes(items2, item))
+              return [items2, setItems2] as const;
             return [null, null] as const;
           };
 
