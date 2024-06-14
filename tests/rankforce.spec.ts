@@ -1,14 +1,19 @@
 import { expect, test } from '@playwright/test';
 
 test.describe('Item ranking', () => {
-  test('should fill in username and remember it', async ({ page }) => {
+  test('should fill in username and remember it across tabs', async ({
+    page,
+    context,
+  }) => {
     await page.goto('/');
 
     await page.getByLabel('Username').fill('testuser');
     await page.getByText('Save').click();
-    await page.reload();
 
-    expect(await page.getByLabel('Username')).toHaveValue('testuser');
+    const newPage = await context.newPage();
+    await newPage.goto(page.url());
+
+    expect(await newPage.getByLabel('Username')).toHaveValue('testuser');
   });
 
   test('should fill in and store items', async ({ page }) => {
