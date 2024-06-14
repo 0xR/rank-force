@@ -3,7 +3,7 @@ import { RankAssignment } from '@/core/RankAssignment';
 import { User } from '@/core/User';
 import { useParams, usePathname, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo } from 'react';
-import { useLocalStorage } from 'usehooks-ts';
+import { useIsClient, useLocalStorage } from 'usehooks-ts';
 
 export function useUserState(rankAssigment: RankAssignment) {
   const params = useParams();
@@ -39,7 +39,11 @@ export function useUser(rankAssignment: RankAssignment) {
   const { sessionId } = useParams();
   const [user] = useUserState(rankAssignment);
   const pathname = usePathname();
+  const isClient = useIsClient();
   useEffect(() => {
+    if (!isClient) {
+      return;
+    }
     if (user) {
       return;
     }
@@ -47,7 +51,7 @@ export function useUser(rankAssignment: RankAssignment) {
       return;
     }
     router.push(createRoutePaths(sessionId).user);
-  }, [pathname, router, sessionId, user]);
+  }, [isClient, pathname, router, sessionId, user]);
 
   return user;
 }
