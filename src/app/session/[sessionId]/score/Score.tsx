@@ -10,7 +10,7 @@ function ScoreList({ score }: { score: RankScore[] }) {
     <ul>
       {score.map((score) => (
         <li key={score.item.id}>
-          {score.item.label} ({score.score.value})
+          {score.item.label} ({score.score.value.toFixed(2)})
         </li>
       ))}
     </ul>
