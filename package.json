@@ -12,7 +12,8 @@
     "test": "sst shell vitest",
     "type-check": "tsc --noEmit --watch",
     "playwright": "playwright test",
-    "playwright:ui": "pnpm run playwright --ui"
+    "playwright:ui": "pnpm run playwright --ui",
+    "prepare": "husky"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.596.0",
@@ -52,6 +53,7 @@
     "autoprefixer": "^10.0.1",
     "eslint": "^8",
     "eslint-config-next": "14.2.4",
+    "husky": "^9.0.11",
     "jsdom": "^24.1.0",
     "postcss": "^8",
     "prettier": "^3.3.2",
