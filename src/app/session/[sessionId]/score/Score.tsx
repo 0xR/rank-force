@@ -44,12 +44,20 @@ export function Score() {
               ))}
             </TabsList>
             {rankingByUserEntries.map(([user, userRanking]) => (
-              <TabsContent value={user.id} key={user.id}>
+              <TabsContent
+                value={user.id}
+                key={user.id}
+                className="flex flex-col gap-6"
+              >
                 {Array.from(userRanking.rankings.entries()).map(
                   ([dimension, rankScores]) => (
                     <div key={dimension.id}>
                       <Typography variant="h2">{dimension.name}</Typography>
+                      <Typography variant="h3">{dimension.labelEnd}</Typography>
                       <ScoreList score={rankScores} />
+                      <Typography variant="h3">
+                        {dimension.labelStart}
+                      </Typography>
                     </div>
                   ),
                 )}
