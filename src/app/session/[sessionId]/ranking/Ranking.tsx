@@ -71,17 +71,22 @@ export function Ranking() {
           </Button>
         </>
       ) : (
-        rankAssigment.dimensions.map((dimension) => (
-          <Dimension
-            key={dimension.id}
-            dimension={dimension}
-            items={rankAssigment.items}
-            userRanking={ranking}
-            onChange={(items) => {
-              rankAssigment.rank(user, dimension, items);
-            }}
-          />
-        ))
+        <>
+          <Typography variant="p">
+            Drag items to the right to rank them
+          </Typography>
+          {rankAssigment.dimensions.map((dimension) => (
+            <Dimension
+              key={dimension.id}
+              dimension={dimension}
+              items={rankAssigment.items}
+              userRanking={ranking}
+              onChange={(items) => {
+                rankAssigment.rank(user, dimension, items);
+              }}
+            />
+          ))}
+        </>
       )}
     </>
   );

@@ -16,6 +16,7 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
+import { cx } from 'class-variance-authority';
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 
 import { SortableItem } from './SortableItem';
@@ -29,20 +30,21 @@ function assertString(value: unknown): asserts value is string {
 function Droppable({
   id,
   children,
+  className,
 }: {
   id: string;
   children: React.ReactNode;
+  className?: string;
 }) {
   const { setNodeRef } = useDroppable({
     id,
   });
   return (
     <ul
-      style={{
-        border: '1px solid black',
-        height: '100px',
-        margin: '10px',
-      }}
+      className={cx(
+        'border-solid border-2 border-black min-h-[100px] m-4',
+        className,
+      )}
       ref={setNodeRef}
     >
       {children}
@@ -101,7 +103,7 @@ export function Sortable({
   const id = useId();
 
   return (
-    <div>
+    <div className="grid grid-cols-2 grid-flow-row">
       <DndContext
         id={id}
         sensors={sensors}
@@ -175,22 +177,26 @@ export function Sortable({
         }}
       >
         <SortableContext items={items1} strategy={verticalListSortingStrategy}>
-          <Droppable id={'droppable'}>
+          <Droppable id={'droppable'} className="row-start-2">
             {items1.map((item) => (
               <SortableItem key={item.id} item={item} />
             ))}
           </Droppable>
         </SortableContext>
 
-        <Typography variant="h3">{rankDimension.labelEnd}</Typography>
+        <Typography variant="h3" className="col-start-2">
+          {rankDimension.labelEnd}
+        </Typography>
         <SortableContext items={items2} strategy={verticalListSortingStrategy}>
-          <Droppable id={'droppable2'}>
+          <Droppable id={'droppable2'} className="col-start-2">
             {items2.map((item) => (
               <SortableItem key={item.id} item={item} />
             ))}
           </Droppable>
         </SortableContext>
-        <Typography variant="h3">{rankDimension.labelStart}</Typography>
+        <Typography variant="h3" className="col-start-2">
+          {rankDimension.labelStart}
+        </Typography>
       </DndContext>
     </div>
   );
