@@ -4,4 +4,8 @@ export class Ratio {
       throw new Error('Score must be between 0 and 1');
     }
   }
+
+  get label() {
+    return `${Math.round(this.value * 100)}%`;
+  }
 }
