@@ -30,7 +30,7 @@ function useServerData(
       }
     }, 10000);
     return () => clearInterval(interval);
-  }, []);
+  }, [getServerData, serverData]);
 
   return useMemo(() => {
     if (!serverData) {

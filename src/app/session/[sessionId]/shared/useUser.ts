@@ -22,11 +22,14 @@ export function useUserState(rankAssigment: RankAssignment) {
     return rankAssigment.usersById.get(userId);
   }, [rankAssigment, userId]);
 
-  const setUserName = useCallback((name: string) => {
-    const user = new User(name);
-    rankAssigment.addUser(user);
-    setUserId(user.id);
-  }, []);
+  const setUserName = useCallback(
+    (name: string) => {
+      const user = new User(name);
+      rankAssigment.addUser(user);
+      setUserId(user.id);
+    },
+    [rankAssigment, setUserId],
+  );
 
   return [user, setUserName] as const;
 }
@@ -44,7 +47,7 @@ export function useUser(rankAssignment: RankAssignment) {
       return;
     }
     router.push(createRoutePaths(sessionId).user);
-  }, [user]);
+  }, [pathname, router, sessionId, user]);
 
   return user;
 }
