@@ -54,7 +54,7 @@ export class UserRanking {
   ) {
     for (const [dimension, items] of rankings.entries()) {
       const indexRatioToScore =
-        dimension.direction === 'descending'
+        dimension.direction === 'ascending'
           ? (indexRatio: number) => 1 - indexRatio
           : (indexRatio: number) => indexRatio;
 
