@@ -11,7 +11,16 @@ export class TestStore implements Store {
     public dimensions: RankDimension[] = [],
     readonly users: User[] = [],
     readonly rankingsByUser: Record<string, Record<string, string[]>> = {},
+    readonly dimensionWeights: Record<string, number> = {},
   ) {}
+
+  setDimensionWeight(dimensionId: string, weight: number | undefined): void {
+    if (weight === undefined) {
+      delete this.dimensionWeights[dimensionId];
+      return;
+    }
+    this.dimensionWeights[dimensionId] = weight;
+  }
 
   addUsers(...users: User[]): void {
     this.users.push(...users);
@@ -33,6 +42,7 @@ export class TestStore implements Store {
       state.dimensions,
       state.users,
       state.rankingsByUser,
+      state.dimensionWeights,
     );
   }
 
@@ -66,6 +76,7 @@ export class TestStore implements Store {
       ),
       users: this.users.map((user) => instanceToPlain(user)),
       rankingsByUser: this.rankingsByUser,
+      dimensionWeights: this.dimensionWeights,
     };
   }
 }

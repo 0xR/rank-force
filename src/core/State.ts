@@ -8,6 +8,8 @@ export interface State {
   readonly users: User[];
   // userId -> dimensionId -> itemIds
   readonly rankingsByUser: Record<string, Record<string, string[]>>;
+
+  readonly dimensionWeights: Record<string, number>;
 }
 
 export interface Mutators {
@@ -26,6 +28,8 @@ export interface Mutators {
     dimennsionId: string,
     itemIds: string[] | undefined,
   ): void;
+
+  setDimensionWeight(dimennsionId: string, weight: number | undefined): void;
 }
 
 export type Store = State & Mutators;

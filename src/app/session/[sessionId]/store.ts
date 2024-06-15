@@ -16,6 +16,7 @@ export function stateFromPlainObject(obj: Record<string, any>): State {
     ),
     users: obj.users.map((user: any) => plainToInstance(User, user)),
     rankingsByUser: obj.rankingsByUser,
+    dimensionWeights: obj.dimensionWeights,
   };
 }
 

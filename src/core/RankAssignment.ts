@@ -9,6 +9,7 @@ import { UserRanking } from './UserRanking';
 export class RankAssignment {
   readonly usersById = new Map<string, User>();
   readonly rankingsByUser = new Map<User, UserRanking>();
+  readonly dimensionWeight = new Map<RankDimension, Ratio>();
 
   constructor(private store: Store) {
     this.usersById = new Map();
@@ -45,6 +46,14 @@ export class RankAssignment {
         this.rankingsByUser.set(this.usersById.get(userId)!, userRanking);
       },
     );
+
+    Object.entries(store.dimensionWeights).forEach(([dimensionId, weight]) => {
+      const dimension = this.store.dimensions.find((d) => d.id === dimensionId);
+      if (!dimension) {
+        throw new Error(`Dimension ${dimensionId} not found in assignment`);
+      }
+      this.dimensionWeight.set(dimension, new Ratio(weight));
+    });
   }
 
   get items() {
@@ -64,7 +73,13 @@ export class RankAssignment {
   }
 
   addDimension(...rankDimensions: RankDimension[]) {
-    this.store.addDimension(...rankDimensions);
+    rankDimensions.forEach((dimension) => {
+      this.store.addDimension(dimension);
+      this.setDimensionWeight(
+        dimension,
+        new Ratio(1 / this.store.dimensions.length),
+      );
+    });
   }
 
   removeDimensions(...dimensions: RankDimension[]) {
@@ -73,6 +88,8 @@ export class RankAssignment {
     Array.from(this.rankingsByUser.values()).forEach((userRanking) => {
       userRanking.removeDimensions(...dimensions);
     });
+
+    this.store.setDimensionWeight(dimensions[0].id, undefined);
   }
 
   rank(user: User, dimension: RankDimension, items: Item[]) {
@@ -133,5 +150,28 @@ export class RankAssignment {
 
   addUser(user: User) {
     this.store.addUsers(user);
+  }
+
+  setDimensionWeight(rankDimension: RankDimension, ratio: Ratio) {
+    const previousWeight = this.dimensionWeight.get(rankDimension);
+    this.dimensions.forEach((dimension) => {
+      if (dimension.id === rankDimension.id) {
+        this.store.setDimensionWeight(dimension.id, ratio.value);
+        return;
+      }
+      let currentWeight = this.store.dimensionWeights[dimension.id];
+      assertDefined(currentWeight);
+      this.store.setDimensionWeight(
+        dimension.id,
+        (currentWeight / (1 - (previousWeight?.value ?? 0))) *
+          (1 - ratio.value),
+      );
+    });
+  }
+}
+
+function assertDefined<T>(value: T | undefined): asserts value is T {
+  if (value === undefined) {
+    throw new Error('Value is undefined');
   }
 }

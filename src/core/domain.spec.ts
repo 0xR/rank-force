@@ -18,8 +18,7 @@ describe('Domain', () => {
       'importance',
       'low',
       'high',
-      'ascending',
-      new Ratio(1),
+      'descending',
     );
     const testStore = new TestStore();
     testStore.rankAssignment.addDimension(rankDimension);
@@ -42,7 +41,7 @@ describe('Domain', () => {
       'importance',
       'high',
       'low',
-      'descending',
+      'ascending',
     );
     const testStore = new TestStore();
     testStore.rankAssignment.addDimension(rankDimension);
@@ -91,6 +90,81 @@ describe('Domain', () => {
     );
   });
 
+  it('should consider dimension weight', () => {
+    const user = new User('user 0');
+    const rankDimension1 = new RankDimension(
+      'importance',
+      'low',
+      'high',
+      'ascending',
+    );
+    const rankDimension2 = new RankDimension(
+      'urgency',
+      'low',
+      'high',
+      'ascending',
+    );
+    const testStore = new TestStore();
+    testStore.rankAssignment.addDimension(rankDimension1, rankDimension2);
+    testStore.rankAssignment.addItems('item1', 'item2', 'item3');
+    testStore.rankAssignment.rank(user, testStore.dimensions[0], [
+      testStore.items[2],
+      testStore.items[0],
+      testStore.items[1],
+    ]);
+    testStore.rankAssignment.rank(user, testStore.dimensions[1], [
+      testStore.items[1],
+      testStore.items[0],
+      testStore.items[2],
+    ]);
+
+    testStore.rankAssignment.setDimensionWeight(
+      testStore.dimensions[0],
+      new Ratio(1),
+    );
+
+    expect(testStore.rankAssignment.score).toEqual([
+      new RankScore(testStore.items[2], new Ratio(1)),
+      new RankScore(testStore.items[0], new Ratio(0.5)),
+      new RankScore(testStore.items[1], new Ratio(0)),
+    ]);
+  });
+
+  it('should divide the weight of dimensions', () => {
+    const rankDimension1 = new RankDimension(
+      'importance',
+      'low',
+      'high',
+      'ascending',
+    );
+    const rankDimension2 = new RankDimension(
+      'urgency',
+      'low',
+      'high',
+      'ascending',
+    );
+    const testStore = new TestStore();
+    testStore.rankAssignment.addDimension(rankDimension1, rankDimension2);
+
+    expect(
+      testStore.rankAssignment.dimensionWeight.get(rankDimension1),
+    ).toEqual(new Ratio(0.5));
+    expect(
+      testStore.rankAssignment.dimensionWeight.get(rankDimension2),
+    ).toEqual(new Ratio(0.5));
+
+    testStore.rankAssignment.setDimensionWeight(rankDimension1, new Ratio(0.8));
+
+    expect(
+      testStore.rankAssignment.dimensionWeight.get(rankDimension1),
+    ).toEqual(new Ratio(0.8));
+    expect(
+      testStore.rankAssignment.dimensionWeight
+        .get(rankDimension2)
+        ?.equals(new Ratio(0.2)),
+    ).toBe(true);
+  });
+
   it('should rank for multiple users', () => {
     const user1 = new User('user 0');
     const user2 = new User('user 1', '1');
@@ -117,39 +191,6 @@ describe('Domain', () => {
     );
   });
 
-  it('should rank supporting importance', () => {
-    const user = new User('user 0');
-    const rankDimension1 = new RankDimension(
-      'importance',
-      'low',
-      'high',
-      'ascending',
-      new Ratio(1),
-    );
-    const rankDimension2 = new RankDimension(
-      'urgency',
-      'low',
-      'high',
-      'ascending',
-      new Ratio(0.5),
-    );
-    const testStore = new TestStore();
-    testStore.rankAssignment.addDimension(rankDimension1, rankDimension2);
-    testStore.rankAssignment.addItems('item1', 'item2');
-    testStore.rankAssignment.rank(user, testStore.dimensions[0], [
-      testStore.items[0],
-      testStore.items[1],
-    ]);
-    testStore.rankAssignment.rank(user, testStore.dimensions[1], [
-      testStore.items[1],
-      testStore.items[0],
-    ]);
-    expect(testStore.rankAssignment.score).toEqual([
-      new RankScore(testStore.items[1], new Ratio(0.5)),
-      new RankScore(testStore.items[0], new Ratio(0.25)),
-    ]);
-  });
-
   it('should support adding items and dimensions', () => {
     const user = new User('user 0');
     const rankDimension1 = new RankDimension(
@@ -157,7 +198,6 @@ describe('Domain', () => {
       'low',
       'high',
       'ascending',
-      new Ratio(1),
       '0',
     );
     const rankDimension2 = new RankDimension(
@@ -165,7 +205,6 @@ describe('Domain', () => {
       'low',
       'high',
       'ascending',
-      new Ratio(1),
       '1',
     );
     const testStore = new TestStore();
@@ -192,13 +231,7 @@ describe('Domain', () => {
     expect(testStore.rankAssignment.rankingComplete).toBe(true);
     expect(testStore.rankAssignment.score).toHaveLength(2);
     testStore.rankAssignment.addDimension(
-      new RankDimension(
-        'complexity',
-        'low',
-        'high',
-        'ascending',
-        new Ratio(0.5),
-      ),
+      new RankDimension('complexity', 'low', 'high', 'ascending'),
     );
     expect(testStore.rankAssignment.rankingComplete).toBe(false);
     expect(testStore.rankAssignment.score).toBeUndefined();
@@ -216,7 +249,6 @@ describe('Domain', () => {
       'low',
       'high',
       'ascending',
-      new Ratio(1),
     );
     const testStore = new TestStore();
     testStore.rankAssignment.addDimension(rankDimension);
@@ -246,8 +278,7 @@ describe('Domain', () => {
       'importance',
       'low',
       'high',
-      'ascending',
-      new Ratio(1),
+      'descending',
     );
     const testStore = new TestStore();
     testStore.rankAssignment.addDimension(rankDimension);

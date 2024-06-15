@@ -96,12 +96,10 @@ export class UserRanking {
         if (!rankScore) {
           throw new Error(`Ranking not found for item ${item.label}`);
         }
-        return (
-          score +
-          (rankScore.score.value * dimension.importance.value) /
-            store.dimensions.length
-        );
+        const dimensionWeight = this.store.dimensionWeights[dimension.id];
+        return score + rankScore.score.value * dimensionWeight;
       }, 0);
+
       return new RankScore(item, new Ratio(scoreValue));
     });
   }

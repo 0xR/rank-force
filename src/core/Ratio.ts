@@ -8,4 +8,8 @@ export class Ratio {
   get label() {
     return `${Math.round(this.value * 100)}%`;
   }
+
+  equals(other: Ratio) {
+    return this.value.toFixed(2) === other.value.toFixed(2);
+  }
 }

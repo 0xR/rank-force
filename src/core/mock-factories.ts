@@ -1,5 +1,4 @@
 import { RankDimension } from '@/core/RankDimension';
-import { Ratio } from '@/core/Ratio';
 import { TestStore } from '@/core/TestStore';
 import { User } from '@/core/User';
 
@@ -10,7 +9,6 @@ export function createCompleteRankingAssignment() {
     'low',
     'high',
     'ascending',
-    new Ratio(1),
   );
   const testStore = new TestStore();
   testStore.rankAssignment.addDimension(rankDimension);
@@ -28,8 +26,7 @@ export function createDimension() {
     'importance',
     'low',
     'high',
-    'ascending',
-    new Ratio(1),
+    'descending',
   );
   return rankDimension;
 }
