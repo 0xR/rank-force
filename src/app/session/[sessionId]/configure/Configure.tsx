@@ -2,6 +2,13 @@
 import { useRankAssignment } from '@/app/session/[sessionId]/shared/UseRankAssignment';
 import { useUser } from '@/app/session/[sessionId]/shared/useUser';
 import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -141,17 +148,24 @@ function DimensionList({
   onRemove: (dimension: RankDimension) => void;
 }) {
   return (
-    <ul>
+    <>
       {dimensions.map((dimension) => (
-        <li key={dimension.id}>
-          {dimension.name}: {dimension.labelStart} (
-          {dimension.direction === 'ascending' ? 'worse' : 'better'}) to{' '}
-          {dimension.labelEnd} (
-          {dimension.direction === 'ascending' ? 'better' : 'worse'}){' '}
-          <Button onClick={() => onRemove(dimension)}>Remove</Button>
-        </li>
+        <Card key={dimension.id}>
+          <CardHeader>
+            <CardTitle>{dimension.name}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {dimension.labelStart} (
+            {dimension.direction === 'ascending' ? 'worse' : 'better'}) to{' '}
+            {dimension.labelEnd} (
+            {dimension.direction === 'ascending' ? 'better' : 'worse'}){' '}
+          </CardContent>
+          <CardFooter>
+            <Button onClick={() => onRemove(dimension)}>Remove</Button>
+          </CardFooter>
+        </Card>
       ))}
-    </ul>
+    </>
   );
 }
 
