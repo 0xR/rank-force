@@ -146,20 +146,11 @@ describe('Domain', () => {
   });
 
   it('should divide the weight of dimensions', () => {
-    const rankDimension1 = new RankDimension(
-      'importance',
-      'low',
-      'high',
-      'ascending',
-    );
-    const rankDimension2 = new RankDimension(
-      'urgency',
-      'low',
-      'high',
-      'ascending',
-    );
+    const rankDimension1 = createDimension();
+    const rankDimension2 = createDimension();
     const testStore = new TestStore();
-    testStore.rankAssignment.addDimension(rankDimension1, rankDimension2);
+    testStore.rankAssignment.addDimension(rankDimension1);
+    testStore.rankAssignment.addDimension(rankDimension2);
 
     expect(
       testStore.rankAssignment.dimensionWeight.get(rankDimension1),
@@ -178,6 +169,56 @@ describe('Domain', () => {
         .get(rankDimension2)
         ?.equals(new Ratio(0.2)),
     ).toBe(true);
+  });
+
+  it('should divide the weight of dimensions when adding', () => {
+    const rankDimension1 = createDimension();
+    const rankDimension2 = createDimension();
+    const rankDimension3 = createDimension();
+    const rankDimension4 = createDimension();
+    const testStore = new TestStore();
+    testStore.rankAssignment.addDimension(rankDimension1);
+
+    expect(
+      testStore.rankAssignment.dimensionWeight
+        .get(rankDimension1)
+        ?.equals(new Ratio(1)),
+    ).toBe(true);
+
+    testStore.rankAssignment.addDimension(rankDimension2);
+
+    for (const dimension of [rankDimension1, rankDimension2]) {
+      expect(
+        testStore.rankAssignment.dimensionWeight
+          .get(dimension)
+          ?.equals(new Ratio(0.5)),
+      ).toBe(true);
+    }
+
+    testStore.rankAssignment.addDimension(rankDimension3);
+
+    for (const dimension of [rankDimension1, rankDimension2, rankDimension3]) {
+      expect(
+        testStore.rankAssignment.dimensionWeight
+          .get(dimension)
+          ?.equals(new Ratio(1 / 3)),
+      ).toBe(true);
+    }
+
+    testStore.rankAssignment.addDimension(rankDimension4);
+
+    for (const dimension of [
+      rankDimension1,
+      rankDimension2,
+      rankDimension3,
+      rankDimension4,
+    ]) {
+      expect(
+        testStore.rankAssignment.dimensionWeight
+          .get(dimension)
+          ?.equals(new Ratio(0.25)),
+      ).toBe(true);
+    }
   });
 
   it('should rank for multiple users', () => {

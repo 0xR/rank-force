@@ -12,10 +12,12 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Slider } from '@/components/ui/slider';
 import { Typography } from '@/components/ui/typography';
 import { Item } from '@/core/Item';
 import { RankDimension } from '@/core/RankDimension';
-import React, { FormEvent } from 'react';
+import { Ratio } from '@/core/Ratio';
+import React, { FormEvent, useEffect } from 'react';
 
 function ItemForm({ onSubmit }: { onSubmit: (itemLabel: string) => void }) {
   return (
@@ -140,31 +142,80 @@ function DimensionForm({
   );
 }
 
+function DimensionCard({
+  dimension,
+  weight,
+  onRemove,
+  onChangeWeight,
+}: {
+  dimension: RankDimension;
+  weight: Ratio;
+  onRemove: () => void;
+  onChangeWeight: (ratio: Ratio) => void;
+}) {
+  const [percentValue, setPercentValue] = React.useState(
+    Math.round(weight.value * 100),
+  );
+  useEffect(() => {
+    setPercentValue(Math.round(weight.value * 100));
+  }, [weight.value]);
+  return (
+    <Card key={dimension.id}>
+      <CardHeader>
+        <CardTitle>{dimension.name}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Typography variant="p" className="mb-6">
+          {dimension.labelStart} (
+          {dimension.direction === 'ascending' ? 'worse' : 'better'}) to{' '}
+          {dimension.labelEnd} (
+          {dimension.direction === 'ascending' ? 'better' : 'worse'}){' '}
+        </Typography>
+        <Typography variant="p" className="mb-3">
+          Weight: {percentValue}%
+        </Typography>
+        <Slider
+          value={[percentValue]}
+          onValueChange={(value) => {
+            setPercentValue(value[0]);
+          }}
+          onValueCommit={(value) => {
+            onChangeWeight(new Ratio(value[0] / 100));
+          }}
+          min={1}
+          max={100}
+          step={1}
+        />
+      </CardContent>
+      <CardFooter>
+        <Button onClick={() => onRemove()}>Remove</Button>
+      </CardFooter>
+    </Card>
+  );
+}
+
 function DimensionList({
   dimensions,
   onRemove,
+  onChangeWeight,
 }: {
-  dimensions: RankDimension[];
+  dimensions: [RankDimension, Ratio][];
   onRemove: (dimension: RankDimension) => void;
+  onChangeWeight: (dimension: RankDimension, ratio: Ratio) => void;
 }) {
   return (
     <>
-      {dimensions.map((dimension) => (
-        <Card key={dimension.id}>
-          <CardHeader>
-            <CardTitle>{dimension.name}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {dimension.labelStart} (
-            {dimension.direction === 'ascending' ? 'worse' : 'better'}) to{' '}
-            {dimension.labelEnd} (
-            {dimension.direction === 'ascending' ? 'better' : 'worse'}){' '}
-          </CardContent>
-          <CardFooter>
-            <Button onClick={() => onRemove(dimension)}>Remove</Button>
-          </CardFooter>
-        </Card>
-      ))}
+      {dimensions.map(([dimension, ratio]) => {
+        return (
+          <DimensionCard
+            key={dimension.id}
+            dimension={dimension}
+            weight={ratio}
+            onRemove={() => onRemove(dimension)}
+            onChangeWeight={(ratio) => onChangeWeight(dimension, ratio)}
+          />
+        );
+      })}
     </>
   );
 }
@@ -192,8 +243,11 @@ export function Configure() {
         }}
       />
       <DimensionList
-        dimensions={rankAssigment.dimensions}
+        dimensions={Array.from(rankAssigment.dimensionWeight.entries())}
         onRemove={(dimension) => rankAssigment.removeDimensions(dimension)}
+        onChangeWeight={(dimension, ratio) =>
+          rankAssigment.setDimensionWeight(dimension, ratio)
+        }
       />
     </>
   );

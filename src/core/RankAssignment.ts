@@ -155,18 +155,24 @@ export class RankAssignment {
 
   setDimensionWeight(rankDimension: RankDimension, ratio: Ratio) {
     const previousWeight = this.dimensionWeight.get(rankDimension);
+
+    this.store.setDimensionWeight(rankDimension.id, ratio.value);
+    let total = ratio.value;
     this.dimensions.forEach((dimension) => {
       if (dimension.id === rankDimension.id) {
-        this.store.setDimensionWeight(dimension.id, ratio.value);
         return;
       }
-      let currentWeight = this.store.dimensionWeights[dimension.id] ?? 1;
-      this.store.setDimensionWeight(
-        dimension.id,
+      const currentWeight = this.store.dimensionWeights[dimension.id] ?? 1;
+      const newRatio =
         (currentWeight / (1 - (previousWeight?.value ?? 0))) *
-          (1 - ratio.value),
-      );
+        (1 - ratio.value);
+
+      this.store.setDimensionWeight(dimension.id, newRatio);
+      total += newRatio;
     });
+    if (!new Ratio(total).equals(new Ratio(1))) {
+      throw new Error('Dimension weights do not sum to 1');
+    }
   }
 }
 
