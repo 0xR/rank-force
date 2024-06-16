@@ -73,11 +73,12 @@ export class RankAssignment {
   }
 
   addDimension(...rankDimensions: RankDimension[]) {
-    rankDimensions.forEach((dimension) => {
+    const initialDimensionCount = this.store.dimensions.length;
+    rankDimensions.forEach((dimension, i) => {
       this.store.addDimension(dimension);
       this.setDimensionWeight(
         dimension,
-        new Ratio(1 / this.store.dimensions.length),
+        new Ratio(1 / (initialDimensionCount + i + 1)),
       );
     });
   }
@@ -159,8 +160,7 @@ export class RankAssignment {
         this.store.setDimensionWeight(dimension.id, ratio.value);
         return;
       }
-      let currentWeight = this.store.dimensionWeights[dimension.id];
-      assertDefined(currentWeight);
+      let currentWeight = this.store.dimensionWeights[dimension.id] ?? 1;
       this.store.setDimensionWeight(
         dimension.id,
         (currentWeight / (1 - (previousWeight?.value ?? 0))) *

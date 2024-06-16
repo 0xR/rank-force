@@ -130,6 +130,21 @@ describe('Domain', () => {
     ]);
   });
 
+  it('should give a dimension a weight', () => {
+    const rankDimension1 = new RankDimension(
+      'importance',
+      'low',
+      'high',
+      'ascending',
+    );
+    const testStore = new TestStore();
+    testStore.rankAssignment.addDimension(rankDimension1);
+
+    expect(
+      testStore.rankAssignment.dimensionWeight.get(rankDimension1),
+    ).toEqual(new Ratio(1));
+  });
+
   it('should divide the weight of dimensions', () => {
     const rankDimension1 = new RankDimension(
       'importance',

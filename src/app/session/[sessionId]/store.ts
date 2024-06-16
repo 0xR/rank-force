@@ -49,6 +49,7 @@ export const useSharedStore = (
           users: [],
           dimensions: [],
           rankingsByUser: {},
+          dimensionWeights: {},
         };
     return create<Store>()(
       // Wrap the store creator with the Yjs middleware.
@@ -91,6 +92,20 @@ export const useSharedStore = (
               },
             };
           }),
+
+        setDimensionWeight(dimennsionId: string, weight: number | undefined) {
+          return set(({ dimensionWeights }) => {
+            if (weight === undefined) {
+              delete dimensionWeights[dimennsionId];
+              return {
+                dimensionWeights,
+              };
+            }
+            return {
+              dimensionWeights: { ...dimensionWeights, [dimennsionId]: weight },
+            };
+          });
+        },
       })),
     );
   }, [yDoc]);
