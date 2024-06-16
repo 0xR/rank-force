@@ -1,3 +1,4 @@
+import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { Item } from '@/core/Item';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -15,8 +16,16 @@ export function SortableItem({ item }: { item: Item }) {
   };
 
   return (
-    <li ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      {item.label}
-    </li>
+    <Card
+      ref={setNodeRef}
+      style={style}
+      className="touch-none"
+      {...attributes}
+      {...listeners}
+    >
+      <CardHeader>
+        <CardTitle>{item.label}</CardTitle>
+      </CardHeader>
+    </Card>
   );
 }

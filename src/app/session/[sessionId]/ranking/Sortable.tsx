@@ -7,6 +7,7 @@ import {
   DndContext,
   KeyboardSensor,
   PointerSensor,
+  TouchSensor,
   useDroppable,
   useSensor,
   useSensors,
@@ -40,15 +41,15 @@ function Droppable({
     id,
   });
   return (
-    <ul
+    <div
       className={cx(
-        'border-solid border-2 border-black min-h-[100px] m-4',
+        'bg-gray-300 min-h-[100px] p-4 flex flex-col gap-2',
         className,
       )}
       ref={setNodeRef}
     >
       {children}
-    </ul>
+    </div>
   );
 }
 
@@ -72,6 +73,7 @@ export function Sortable({
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
+    useSensor(TouchSensor),
   );
 
   const itemsPropChanged = useChanged(items);
@@ -103,7 +105,7 @@ export function Sortable({
   const id = useId();
 
   return (
-    <div className="grid grid-cols-2 grid-flow-row">
+    <div className="grid grid-cols-2 grid-flow-row gap-x-6">
       <DndContext
         id={id}
         sensors={sensors}
