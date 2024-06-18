@@ -1,10 +1,10 @@
-import { Store } from '@/core/State';
-import { Item, itemsIncludes } from './Item';
-import { RankDimension } from './RankDimension';
-import { RankScore } from './RankScore';
-import { Ratio } from './Ratio';
-import { User } from './User';
-import { UserRanking } from './UserRanking';
+import { Store } from "@/core/State";
+import { Item, itemsIncludes } from "./Item";
+import { RankDimension } from "./RankDimension";
+import { RankScore } from "./RankScore";
+import { Ratio } from "./Ratio";
+import { User } from "./User";
+import { UserRanking } from "./UserRanking";
 
 export class RankAssignment {
   readonly usersById = new Map<string, User>();
@@ -120,9 +120,10 @@ export class RankAssignment {
     if (!this.rankingComplete) {
       return undefined;
     }
-    const scoresForUsers = Array.from(this.rankingsByUser.values()).map(
-      (userRanking) => userRanking.score(this.store),
-    );
+
+    const scoresForUsers = Array.from(this.rankingsByUser.values())
+      .filter((userRanking) => userRanking.rankingComplete(this.store))
+      .map((userRanking) => userRanking.score(this.store));
     const scores = this.store.items.map((item, index) => {
       const scoreValue = scoresForUsers.reduce(
         (score, userScores) => score + userScores[index].score.value,
@@ -137,7 +138,7 @@ export class RankAssignment {
     if (this.rankingsByUser.size === 0) {
       return false;
     }
-    return Array.from(this.rankingsByUser.values()).every((userRanking) =>
+    return Array.from(this.rankingsByUser.values()).some((userRanking) =>
       userRanking.rankingComplete(this.store),
     );
   }
@@ -171,13 +172,13 @@ export class RankAssignment {
       total += newRatio;
     });
     if (!new Ratio(total).equals(new Ratio(1))) {
-      throw new Error('Dimension weights do not sum to 1');
+      throw new Error("Dimension weights do not sum to 1");
     }
   }
 }
 
 function assertDefined<T>(value: T | undefined): asserts value is T {
   if (value === undefined) {
-    throw new Error('Value is undefined');
+    throw new Error("Value is undefined");
   }
 }
