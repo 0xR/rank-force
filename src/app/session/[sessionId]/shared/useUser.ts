@@ -5,15 +5,19 @@ import { useParams, usePathname, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useIsClient, useLocalStorage } from 'usehooks-ts';
 
-export function useUserState(rankAssigment: RankAssignment) {
+export function useUserId() {
   const params = useParams();
-  const [userId, setUserId] = useLocalStorage<string | null>(
+  return useLocalStorage<string | null>(
     `rank-force-${params.sessionId}-userid`,
     null,
     {
       initializeWithValue: false,
     },
   );
+}
+
+export function useUserState(rankAssigment: RankAssignment) {
+  const [userId, setUserId] = useUserId();
 
   const user = useMemo(() => {
     if (!userId) {
@@ -24,11 +28,17 @@ export function useUserState(rankAssigment: RankAssignment) {
 
   const setUserName = useCallback(
     (name: string) => {
-      const user = new User(name);
-      rankAssigment.addUser(user);
-      setUserId(user.id);
+      if (name === '') {
+        return;
+      }
+      if (name === user?.name) {
+        return;
+      }
+      const newUser = new User(name);
+      rankAssigment.addUser(newUser);
+      setUserId(newUser.id);
     },
-    [rankAssigment, setUserId],
+    [rankAssigment, setUserId, user?.name],
   );
 
   return [user, setUserName] as const;

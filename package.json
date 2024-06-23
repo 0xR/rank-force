@@ -27,6 +27,7 @@
     "@radix-ui/react-slider": "^1.1.2",
     "@radix-ui/react-slot": "^1.0.2",
     "@radix-ui/react-tabs": "^1.0.4",
+    "aws-iot-device-sdk-v2": "^1.19.5",
     "class-transformer": "^0.5.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",

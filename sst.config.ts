@@ -9,6 +9,15 @@ export default $config({
     };
   },
   async run() {
+    const topicPrefix = `${$app.name}/${$app.stage}/`;
+    const realtime = new sst.aws.Realtime('MyRealtime', {
+      authorizer: {
+        handler: 'src/function/realtime-authorizer.handler',
+        environment: {
+          SST_TOPIC_PREFIX: topicPrefix,
+        },
+      },
+    });
     const table = new sst.aws.Dynamo('Table', {
       fields: {
         pk: 'string',
@@ -18,6 +27,11 @@ export default $config({
     });
     new sst.aws.Nextjs('Web', {
       link: [table],
+      environment: {
+        NEXT_PUBLIC_REALTIME_ENDPOINT: realtime.endpoint,
+        NEXT_PUBLIC_REALTIME_TOPIC_PREFIX: topicPrefix,
+        NEXT_PUBLIC_REALTIME_AUTHORIZER: realtime.authorizer,
+      },
     });
   },
 });
