@@ -40,74 +40,74 @@ export const useSharedStore = (
     return doc;
   }, [defaultValue, onChange]);
 
-  const useStore = useMemo(() => {
-    let ydocData = yDoc.getMap('shared');
-    const defaultValues: State = ydocData.size
-      ? stateFromPlainObject(ydocData.toJSON())
-      : {
-          items: [],
-          users: [],
-          dimensions: [],
-          rankingsByUser: {},
-          dimensionWeights: {},
-        };
-    return create<Store>()(
-      // Wrap the store creator with the Yjs middleware.
-      // Create the store as you would normally.
-      yjs(yDoc, 'shared', (set) => ({
-        ...defaultValues,
-        addItems: (...items) =>
-          set((state) => {
-            return { items: [...state.items, ...items] };
-          }),
-        addDimension: (...dimensions) =>
-          set((state) => ({
-            dimensions: [...state.dimensions, ...dimensions],
-          })),
-        addUsers(...users) {
-          set((state) => {
-            return { users: [...state.users, ...users] };
-          });
-        },
-        removeDimensions: (...dimensions) =>
-          set((state) => ({
-            dimensions: state.dimensions.filter((d) => !dimensions.includes(d)),
-          })),
-        removeItems: (...items) =>
-          set((state) => ({
-            items: state.items.filter((i) => !items.includes(i)),
-          })),
-        setUserRanking: (userId, dimensionId, itemIds) =>
-          set(({ rankingsByUser }) => {
-            const userRanking = rankingsByUser[userId] ?? {};
-            if (itemIds) {
-              userRanking[dimensionId] = itemIds;
-            } else {
-              delete userRanking[dimensionId];
-            }
-            return {
-              rankingsByUser: {
-                ...rankingsByUser,
-                [userId]: userRanking,
-              },
-            };
-          }),
-
-        setDimensionWeight(dimennsionId: string, weight: number | undefined) {
-          return set(({ dimensionWeights }) => {
-            if (weight === undefined) {
-              delete dimensionWeights[dimennsionId];
-              return {
-                dimensionWeights,
-              };
-            }
-            return {
-              dimensionWeights: { ...dimensionWeights, [dimennsionId]: weight },
-            };
-          });
-        },
-      })),
-    );
-  }, [yDoc]);
-  return useStore();
+  // const useStore = useMemo(() => {
+  //   let ydocData = yDoc.getMap('shared');
+  //   const defaultValues: State = ydocData.size
+  //     ? stateFromPlainObject(ydocData.toJSON())
+  //     : {
+  //         items: [],
+  //         users: [],
+  //         dimensions: [],
+  //         rankingsByUser: {},
+  //         dimensionWeights: {},
+  //       };
+  //   return create<Store>()(
+  //     // Wrap the store creator with the Yjs middleware.
+  //     // Create the store as you would normally.
+  //     yjs(yDoc, 'shared', (set) => ({
+  //       ...defaultValues,
+  //       addItems: (...items) =>
+  //         set((state) => {
+  //           return { items: [...state.items, ...items] };
+  //         }),
+  //       addDimension: (...dimensions) =>
+  //         set((state) => ({
+  //           dimensions: [...state.dimensions, ...dimensions],
+  //         })),
+  //       addUsers(...users) {
+  //         set((state) => {
+  //           return { users: [...state.users, ...users] };
+  //         });
+  //       },
+  //       removeDimensions: (...dimensions) =>
+  //         set((state) => ({
+  //           dimensions: state.dimensions.filter((d) => !dimensions.includes(d)),
+  //         })),
+  //       removeItems: (...items) =>
+  //         set((state) => ({
+  //           items: state.items.filter((i) => !items.includes(i)),
+  //         })),
+  //       setUserRanking: (userId, dimensionId, itemIds) =>
+  //         set(({ rankingsByUser }) => {
+  //           const userRanking = rankingsByUser[userId] ?? {};
+  //           if (itemIds) {
+  //             userRanking[dimensionId] = itemIds;
+  //           } else {
+  //             delete userRanking[dimensionId];
+  //           }
+  //           return {
+  //             rankingsByUser: {
+  //               ...rankingsByUser,
+  //               [userId]: userRanking,
+  //             },
+  //           };
+  //         }),
+  //
+  //       setDimensionWeight(dimennsionId: string, weight: number | undefined) {
+  //         return set(({ dimensionWeights }) => {
+  //           if (weight === undefined) {
+  //             delete dimensionWeights[dimennsionId];
+  //             return {
+  //               dimensionWeights,
+  //             };
+  //           }
+  //           return {
+  //             dimensionWeights: { ...dimensionWeights, [dimennsionId]: weight },
+  //           };
+  //         });
+  //       },
+  //     })),
+  //   );
+  // }, [yDoc]);
+  // return useStore();
 };

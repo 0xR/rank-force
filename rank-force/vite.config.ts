@@ -8,6 +8,13 @@ export default defineConfig({
     TanStackRouterVite({
       routeFilePrefix: '~',
     }),
-    react(),
+    react({
+      tsDecorators: true,
+    }),
   ],
+  resolve: {
+    alias: {
+      '@': '/src',
+    },
+  },
 });

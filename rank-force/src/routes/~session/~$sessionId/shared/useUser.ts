@@ -1,7 +1,7 @@
-import { createRoutePaths } from '@/app/session/[sessionId]/shared/route-paths';
+import { createRoutePaths } from '@/routes/~session/~$sessionId/shared/route-paths';
 import { RankAssignment } from '@/core/RankAssignment';
 import { User } from '@/core/User';
-import { useParams, usePathname, useRouter } from 'next/navigation';
+// import { useParams, usePathname, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useIsClient, useLocalStorage } from 'usehooks-ts';
 

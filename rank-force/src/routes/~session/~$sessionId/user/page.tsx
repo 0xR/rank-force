@@ -1,7 +1,7 @@
 'use client';
-import { useRankAssignment } from '@/app/session/[sessionId]/shared/UseRankAssignment';
-import { useUserState } from '@/app/session/[sessionId]/shared/useUser';
-import { RealtimeDemo } from '@/app/session/[sessionId]/user/RealtimeDemo';
+import { useRankAssignment } from '@/routes/~session/~$sessionId/shared/UseRankAssignment';
+import { useUserState } from '@/routes/~session/~$sessionId/shared/useUser';
+import { RealtimeDemo } from '@/routes/~session/~$sessionId/user/RealtimeDemo';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';

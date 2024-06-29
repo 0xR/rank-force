@@ -1,15 +1,15 @@
 'use client';
-import { Sortable } from '@/app/session/[sessionId]/ranking/Sortable';
-import { createRoutePaths } from '@/app/session/[sessionId]/shared/route-paths';
-import { useRankAssignment } from '@/app/session/[sessionId]/shared/UseRankAssignment';
-import { useUser } from '@/app/session/[sessionId]/shared/useUser';
+import { Sortable } from '@/routes/~session/~$sessionId/~ranking/Sortable';
+import { createRoutePaths } from '@/routes/~session/~$sessionId/shared/route-paths';
+import { useRankAssignment } from '@/routes/~session/~$sessionId/shared/UseRankAssignment';
+import { useUser } from '@/routes/~session/~$sessionId/shared/useUser';
 import { Button } from '@/components/ui/button';
 import { Typography } from '@/components/ui/typography';
 import { Item } from '@/core/Item';
 import { RankDimension } from '@/core/RankDimension';
 import { UserRanking } from '@/core/UserRanking';
-import Link from 'next/link';
-import { useParams } from 'next/navigation';
+// import Link from 'next/link';
+// import { useParams } from 'next/navigation';
 
 function Dimension({
   dimension,

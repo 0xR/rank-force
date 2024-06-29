@@ -1,5 +1,13 @@
-import { createLazyFileRoute } from '@tanstack/react-router';
+import { createLazyFileRoute, Navigate } from '@tanstack/react-router';
+import { ulid } from 'ulid';
 
 export const Route = createLazyFileRoute('/')({
-  component: () => <div>Hello /!</div>,
+  component: () => (
+    <Navigate
+      to="/session/$sessionId"
+      params={{
+        sessionId: ulid(),
+      }}
+    />
+  ),
 });

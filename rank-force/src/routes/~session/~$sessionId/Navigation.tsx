@@ -1,6 +1,5 @@
 'use client';
 
-import { createRoutePaths } from '@/app/session/[sessionId]/shared/route-paths';
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -8,10 +7,14 @@ import {
   NavigationMenuList,
   navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu';
-import Link from 'next/link';
-import { useParams, usePathname } from 'next/navigation';
-import * as React from 'react';
+import { Route } from '@/routes/~session/~$sessionId.tsx';
+import { createRoutePaths } from '@/routes/~session/~$sessionId/shared/route-paths';
+import { Link, createLink } from '@tanstack/react-router';
+// import Link from 'next/link';
+// import { useParams, usePathname } from 'next/navigation';
 import { PropsWithChildren } from 'react';
+
+const MyLink = createLink((props) => <NavigationMenuLink {...props} />);
 
 function NavigationLinkWithActive({
   href,
@@ -19,23 +22,19 @@ function NavigationLinkWithActive({
 }: PropsWithChildren<{
   href: string;
 }>) {
-  const pathName = usePathname();
   return (
     <NavigationMenuItem>
-      <Link href={href} legacyBehavior passHref>
-        <NavigationMenuLink
-          className={navigationMenuTriggerStyle()}
-          active={pathName === href}
-        >
-          {children}
-        </NavigationMenuLink>
-      </Link>
+      <MyLink
+        from={Route.fullPath}
+        to="./nking"
+        className={navigationMenuTriggerStyle()}
+      />
     </NavigationMenuItem>
   );
 }
 
 export function NavigationMenuDemo() {
-  const params = useParams();
+  const params = Route.useParams();
   return (
     <NavigationMenu>
       <NavigationMenuList>

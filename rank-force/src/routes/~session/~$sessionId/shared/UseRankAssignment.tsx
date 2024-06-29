@@ -1,4 +1,4 @@
-import { useStoreContext } from '@/app/session/[sessionId]/StateProvider';
+import { useStoreContext } from '@/routes/~session/~$sessionId/StateProvider';
 import { RankAssignment } from '@/core/RankAssignment';
 import { useMemo } from 'react';
 

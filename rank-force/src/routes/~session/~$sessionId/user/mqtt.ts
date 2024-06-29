@@ -4,14 +4,13 @@ import { iot, mqtt } from 'aws-iot-device-sdk-v2';
 import { ulid } from 'ulid';
 
 export class MqttClient {
-  private endpoint = process.env.NEXT_PUBLIC_REALTIME_ENDPOINT!;
-  private authorizer = process.env.NEXT_PUBLIC_REALTIME_AUTHORIZER!;
+  private endpoint = import.meta.env.VITE_REALTIME_ENDPOINT!;
+  private authorizer = import.meta.env.VITE_REALTIME_AUTHORIZER!;
   private connection: mqtt.MqttClientConnection | undefined;
   private topic: string;
 
   constructor(private token: MqttToken) {
-    this.topic =
-      process.env.NEXT_PUBLIC_REALTIME_TOPIC_PREFIX! + token.sessionId;
+    this.topic = import.meta.env.VITE_REALTIME_TOPIC_PREFIX! + token.sessionId;
     this.setupConnection();
   }
 

@@ -1,5 +1,5 @@
-import { createRoutePaths } from '@/app/session/[sessionId]/shared/route-paths';
-import { redirect } from 'next/navigation';
+import { createRoutePaths } from '@/routes/~session/~$sessionId/shared/route-paths';
+// import { redirect } from 'next/navigation';
 
 export default function SessionRedirectPage({
   params: { sessionId },

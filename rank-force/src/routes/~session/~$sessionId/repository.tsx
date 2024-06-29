@@ -1,4 +1,4 @@
-import { mergeYjsUpdates } from '@/app/session/[sessionId]/yjs';
+import { mergeYjsUpdates } from '@/routes/~session/~$sessionId/yjs';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import {
   DynamoDBDocumentClient,

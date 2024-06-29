@@ -1,6 +1,6 @@
 'use client';
-import { useRankAssignment } from '@/app/session/[sessionId]/shared/UseRankAssignment';
-import { useUser } from '@/app/session/[sessionId]/shared/useUser';
+import { useRankAssignment } from '@/routes/~session/~$sessionId/shared/UseRankAssignment';
+import { useUser } from '@/routes/~session/~$sessionId/shared/useUser';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Typography } from '@/components/ui/typography';
 import { RankScore } from '@/core/RankScore';
@@ -33,7 +33,9 @@ export function Score() {
     return null;
   }
 
-  let rankingByUserEntries = Array.from(rankAssigment.rankingsByUser.entries());
+  const rankingByUserEntries = Array.from(
+    rankAssigment.rankingsByUser.entries(),
+  );
   return (
     <>
       <Typography variant="h1">Score</Typography>
@@ -66,7 +68,7 @@ export function Score() {
                       <Typography variant="h2">
                         {dimension.name}
                         {rankScores.length !== rankAssigment.items.length &&
-                          ' (incomplete ranking)'}
+                          ' (incomplete ~ranking)'}
                       </Typography>
                       <Typography variant="h3">{dimension.labelEnd}</Typography>
                       <ScoreList score={rankScores} />

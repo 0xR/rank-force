@@ -1,4 +1,4 @@
-import { useChanged } from '@/app/session/[sessionId]/ranking/UseChanged';
+import { useChanged } from '@/routes/~session/~$sessionId/~ranking/UseChanged';
 import { Typography } from '@/components/ui/typography';
 import { Item, itemsIncludes } from '@/core/Item';
 import { RankDimension } from '@/core/RankDimension';

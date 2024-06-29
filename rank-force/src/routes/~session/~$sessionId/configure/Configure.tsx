@@ -1,6 +1,6 @@
 'use client';
-import { useRankAssignment } from '@/app/session/[sessionId]/shared/UseRankAssignment';
-import { useUser } from '@/app/session/[sessionId]/shared/useUser';
+import { useRankAssignment } from '@/routes/~session/~$sessionId/shared/UseRankAssignment';
+import { useUser } from '@/routes/~session/~$sessionId/shared/useUser';
 import { Button } from '@/components/ui/button';
 import {
   Card,

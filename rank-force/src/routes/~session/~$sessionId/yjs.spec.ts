@@ -1,4 +1,4 @@
-import { mergeYjsUpdates } from '@/app/session/[sessionId]/yjs';
+import { mergeYjsUpdates } from '@/routes/~session/~$sessionId/yjs';
 import { expect } from 'vitest';
 import * as Y from 'yjs';
 

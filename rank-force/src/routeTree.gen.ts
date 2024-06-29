@@ -13,19 +13,19 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/~__root'
-import { Route as SessionSessionIdrootImport } from './routes/~session/~$sessionId/~__root'
+import { Route as SessionSessionIdImport } from './routes/~session/~$sessionId'
 
 // Create Virtual Routes
 
 const IndexLazyImport = createFileRoute('/')()
-const SessionSessionIdImport = createFileRoute('/session/$sessionId')()
+const SessionSessionIdIndexLazyImport = createFileRoute(
+  '/session/$sessionId/',
+)()
+const SessionSessionIdRankingIndexLazyImport = createFileRoute(
+  '/session/$sessionId/ranking/',
+)()
 
 // Create/Update Routes
-
-const SessionSessionIdrootRoute = SessionSessionIdrootImport.update({
-  id: '/__root',
-  getParentRoute: () => SessionSessionIdRoute,
-} as any)
 
 const IndexLazyRoute = IndexLazyImport.update({
   path: '/',
@@ -36,6 +36,23 @@ const SessionSessionIdRoute = SessionSessionIdImport.update({
   path: '/session/$sessionId',
   getParentRoute: () => rootRoute,
 } as any)
+
+const SessionSessionIdIndexLazyRoute = SessionSessionIdIndexLazyImport.update({
+  path: '/',
+  getParentRoute: () => SessionSessionIdRoute,
+} as any).lazy(() =>
+  import('./routes/~session/~$sessionId/~index.lazy').then((d) => d.Route),
+)
+
+const SessionSessionIdRankingIndexLazyRoute =
+  SessionSessionIdRankingIndexLazyImport.update({
+    path: '/ranking/',
+    getParentRoute: () => SessionSessionIdRoute,
+  } as any).lazy(() =>
+    import('./routes/~session/~$sessionId/~ranking/~index.lazy').then(
+      (d) => d.Route,
+    ),
+  )
 
 // Populate the FileRoutesByPath interface
 
@@ -55,12 +72,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SessionSessionIdImport
       parentRoute: typeof rootRoute
     }
-    '/session/$sessionId/__root': {
-      id: '/session/$sessionId/__root'
-      path: '/session/$sessionId'
-      fullPath: '/session/$sessionId'
-      preLoaderRoute: typeof SessionSessionIdrootImport
-      parentRoute: typeof SessionSessionIdRoute
+    '/session/$sessionId/': {
+      id: '/session/$sessionId/'
+      path: '/'
+      fullPath: '/session/$sessionId/'
+      preLoaderRoute: typeof SessionSessionIdIndexLazyImport
+      parentRoute: typeof SessionSessionIdImport
+    }
+    '/session/$sessionId/ranking/': {
+      id: '/session/$sessionId/ranking/'
+      path: '/ranking'
+      fullPath: '/session/$sessionId/ranking'
+      preLoaderRoute: typeof SessionSessionIdRankingIndexLazyImport
+      parentRoute: typeof SessionSessionIdImport
     }
   }
 }
@@ -69,7 +93,10 @@ declare module '@tanstack/react-router' {
 
 export const routeTree = rootRoute.addChildren({
   IndexLazyRoute,
-  SessionSessionIdRoute: SessionSessionIdRoute.addChildren({}),
+  SessionSessionIdRoute: SessionSessionIdRoute.addChildren({
+    SessionSessionIdIndexLazyRoute,
+    SessionSessionIdRankingIndexLazyRoute,
+  }),
 })
 
 /* prettier-ignore-end */
@@ -88,13 +115,18 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "~index.lazy.tsx"
     },
     "/session/$sessionId": {
-      "filePath": "~session/~$sessionId",
+      "filePath": "~session/~$sessionId.tsx",
       "children": [
-        "/session/$sessionId/__root"
+        "/session/$sessionId/",
+        "/session/$sessionId/ranking/"
       ]
     },
-    "/session/$sessionId/__root": {
-      "filePath": "~session/~$sessionId/~__root.tsx",
+    "/session/$sessionId/": {
+      "filePath": "~session/~$sessionId/~index.lazy.tsx",
+      "parent": "/session/$sessionId"
+    },
+    "/session/$sessionId/ranking/": {
+      "filePath": "~session/~$sessionId/~ranking/~index.lazy.tsx",
       "parent": "/session/$sessionId"
     }
   }

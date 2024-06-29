@@ -1,4 +1,4 @@
-import { Score } from '@/app/session/[sessionId]/score/Score';
+import { Score } from '@/routes/~session/~$sessionId/score/Score';
 
 export default async function Page() {
   return <Score />;
