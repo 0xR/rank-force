@@ -21,6 +21,9 @@ const IndexLazyImport = createFileRoute('/')()
 const SessionSessionIdIndexLazyImport = createFileRoute(
   '/session/$sessionId/',
 )()
+const SessionSessionIdUserIndexLazyImport = createFileRoute(
+  '/session/$sessionId/user/',
+)()
 const SessionSessionIdRankingIndexLazyImport = createFileRoute(
   '/session/$sessionId/ranking/',
 )()
@@ -43,6 +46,16 @@ const SessionSessionIdIndexLazyRoute = SessionSessionIdIndexLazyImport.update({
 } as any).lazy(() =>
   import('./routes/~session/~$sessionId/~index.lazy').then((d) => d.Route),
 )
+
+const SessionSessionIdUserIndexLazyRoute =
+  SessionSessionIdUserIndexLazyImport.update({
+    path: '/user/',
+    getParentRoute: () => SessionSessionIdRoute,
+  } as any).lazy(() =>
+    import('./routes/~session/~$sessionId/~user/~index.lazy').then(
+      (d) => d.Route,
+    ),
+  )
 
 const SessionSessionIdRankingIndexLazyRoute =
   SessionSessionIdRankingIndexLazyImport.update({
@@ -86,6 +99,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SessionSessionIdRankingIndexLazyImport
       parentRoute: typeof SessionSessionIdImport
     }
+    '/session/$sessionId/user/': {
+      id: '/session/$sessionId/user/'
+      path: '/user'
+      fullPath: '/session/$sessionId/user'
+      preLoaderRoute: typeof SessionSessionIdUserIndexLazyImport
+      parentRoute: typeof SessionSessionIdImport
+    }
   }
 }
 
@@ -96,6 +116,7 @@ export const routeTree = rootRoute.addChildren({
   SessionSessionIdRoute: SessionSessionIdRoute.addChildren({
     SessionSessionIdIndexLazyRoute,
     SessionSessionIdRankingIndexLazyRoute,
+    SessionSessionIdUserIndexLazyRoute,
   }),
 })
 
@@ -118,7 +139,8 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "~session/~$sessionId.tsx",
       "children": [
         "/session/$sessionId/",
-        "/session/$sessionId/ranking/"
+        "/session/$sessionId/ranking/",
+        "/session/$sessionId/user/"
       ]
     },
     "/session/$sessionId/": {
@@ -127,6 +149,10 @@ export const routeTree = rootRoute.addChildren({
     },
     "/session/$sessionId/ranking/": {
       "filePath": "~session/~$sessionId/~ranking/~index.lazy.tsx",
+      "parent": "/session/$sessionId"
+    },
+    "/session/$sessionId/user/": {
+      "filePath": "~session/~$sessionId/~user/~index.lazy.tsx",
       "parent": "/session/$sessionId"
     }
   }

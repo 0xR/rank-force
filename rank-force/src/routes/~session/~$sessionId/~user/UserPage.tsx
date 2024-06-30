@@ -1,10 +1,8 @@
-'use client';
-import { useRankAssignment } from '@/routes/~session/~$sessionId/shared/UseRankAssignment';
-import { useUserState } from '@/routes/~session/~$sessionId/shared/useUser';
-import { RealtimeDemo } from '@/routes/~session/~$sessionId/user/RealtimeDemo';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useRankAssignment } from '@/routes/~session/~$sessionId/shared/UseRankAssignment';
+import { useUserState } from '@/routes/~session/~$sessionId/shared/useUser';
 import { useEffect, useState } from 'react';
 
 export default function UserPage() {
@@ -39,7 +37,6 @@ export default function UserPage() {
           onChange={(e) => setUserNameLocal(e.target.value)}
         />
       </Label>
-      <RealtimeDemo />
       <Button type="submit">Save</Button>
     </form>
   );

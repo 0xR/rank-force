@@ -1,5 +1,4 @@
 import { useUserId } from '@/routes/~session/~$sessionId/shared/useUser';
-// import { useParams } from 'next/navigation';
 import { useMemo } from 'react';
 
 export function useMqttToken() {

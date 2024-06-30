@@ -13,7 +13,7 @@ import { User } from './User';
 
 describe('Domain', () => {
   it('should rank on a single dimension', () => {
-    const user = new User('user 0');
+    const user = new User('~user 0');
     const rankDimension = new RankDimension(
       'importance',
       'low',
@@ -36,7 +36,7 @@ describe('Domain', () => {
   });
 
   it('should rank on a single descending dimension', () => {
-    const user = new User('user 0');
+    const user = new User('~user 0');
     const rankDimension = new RankDimension(
       'importance',
       'high',
@@ -59,7 +59,7 @@ describe('Domain', () => {
   });
 
   it('should rank on multiple dimensions', () => {
-    const user = new User('user 0');
+    const user = new User('~user 0');
     const rankDimension1 = new RankDimension(
       'importance',
       'low',
@@ -91,7 +91,7 @@ describe('Domain', () => {
   });
 
   it('should consider dimension weight', () => {
-    const user = new User('user 0');
+    const user = new User('~user 0');
     const rankDimension1 = new RankDimension(
       'importance',
       'low',
@@ -222,8 +222,8 @@ describe('Domain', () => {
   });
 
   it('should rank for multiple users', () => {
-    const user1 = new User('user 0');
-    const user2 = new User('user 1', '1');
+    const user1 = new User('~user 0');
+    const user2 = new User('~user 1', '1');
     const rankDimension1 = new RankDimension(
       'importance',
       'low',
@@ -248,7 +248,7 @@ describe('Domain', () => {
   });
 
   it('should support adding items and dimensions', () => {
-    const user = new User('user 0');
+    const user = new User('~user 0');
     const rankDimension1 = new RankDimension(
       'importance',
       'low',
@@ -299,7 +299,7 @@ describe('Domain', () => {
   });
 
   it('should support incomplete rankings', () => {
-    const user = new User('user 0');
+    const user = new User('~user 0');
     const rankDimension = new RankDimension(
       'importance',
       'low',

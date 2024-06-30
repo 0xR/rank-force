@@ -1,19 +1,13 @@
-import { createRoutePaths } from '@/routes/~session/~$sessionId/shared/route-paths';
 import { RankAssignment } from '@/core/RankAssignment';
 import { User } from '@/core/User';
-// import { useParams, usePathname, useRouter } from 'next/navigation';
+import { Route } from '@/routes/~session/~$sessionId.tsx';
+import { useChildMatches, useNavigate } from '@tanstack/react-router';
 import { useCallback, useEffect, useMemo } from 'react';
-import { useIsClient, useLocalStorage } from 'usehooks-ts';
+import { useLocalStorage } from 'usehooks-ts';
 
 export function useUserId() {
-  const params = useParams();
-  return useLocalStorage<string | null>(
-    `rank-force-${params.sessionId}-userid`,
-    null,
-    {
-      initializeWithValue: false,
-    },
-  );
+  const { sessionId } = Route.useParams();
+  return useLocalStorage<string | null>(`rank-force-${sessionId}-userid`, null);
 }
 
 export function useUserState(rankAssigment: RankAssignment) {
@@ -45,23 +39,26 @@ export function useUserState(rankAssigment: RankAssignment) {
 }
 
 export function useUser(rankAssignment: RankAssignment) {
-  const router = useRouter();
-  const { sessionId } = useParams();
+  const { sessionId } = Route.useParams();
   const [user] = useUserState(rankAssignment);
-  const pathname = usePathname();
-  const isClient = useIsClient();
+  const childMatches = useChildMatches();
+  const navigate = useNavigate();
   useEffect(() => {
-    if (!isClient) {
-      return;
-    }
+    console.log('useUser', sessionId, childMatches, user);
     if (user) {
       return;
     }
-    if (pathname.match(new RegExp('/user/?$'))) {
-      return;
-    }
-    router.push(createRoutePaths(sessionId).user);
-  }, [isClient, pathname, router, sessionId, user]);
+    // if (childMatches) {
+    //   return;
+    // }return
+    navigate({
+      to: '/session/$sessionId/user',
+      params: {
+        sessionId,
+      },
+    });
+    console.log('useUser', sessionId, childMatches, user);
+  }, [childMatches, navigate, sessionId, user]);
 
   return user;
 }

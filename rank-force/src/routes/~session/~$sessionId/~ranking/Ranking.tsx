@@ -1,4 +1,5 @@
 'use client';
+import { Route } from '@/routes/~session/~$sessionId.tsx';
 import { Sortable } from '@/routes/~session/~$sessionId/~ranking/Sortable';
 import { createRoutePaths } from '@/routes/~session/~$sessionId/shared/route-paths';
 import { useRankAssignment } from '@/routes/~session/~$sessionId/shared/UseRankAssignment';
@@ -8,8 +9,6 @@ import { Typography } from '@/components/ui/typography';
 import { Item } from '@/core/Item';
 import { RankDimension } from '@/core/RankDimension';
 import { UserRanking } from '@/core/UserRanking';
-// import Link from 'next/link';
-// import { useParams } from 'next/navigation';
 
 function Dimension({
   dimension,
@@ -41,7 +40,7 @@ function Dimension({
 export function Ranking() {
   const rankAssigment = useRankAssignment();
   const user = useUser(rankAssigment);
-  const params = useParams();
+  const { sessionId } = Route.useParams();
 
   if (!user) {
     return null;
@@ -56,7 +55,7 @@ export function Ranking() {
         <>
           <p>No dimensions defined yet</p>
           <Button variant="link" asChild>
-            <Link href={createRoutePaths(params.sessionId).configure}>
+            <Link href={createRoutePaths(sessionId).configure}>
               Go to configure
             </Link>
           </Button>
@@ -65,7 +64,7 @@ export function Ranking() {
         <>
           <p>No items defined yet</p>
           <Button variant="link" asChild>
-            <Link href={createRoutePaths(params.sessionId).configure}>
+            <Link href={createRoutePaths(sessionId).configure}>
               Go to configure
             </Link>
           </Button>

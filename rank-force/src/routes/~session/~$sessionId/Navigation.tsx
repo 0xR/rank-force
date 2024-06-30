@@ -10,8 +10,6 @@ import {
 import { Route } from '@/routes/~session/~$sessionId.tsx';
 import { createRoutePaths } from '@/routes/~session/~$sessionId/shared/route-paths';
 import { Link, createLink } from '@tanstack/react-router';
-// import Link from 'next/link';
-// import { useParams, usePathname } from 'next/navigation';
 import { PropsWithChildren } from 'react';
 
 const MyLink = createLink((props) => <NavigationMenuLink {...props} />);

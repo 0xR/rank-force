@@ -3,7 +3,7 @@ import { TestStore } from '@/core/TestStore';
 import { User } from '@/core/User';
 
 export function createCompleteRankingAssignment() {
-  const user = new User('user 0');
+  const user = new User('~user 0');
   const rankDimension = new RankDimension(
     'importance',
     'low',
