@@ -1,7 +1,6 @@
 import { createCompleteRankingAssignment } from '@/core/mock-factories';
 import { deserializeJsonToYDoc } from '@/persistence/yjs-serialization';
 import { fireEvent, render, screen, within } from '@testing-library/react';
-import React from 'react';
 import { vi } from 'vitest';
 import * as Y from 'yjs';
 import { Ranking } from './Ranking';

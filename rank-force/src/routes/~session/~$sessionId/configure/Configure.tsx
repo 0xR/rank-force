@@ -17,7 +17,7 @@ import { Typography } from '@/components/ui/typography';
 import { Item } from '@/core/Item';
 import { RankDimension } from '@/core/RankDimension';
 import { Ratio } from '@/core/Ratio';
-import React, { FormEvent, useEffect } from 'react';
+import { FormEvent, useEffect } from 'react';
 
 function ItemForm({ onSubmit }: { onSubmit: (itemLabel: string) => void }) {
   return (
