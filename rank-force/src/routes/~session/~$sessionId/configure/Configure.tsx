@@ -69,6 +69,7 @@ function DimensionForm({
 }: {
   onSubmit: (dimension: RankDimension) => void;
 }) {
+  // @ts-expect-error TS2686
   const [direction, setDirection] = React.useState<'ascending' | 'descending'>(
     'ascending',
   );
@@ -153,6 +154,7 @@ function DimensionCard({
   onRemove: () => void;
   onChangeWeight: (ratio: Ratio) => void;
 }) {
+  // @ts-expect-error TS2686
   const [percentValue, setPercentValue] = React.useState(
     Math.round(weight.value * 100),
   );

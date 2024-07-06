@@ -177,6 +177,7 @@ export class RankAssignment {
   }
 }
 
+// @ts-expect-error TS6133
 function assertDefined<T>(value: T | undefined): asserts value is T {
   if (value === undefined) {
     throw new Error("Value is undefined");

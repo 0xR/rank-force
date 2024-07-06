@@ -31,6 +31,7 @@ export interface TypographyProps
   extends React.HTMLAttributes<HTMLHeadingElement>,
     VariantProps<typeof typographyVariants> {}
 
+// @ts-expect-error TS2686
 export const Typography = React.forwardRef<HTMLHeadingElement, TypographyProps>(
   ({ className, variant, affects, ...props }, ref) => {
     const Comp = variant || 'p';

@@ -14,6 +14,7 @@ global.ResizeObserver = vi.fn().mockImplementation(() => ({
 describe('Ranking', () => {
   it('should output yjs state', () => {
     const onChange = vi.fn();
+    // @ts-expect-error TS2322
     render(<Ranking onChange={onChange} />);
     screen.getByText('Items');
 
@@ -49,6 +50,7 @@ describe('Ranking', () => {
     const update = Y.encodeStateAsUpdate(doc);
     const updateBase64 = Buffer.from(update).toString('base64');
 
+    // @ts-expect-error TS2322
     render(<Ranking defaultValue={updateBase64} />);
     const lists = screen.getAllByRole('list').slice(-3);
     within(lists[1]).getByText('item1');

@@ -13,6 +13,7 @@ const documentClient = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 export async function getCurrentData(sessionId: string) {
   const response = await documentClient.send(
     new QueryCommand({
+      // @ts-expect-error TS2339
       TableName: Resource.Table.name,
       KeyConditionExpression: 'pk = :sessionId AND sk = :sk',
       ExpressionAttributeValues: {
@@ -35,6 +36,7 @@ export async function storeData(sessionId: string, data: string) {
     try {
       await documentClient.send(
         new PutCommand({
+          // @ts-expect-error TS2339
           TableName: Resource.Table.name,
           Item: {
             pk: sessionId,

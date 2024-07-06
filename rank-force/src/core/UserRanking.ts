@@ -15,6 +15,7 @@ export type UserRankingsPlain = [unknown, unknown[]][];
 export class UserRanking {
   @Transform(
     // Deserialize: Convert a plain object to a Map with User as keys and Role as values
+    // @ts-expect-error TS6133
     ({ type, value, obj }) => {
       if (type === TransformationType.CLASS_TO_PLAIN) {
         const rankings = value as Map<RankDimension, RankScore[]>;

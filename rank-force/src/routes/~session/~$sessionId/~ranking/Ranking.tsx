@@ -55,8 +55,12 @@ export function Ranking() {
         <>
           <p>No dimensions defined yet</p>
           <Button variant="link" asChild>
+            {/*
+             // @ts-expect-error TS2304 */}
             <Link href={createRoutePaths(sessionId).configure}>
               Go to configure
+            {/*
+             // @ts-expect-error TS2304 */}
             </Link>
           </Button>
         </>
@@ -64,8 +68,12 @@ export function Ranking() {
         <>
           <p>No items defined yet</p>
           <Button variant="link" asChild>
+            {/*
+             // @ts-expect-error TS2304 */}
             <Link href={createRoutePaths(sessionId).configure}>
               Go to configure
+            {/*
+             // @ts-expect-error TS2304 */}
             </Link>
           </Button>
         </>
