@@ -1,14 +1,15 @@
+import { useSharedStore } from '@/routes/~session/~$sessionId/store.ts';
 import { routeTree } from '@/routeTree.gen.ts';
 import {
   createMemoryHistory,
   createRouter,
   RouterProvider,
 } from '@tanstack/react-router';
-import { render, screen } from '@testing-library/react';
-import { describe, it } from 'vitest';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { describe, it, expect } from 'vitest';
 
 describe('UserPage', () => {
-  it('should render', async () => {
+  it('should should store the user once', async () => {
     const memoryHistory = createMemoryHistory({
       initialEntries: ['/session/01J23ZD5YVK05BTTKZ0027G6D2/user'], // Pass your initial url
     });
@@ -17,8 +18,16 @@ describe('UserPage', () => {
 
     render(<RouterProvider router={router} />);
 
-    await screen.findByLabelText('Username');
+    const userInput = await screen.findByLabelText('Username');
+    fireEvent.change(userInput, {
+      target: { value: 'John' },
+    });
+    const saveButton = screen.getByRole('button', { name: 'Save' });
+    fireEvent.click(saveButton);
+    fireEvent.click(saveButton);
 
-    screen.debug();
+    let users = useSharedStore.getState?.().users;
+    expect(users).toHaveLength(1);
+    expect(users![0]).toHaveProperty('name', 'John');
   });
 });

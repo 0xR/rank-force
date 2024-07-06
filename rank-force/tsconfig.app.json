@@ -29,5 +29,9 @@
         "@/*": ["./src/*"]
     }
   },
-  "include": ["src"]
+  "include": [
+    "src",
+    "node_modules",
+    "node_modules/vitest/globals.d.ts"
+  ]
 }

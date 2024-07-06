@@ -21,7 +21,7 @@ export function stateFromPlainObject(obj: Record<string, any>): State {
 
 const doc = new Y.Doc();
 
-const useStore = create<Store>()(
+export const useSharedStore = create<Store>(
   // Wrap the store creator with the Yjs middleware.
   // Create the store as you would normally.
   yjs(doc, 'shared', (set) => ({
@@ -82,7 +82,3 @@ const useStore = create<Store>()(
     },
   })),
 );
-
-export const useSharedStore = () => {
-  return useStore();
-};
