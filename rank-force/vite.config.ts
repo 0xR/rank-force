@@ -12,6 +12,11 @@ export default defineConfig({
       tsDecorators: true,
     }),
   ],
+  test: {
+    setupFiles: ['./tests/setup-tests.ts'],
+    environment: 'jsdom',
+    globals: true,
+  },
   resolve: {
     alias: {
       '@': '/src',

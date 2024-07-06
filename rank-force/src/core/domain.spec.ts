@@ -1,10 +1,10 @@
 import 'reflect-metadata';
-import { stateFromPlainObject } from '@/app/session/[sessionId]/store';
 import {
   createCompleteRankingAssignment,
   createDimension,
 } from '@/core/mock-factories';
 import { TestStore } from '@/core/TestStore';
+import { stateFromPlainObject } from '@/routes/~session/~$sessionId/store.ts';
 import { expect } from 'vitest';
 import { RankDimension } from './RankDimension';
 import { RankScore } from './RankScore';
