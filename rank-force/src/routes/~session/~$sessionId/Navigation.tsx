@@ -1,5 +1,3 @@
-'use client';
-
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -8,58 +6,33 @@ import {
   navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu';
 import { Route } from '@/routes/~session/~$sessionId.tsx';
-import { createRoutePaths } from '@/routes/~session/~$sessionId/shared/route-paths';
-// @ts-expect-error TS6133
-import { Link, createLink } from '@tanstack/react-router';
+import { Link } from '@tanstack/react-router';
 import { PropsWithChildren } from 'react';
 
-// @ts-expect-error TS7006
-const MyLink = createLink((props) => <NavigationMenuLink {...props} />);
-
-// @ts-expect-error TS6198
-function NavigationLinkWithActive({
-  href,
-  children,
-}: PropsWithChildren<{
-  href: string;
-}>) {
+function MyMenuItem({ to, children }: PropsWithChildren<{ to: string }>) {
+  const params = Route.useParams();
   return (
     <NavigationMenuItem>
-      <MyLink
-        from={Route.fullPath}
-        // @ts-expect-error TS2322
-        to="./nking"
+      <Link
+        to={to}
+        params={params}
+        _asChild={NavigationMenuLink}
         className={navigationMenuTriggerStyle()}
-      />
+      >
+        {children}
+      </Link>
     </NavigationMenuItem>
   );
 }
 
 export function NavigationMenuDemo() {
-  const params = Route.useParams();
   return (
     <NavigationMenu>
       <NavigationMenuList>
-        <NavigationLinkWithActive
-          href={createRoutePaths(params.sessionId).user}
-        >
-          User
-        </NavigationLinkWithActive>
-        <NavigationLinkWithActive
-          href={createRoutePaths(params.sessionId).configure}
-        >
-          Configure
-        </NavigationLinkWithActive>
-        <NavigationLinkWithActive
-          href={createRoutePaths(params.sessionId).ranking}
-        >
-          Ranking
-        </NavigationLinkWithActive>
-        <NavigationLinkWithActive
-          href={createRoutePaths(params.sessionId).score}
-        >
-          Score
-        </NavigationLinkWithActive>
+        <MyMenuItem to="/session/$sessionId/user/">User</MyMenuItem>
+        <MyMenuItem to="/session/$sessionId/configure/">Configure</MyMenuItem>
+        <MyMenuItem to="/session/$sessionId/ranking/">Ranking</MyMenuItem>
+        <MyMenuItem to="/session/$sessionId/score/">Score</MyMenuItem>
       </NavigationMenuList>
     </NavigationMenu>
   );
