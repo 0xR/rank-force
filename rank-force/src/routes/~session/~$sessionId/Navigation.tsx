@@ -16,6 +16,7 @@ function MyMenuItem({ to, children }: PropsWithChildren<{ to: string }>) {
       <Link
         to={to}
         params={params}
+        // @ts-expect-error
         _asChild={NavigationMenuLink}
         className={navigationMenuTriggerStyle()}
       >

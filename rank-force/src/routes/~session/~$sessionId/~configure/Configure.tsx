@@ -1,6 +1,3 @@
-'use client';
-import { useRankAssignment } from '@/routes/~session/~$sessionId/shared/UseRankAssignment';
-import { useUser } from '@/routes/~session/~$sessionId/shared/useUser';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -17,7 +14,9 @@ import { Typography } from '@/components/ui/typography';
 import { Item } from '@/core/Item';
 import { RankDimension } from '@/core/RankDimension';
 import { Ratio } from '@/core/Ratio';
-import { FormEvent, useEffect } from 'react';
+import { useRankAssignment } from '@/routes/~session/~$sessionId/shared/UseRankAssignment';
+import { useUser } from '@/routes/~session/~$sessionId/shared/useUser';
+import { FormEvent, useEffect, useState } from 'react';
 
 function ItemForm({ onSubmit }: { onSubmit: (itemLabel: string) => void }) {
   return (
@@ -69,8 +68,7 @@ function DimensionForm({
 }: {
   onSubmit: (dimension: RankDimension) => void;
 }) {
-  // @ts-expect-error TS2686
-  const [direction, setDirection] = React.useState<'ascending' | 'descending'>(
+  const [direction, setDirection] = useState<'ascending' | 'descending'>(
     'ascending',
   );
   return (
@@ -154,8 +152,7 @@ function DimensionCard({
   onRemove: () => void;
   onChangeWeight: (ratio: Ratio) => void;
 }) {
-  // @ts-expect-error TS2686
-  const [percentValue, setPercentValue] = React.useState(
+  const [percentValue, setPercentValue] = useState(
     Math.round(weight.value * 100),
   );
   useEffect(() => {

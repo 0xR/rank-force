@@ -1,5 +1,6 @@
 import { cn } from '@/lib/utils';
 import { cva, type VariantProps } from 'class-variance-authority';
+import { forwardRef, HTMLAttributes } from 'react';
 
 export const typographyVariants = cva('text-xl', {
   variants: {
@@ -28,11 +29,10 @@ export const typographyVariants = cva('text-xl', {
 });
 
 export interface TypographyProps
-  extends React.HTMLAttributes<HTMLHeadingElement>,
+  extends HTMLAttributes<HTMLHeadingElement>,
     VariantProps<typeof typographyVariants> {}
 
-// @ts-expect-error TS2686
-export const Typography = React.forwardRef<HTMLHeadingElement, TypographyProps>(
+export const Typography = forwardRef<HTMLHeadingElement, TypographyProps>(
   ({ className, variant, affects, ...props }, ref) => {
     const Comp = variant || 'p';
     return (

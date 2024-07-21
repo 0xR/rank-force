@@ -1,7 +1,7 @@
-import { useChanged } from '@/routes/~session/~$sessionId/~ranking/UseChanged';
 import { Typography } from '@/components/ui/typography';
 import { Item, itemsIncludes } from '@/core/Item';
 import { RankDimension } from '@/core/RankDimension';
+import { useChanged } from '@/routes/~session/~$sessionId/~ranking/UseChanged';
 import {
   closestCenter,
   DndContext,
@@ -18,7 +18,14 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { cx } from 'class-variance-authority';
-import { useCallback, useEffect, useId, useRef, useState } from 'react';
+import {
+  ReactNode,
+  useCallback,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+} from 'react';
 
 import { SortableItem } from './SortableItem';
 
@@ -34,7 +41,7 @@ function Droppable({
   className,
 }: {
   id: string;
-  children: React.ReactNode;
+  children: ReactNode;
   className?: string;
 }) {
   const { setNodeRef } = useDroppable({
