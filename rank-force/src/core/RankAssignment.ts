@@ -1,10 +1,10 @@
-import { Store } from "@/core/State";
-import { Item, itemsIncludes } from "./Item";
-import { RankDimension } from "./RankDimension";
-import { RankScore } from "./RankScore";
-import { Ratio } from "./Ratio";
-import { User } from "./User";
-import { UserRanking } from "./UserRanking";
+import { Store } from '@/core/State';
+import { Item, itemsIncludes } from './Item';
+import { RankDimension } from './RankDimension';
+import { RankScore } from './RankScore';
+import { Ratio } from './Ratio';
+import { User } from './User';
+import { UserRanking } from './UserRanking';
 
 export class RankAssignment {
   readonly usersById = new Map<string, User>();
@@ -172,14 +172,7 @@ export class RankAssignment {
       total += newRatio;
     });
     if (!new Ratio(total).equals(new Ratio(1))) {
-      throw new Error("Dimension weights do not sum to 1");
+      throw new Error('Dimension weights do not sum to 1');
     }
-  }
-}
-
-// @ts-expect-error TS6133
-function assertDefined<T>(value: T | undefined): asserts value is T {
-  if (value === undefined) {
-    throw new Error("Value is undefined");
   }
 }

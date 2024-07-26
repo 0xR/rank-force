@@ -5,14 +5,18 @@ import {
   NavigationMenuList,
   navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu';
+import { Route } from '@/routes/~session/~$sessionId.tsx';
 import { Link } from '@tanstack/react-router';
 import { PropsWithChildren } from 'react';
 
 function MyMenuItem({ to, children }: PropsWithChildren<{ to: string }>) {
+  const params = Route.useParams();
   return (
     <NavigationMenuItem>
       <Link
         to={to}
+        params={params}
+        // @ts-expect-error
         _asChild={NavigationMenuLink}
         className={navigationMenuTriggerStyle()}
       >

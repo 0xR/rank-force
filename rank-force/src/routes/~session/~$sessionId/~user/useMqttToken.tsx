@@ -1,9 +1,9 @@
+import { Route } from '@/routes/~session/~$sessionId.tsx';
 import { useUserId } from '@/routes/~session/~$sessionId/shared/useUser';
 import { useMemo } from 'react';
 
 export function useMqttToken() {
-  // @ts-expect-error TS2304
-  const { sessionId } = useParams();
+  const { sessionId } = Route.useParams();
   const [userId] = useUserId();
 
   return useMemo(() => {
