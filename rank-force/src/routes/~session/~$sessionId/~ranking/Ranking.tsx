@@ -4,11 +4,13 @@ import { Sortable } from '@/routes/~session/~$sessionId/~ranking/Sortable';
 import { createRoutePaths } from '@/routes/~session/~$sessionId/shared/route-paths';
 import { useRankAssignment } from '@/routes/~session/~$sessionId/shared/UseRankAssignment';
 import { useUser } from '@/routes/~session/~$sessionId/shared/useUser';
+import { Route as configRoute } from '@/routes/~session/~$sessionId/~configure/~index.lazy.tsx';
 import { Button } from '@/components/ui/button';
 import { Typography } from '@/components/ui/typography';
 import { Item } from '@/core/Item';
 import { RankDimension } from '@/core/RankDimension';
 import { UserRanking } from '@/core/UserRanking';
+import { Link } from '@tanstack/react-router';
 
 function Dimension({
   dimension,
@@ -40,7 +42,6 @@ function Dimension({
 export function Ranking() {
   const rankAssigment = useRankAssignment();
   const user = useUser(rankAssigment);
-  const { sessionId } = Route.useParams();
 
   if (!user) {
     return null;
@@ -55,26 +56,14 @@ export function Ranking() {
         <>
           <p>No dimensions defined yet</p>
           <Button variant="link" asChild>
-            {/*
-             // @ts-expect-error TS2304 */}
-            <Link href={createRoutePaths(sessionId).configure}>
-              Go to configure
-            {/*
-             // @ts-expect-error TS2304 */}
-            </Link>
+            <Link to="/session/$sessionId/configure/">Go to configure</Link>
           </Button>
         </>
       ) : rankAssigment.items.length === 0 ? (
         <>
           <p>No items defined yet</p>
           <Button variant="link" asChild>
-            {/*
-             // @ts-expect-error TS2304 */}
-            <Link href={createRoutePaths(sessionId).configure}>
-              Go to configure
-            {/*
-             // @ts-expect-error TS2304 */}
-            </Link>
+            <Link to="/session/$sessionId/configure/">Go to configure</Link>
           </Button>
         </>
       ) : (
