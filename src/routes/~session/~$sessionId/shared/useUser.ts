@@ -32,7 +32,7 @@ export function useUserState(rankAssigment: RankAssignment) {
       if (name === user?.name) {
         return;
       }
-      const newUser = new User(name);
+      const newUser = User.make(name);
       rankAssigment.addUser(newUser);
       setUserId(newUser.id);
     },

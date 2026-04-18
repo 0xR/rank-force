@@ -1,51 +1,11 @@
 import { Store } from '@/core/State';
 import { User } from '@/core/User';
-import {
-  instanceToPlain,
-  plainToInstance,
-  Transform,
-  TransformationType,
-} from 'class-transformer';
 import { Item } from './Item';
 import { RankDimension } from './RankDimension';
 import { RankScore } from './RankScore';
 import { Ratio } from './Ratio';
 
-export type UserRankingsPlain = [unknown, unknown[]][];
 export class UserRanking {
-  @Transform(
-    // Deserialize: Convert a plain object to a Map with User as keys and Role as values
-    // @ts-expect-error TS6133
-    ({ type, value, obj }) => {
-      if (type === TransformationType.CLASS_TO_PLAIN) {
-        const rankings = value as Map<RankDimension, RankScore[]>;
-        return Array.from(rankings.entries()).map(([dimension, rankScores]) => {
-          return [
-            instanceToPlain(dimension),
-            rankScores.map((rankScore) => instanceToPlain(rankScore)),
-          ];
-        }) satisfies UserRankingsPlain;
-      }
-      if (type === TransformationType.PLAIN_TO_CLASS) {
-        const plain = value as UserRankingsPlain;
-        let map = new Map(
-          plain.map(([dimension, rankScores]) => {
-            return [
-              plainToInstance(RankDimension, dimension),
-              rankScores.map((rankScore) =>
-                plainToInstance(RankScore, rankScore),
-              ),
-            ];
-          }),
-        );
-        return map;
-      }
-    },
-    {
-      toClassOnly: true,
-      toPlainOnly: true,
-    },
-  )
   readonly rankings: Map<RankDimension, RankScore[]> = new Map();
 
   constructor(

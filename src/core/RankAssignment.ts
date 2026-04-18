@@ -1,5 +1,5 @@
 import { Store } from '@/core/State';
-import { Item, itemsIncludes } from './Item';
+import { Item } from './Item';
 import { RankDimension } from './RankDimension';
 import { RankScore } from './RankScore';
 import { Ratio } from './Ratio';
@@ -69,7 +69,7 @@ export class RankAssignment {
   }
 
   addItems(...items: string[]) {
-    this.store.addItems(...items.map((label) => new Item(label)));
+    this.store.addItems(...items.map((label) => Item.make(label)));
   }
 
   addDimension(...rankDimensions: RankDimension[]) {
@@ -103,7 +103,7 @@ export class RankAssignment {
     }
 
     items.forEach((item) => {
-      if (!itemsIncludes(this.store.items, item)) {
+      if (!Item.includes(this.store.items, item)) {
         throw new Error(`Item ${item.label} not found in assignment`);
       }
     });

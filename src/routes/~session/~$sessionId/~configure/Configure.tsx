@@ -97,7 +97,7 @@ function DimensionForm({
         }
 
         onSubmit(
-          new RankDimension(
+          RankDimension.make(
             name,
             labelStart,
             labelEnd,

@@ -1,19 +1,12 @@
 import { ulid } from 'ulid';
 
-export class User {
-  constructor(
-    readonly name: string,
-    readonly id: string = ulid(),
-  ) {}
+export type User = {
+  readonly id: string;
+  readonly name: string;
+};
 
-  serialize() {
-    return {
-      id: this.id,
-      name: this.name,
-    };
-  }
-
-  static deserialize(user: ReturnType<User['serialize']>) {
-    return new User(user.name, user.id);
-  }
-}
+export const User = {
+  make(name: string, id: string = ulid()): User {
+    return { id, name };
+  },
+};

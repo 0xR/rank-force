@@ -3,8 +3,8 @@ import { TestStore } from '@/core/TestStore';
 import { User } from '@/core/User';
 
 export function createCompleteRankingAssignment() {
-  const user = new User('~user 0');
-  const rankDimension = new RankDimension(
+  const user = User.make('~user 0');
+  const rankDimension = RankDimension.make(
     'importance',
     'low',
     'high',
@@ -22,11 +22,5 @@ export function createCompleteRankingAssignment() {
 }
 
 export function createDimension() {
-  const rankDimension = new RankDimension(
-    'importance',
-    'low',
-    'high',
-    'descending',
-  );
-  return rankDimension;
+  return RankDimension.make('importance', 'low', 'high', 'descending');
 }

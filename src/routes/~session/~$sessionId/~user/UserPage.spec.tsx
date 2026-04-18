@@ -24,8 +24,8 @@ describe('UserPage', () => {
     const saveButton = screen.getByRole('button', { name: 'Save' });
     fireEvent.click(saveButton);
 
-    let users = useSharedStore.getState?.().users;
+    const users = useSharedStore.getState().doc.users;
     expect(users).toHaveLength(1);
-    expect(users![0]).toHaveProperty('name', 'John');
+    expect(users[0]).toHaveProperty('name', 'John');
   });
 });

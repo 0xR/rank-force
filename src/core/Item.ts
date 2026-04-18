@@ -1,21 +1,15 @@
 import { ulid } from 'ulid';
 
-export class Item {
-  constructor(
-    readonly label: string,
-    readonly id: string = ulid(),
-  ) {}
+export type Item = {
+  readonly id: string;
+  readonly label: string;
+};
 
-  serialize() {
-    return {
-      id: this.id,
-      label: this.label,
-    };
-  }
-
-  static deserialize(item: ReturnType<Item['serialize']>) {
-    return new Item(item.label, item.id);
-  }
-}
-export const itemsIncludes = (items: Item[], item: Item) =>
-  items.some((i) => i.id === item.id);
+export const Item = {
+  make(label: string, id: string = ulid()): Item {
+    return { id, label };
+  },
+  includes(items: Item[], item: Item): boolean {
+    return items.some((i) => i.id === item.id);
+  },
+};

@@ -1,4 +1,3 @@
-import 'reflect-metadata';
 import { createRouter, RouterProvider } from '@tanstack/react-router';
 import './index.css';
 import { StrictMode } from 'react';

@@ -3,7 +3,6 @@ import { RankAssignment } from '@/core/RankAssignment';
 import { RankDimension } from '@/core/RankDimension';
 import { State, Store } from '@/core/State';
 import { User } from '@/core/User';
-import { instanceToPlain } from 'class-transformer';
 
 export class TestStore implements Store {
   constructor(
@@ -38,11 +37,11 @@ export class TestStore implements Store {
 
   static fromState(state: State) {
     return new TestStore(
-      state.items,
-      state.dimensions,
-      state.users,
-      state.rankingsByUser,
-      state.dimensionWeights,
+      [...state.items],
+      [...state.dimensions],
+      [...state.users],
+      { ...state.rankingsByUser },
+      { ...state.dimensionWeights },
     );
   }
 
@@ -68,13 +67,11 @@ export class TestStore implements Store {
     this.items = this.items.filter((item) => !items.includes(item));
   }
 
-  toPlainObject(): Record<string, any> {
+  toPlainObject(): State {
     return {
-      items: this.items.map((item) => instanceToPlain(item)),
-      dimensions: this.dimensions.map((dimension) =>
-        instanceToPlain(dimension),
-      ),
-      users: this.users.map((user) => instanceToPlain(user)),
+      items: this.items,
+      dimensions: this.dimensions,
+      users: this.users,
       rankingsByUser: this.rankingsByUser,
       dimensionWeights: this.dimensionWeights,
     };

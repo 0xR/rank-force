@@ -1,5 +1,5 @@
 import { Typography } from '@/components/ui/typography';
-import { Item, itemsIncludes } from '@/core/Item';
+import { Item } from '@/core/Item';
 import { RankDimension } from '@/core/RankDimension';
 import { useChanged } from '@/routes/~session/~$sessionId/~ranking/UseChanged';
 import {
@@ -72,7 +72,7 @@ export function Sortable({
   rankDimension: RankDimension;
 }) {
   const [items1, setItems1] = useState(() => {
-    return items.filter((item) => !itemsIncludes(initialRanking, item));
+    return items.filter((item) => !Item.includes(initialRanking, item));
   });
   const [items2, setItems2] = useState<Item[]>(initialRanking);
   const sensors = useSensors(
@@ -88,17 +88,17 @@ export function Sortable({
   useEffect(() => {
     if (!itemsPropChanged) return;
     const newItems = items.filter(
-      (item) => !itemsIncludes(items1, item) && !itemsIncludes(items2, item),
+      (item) => !Item.includes(items1, item) && !Item.includes(items2, item),
     );
     if (newItems.length) {
       setItems1((items) => [...items, ...newItems]);
     }
     // remove items that are no longer in the list
     setItems1((itemState) =>
-      itemState.filter((item) => itemsIncludes(items, item)),
+      itemState.filter((item) => Item.includes(items, item)),
     );
     setItems2((itemState) =>
-      itemState.filter((item) => itemsIncludes(items, item)),
+      itemState.filter((item) => Item.includes(items, item)),
     );
   }, [items, items1, items2, itemsPropChanged]);
 
@@ -134,9 +134,9 @@ export function Sortable({
           assertString(over.id);
 
           const getItemsAndSetter = (item: Item) => {
-            if (itemsIncludes(items1, item))
+            if (Item.includes(items1, item))
               return [items1, setItems1] as const;
-            if (itemsIncludes(items2, item))
+            if (Item.includes(items2, item))
               return [items2, setItems2] as const;
             return [null, null] as const;
           };

@@ -1,10 +1,8 @@
-import 'reflect-metadata';
 import {
   createCompleteRankingAssignment,
   createDimension,
 } from '@/core/mock-factories';
 import { TestStore } from '@/core/TestStore';
-import { stateFromPlainObject } from '@/routes/~session/~$sessionId/store.ts';
 import { expect } from 'vitest';
 import { RankDimension } from './RankDimension';
 import { RankScore } from './RankScore';
@@ -13,8 +11,8 @@ import { User } from './User';
 
 describe('Domain', () => {
   it('should rank on a single dimension', () => {
-    const user = new User('~user 0');
-    const rankDimension = new RankDimension(
+    const user = User.make('~user 0');
+    const rankDimension = RankDimension.make(
       'importance',
       'low',
       'high',
@@ -36,8 +34,8 @@ describe('Domain', () => {
   });
 
   it('should rank on a single descending dimension', () => {
-    const user = new User('~user 0');
-    const rankDimension = new RankDimension(
+    const user = User.make('~user 0');
+    const rankDimension = RankDimension.make(
       'importance',
       'high',
       'low',
@@ -59,14 +57,14 @@ describe('Domain', () => {
   });
 
   it('should rank on multiple dimensions', () => {
-    const user = new User('~user 0');
-    const rankDimension1 = new RankDimension(
+    const user = User.make('~user 0');
+    const rankDimension1 = RankDimension.make(
       'importance',
       'low',
       'high',
       'ascending',
     );
-    const rankDimension2 = new RankDimension(
+    const rankDimension2 = RankDimension.make(
       'urgency',
       'low',
       'high',
@@ -91,14 +89,14 @@ describe('Domain', () => {
   });
 
   it('should consider dimension weight', () => {
-    const user = new User('~user 0');
-    const rankDimension1 = new RankDimension(
+    const user = User.make('~user 0');
+    const rankDimension1 = RankDimension.make(
       'importance',
       'low',
       'high',
       'ascending',
     );
-    const rankDimension2 = new RankDimension(
+    const rankDimension2 = RankDimension.make(
       'urgency',
       'low',
       'high',
@@ -131,7 +129,7 @@ describe('Domain', () => {
   });
 
   it('should give a dimension a weight', () => {
-    const rankDimension1 = new RankDimension(
+    const rankDimension1 = RankDimension.make(
       'importance',
       'low',
       'high',
@@ -222,9 +220,9 @@ describe('Domain', () => {
   });
 
   it('should rank for multiple users', () => {
-    const user1 = new User('~user 0');
-    const user2 = new User('~user 1', '1');
-    const rankDimension1 = new RankDimension(
+    const user1 = User.make('~user 0');
+    const user2 = User.make('~user 1', '1');
+    const rankDimension1 = RankDimension.make(
       'importance',
       'low',
       'high',
@@ -248,15 +246,15 @@ describe('Domain', () => {
   });
 
   it('should support adding items and dimensions', () => {
-    const user = new User('~user 0');
-    const rankDimension1 = new RankDimension(
+    const user = User.make('~user 0');
+    const rankDimension1 = RankDimension.make(
       'importance',
       'low',
       'high',
       'ascending',
       '0',
     );
-    const rankDimension2 = new RankDimension(
+    const rankDimension2 = RankDimension.make(
       'urgency',
       'low',
       'high',
@@ -287,7 +285,7 @@ describe('Domain', () => {
     expect(testStore.rankAssignment.rankingComplete).toBe(true);
     expect(testStore.rankAssignment.score).toHaveLength(2);
     testStore.rankAssignment.addDimension(
-      new RankDimension('complexity', 'low', 'high', 'ascending'),
+      RankDimension.make('complexity', 'low', 'high', 'ascending'),
     );
     expect(testStore.rankAssignment.rankingComplete).toBe(false);
     expect(testStore.rankAssignment.score).toBeUndefined();
@@ -299,8 +297,8 @@ describe('Domain', () => {
   });
 
   it('should support incomplete rankings', () => {
-    const user = new User('~user 0');
-    const rankDimension = new RankDimension(
+    const user = User.make('~user 0');
+    const rankDimension = RankDimension.make(
       'importance',
       'low',
       'high',
@@ -329,8 +327,8 @@ describe('Domain', () => {
   });
 
   it('should allow ranking a single item', () => {
-    const user = new User('user', '0');
-    const rankDimension = new RankDimension(
+    const user = User.make('user', '0');
+    const rankDimension = RankDimension.make(
       'importance',
       'low',
       'high',
@@ -348,7 +346,7 @@ describe('Domain', () => {
   });
 
   it('should allow removing an item that is ranked', () => {
-    const user = new User('user', '0');
+    const user = User.make('user', '0');
     const rankDimension = createDimension();
     const testStore = new TestStore();
     testStore.rankAssignment.addDimension(rankDimension);
@@ -367,7 +365,7 @@ describe('Domain', () => {
   });
 
   it('should allow removing a dimension is ranked', () => {
-    const user = new User('user', '0');
+    const user = User.make('user', '0');
     const rankDimension = createDimension();
     const testStore = new TestStore();
     testStore.rankAssignment.addDimension(rankDimension);
@@ -392,7 +390,7 @@ describe('Domain', () => {
     const serialized = JSON.stringify(plain, null, 2);
     const deserialized = JSON.parse(serialized);
 
-    const testStore2 = TestStore.fromState(stateFromPlainObject(deserialized));
+    const testStore2 = TestStore.fromState(deserialized);
     expect(testStore.rankAssignment).toEqual(testStore2.rankAssignment);
   });
 });
