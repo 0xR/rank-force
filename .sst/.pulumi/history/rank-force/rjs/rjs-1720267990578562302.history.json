@@ -1,0 +1,44 @@
+{
+    "kind": "update",
+    "startTime": 1720267984,
+    "message": "viewable user page",
+    "environment": {
+        "exec.kind": "auto.local",
+        "git.author": "Ruben Oostinga",
+        "git.author.email": "ruben.oostinga@gmail.com",
+        "git.committer": "Ruben Oostinga",
+        "git.committer.email": "ruben.oostinga@gmail.com",
+        "git.dirty": "false",
+        "git.head": "2bb3b75d0ccefea25f2a059d049bbce1fd50755e",
+        "git.headName": "refs/heads/main",
+        "pulumi.arch": "amd64",
+        "pulumi.env.PULUMI_CONFIG_PASSPHRASE": "set",
+        "pulumi.env.PULUMI_DEBUG_COMMANDS": "true",
+        "pulumi.env.PULUMI_HOME": "set",
+        "pulumi.flag.continue-on-error": "true",
+        "pulumi.flag.event-log": "set",
+        "pulumi.flag.exec-kind": "set",
+        "pulumi.flag.non-interactive": "true",
+        "pulumi.flag.skip-preview": "true",
+        "pulumi.flag.stack": "set",
+        "pulumi.flag.target-dependents": "true",
+        "pulumi.flag.yes": "true",
+        "pulumi.os": "linux",
+        "pulumi.version": "v3.115.2",
+        "updatePlan": "false",
+        "vcs.kind": "github.com",
+        "vcs.owner": "0xR",
+        "vcs.repo": "rank-force",
+        "vcs.root": ".sst"
+    },
+    "config": {
+        "aws:defaultTags": "{\"tags\":{\"sst:app\":\"rank-force\",\"sst:stage\":\"rjs\"}}",
+        "aws:region": "eu-west-1"
+    },
+    "version": 0,
+    "result": "succeeded",
+    "endTime": 1720267990,
+    "resourceChanges": {
+        "same": 43
+    }
+}

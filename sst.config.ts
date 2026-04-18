@@ -25,12 +25,20 @@ export default $config({
       },
       primaryIndex: { hashKey: 'pk', rangeKey: 'sk' },
     });
-    new sst.aws.Nextjs('Web', {
+    new sst.aws.StaticSite('Web', {
       link: [table],
+      build: {
+        command: 'pnpm build',
+        output: 'dist',
+      },
+      dev: {
+        command: 'pnpm exec vite',
+        autostart: true,
+      },
       environment: {
-        NEXT_PUBLIC_REALTIME_ENDPOINT: realtime.endpoint,
-        NEXT_PUBLIC_REALTIME_TOPIC_PREFIX: topicPrefix,
-        NEXT_PUBLIC_REALTIME_AUTHORIZER: realtime.authorizer,
+        VITE_REALTIME_ENDPOINT: realtime.endpoint,
+        VITE_REALTIME_TOPIC_PREFIX: topicPrefix,
+        VITE_REALTIME_AUTHORIZER: realtime.authorizer,
       },
     });
   },
