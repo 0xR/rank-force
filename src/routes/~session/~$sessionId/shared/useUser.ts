@@ -5,9 +5,13 @@ import { useChildMatches, useNavigate } from '@tanstack/react-router';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useLocalStorage } from 'usehooks-ts';
 
+export function userIdStorageKey(sessionId: string) {
+  return `rank-force-${sessionId}-userid`;
+}
+
 export function useUserId() {
   const { sessionId } = Route.useParams();
-  return useLocalStorage<string | null>(`rank-force-${sessionId}-userid`, null);
+  return useLocalStorage<string | null>(userIdStorageKey(sessionId), null);
 }
 
 export function useUserState(rankAssigment: RankAssignment) {
