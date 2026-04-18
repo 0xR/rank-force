@@ -23,4 +23,12 @@ describe('session index redirect', () => {
     expect(await screen.findByLabelText('Username')).toBeTruthy();
   });
 
+  it('redirects to the user page from the app root when no user is configured', async () => {
+    const memoryHistory = createMemoryHistory({ initialEntries: ['/'] });
+    const router = createRouter({ routeTree, history: memoryHistory });
+
+    render(<RouterProvider router={router} />);
+
+    expect(await screen.findByLabelText('Username')).toBeTruthy();
+  });
 });

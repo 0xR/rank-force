@@ -14,13 +14,11 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { Route as rootRoute } from './routes/~__root'
 import { Route as SessionSessionIdImport } from './routes/~session/~$sessionId'
+import { Route as SessionSessionIdIndexImport } from './routes/~session/~$sessionId/~index'
 
 // Create Virtual Routes
 
 const IndexLazyImport = createFileRoute('/')()
-const SessionSessionIdIndexLazyImport = createFileRoute(
-  '/session/$sessionId/',
-)()
 const SessionSessionIdUserIndexLazyImport = createFileRoute(
   '/session/$sessionId/user/',
 )()
@@ -46,12 +44,10 @@ const SessionSessionIdRoute = SessionSessionIdImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const SessionSessionIdIndexLazyRoute = SessionSessionIdIndexLazyImport.update({
+const SessionSessionIdIndexRoute = SessionSessionIdIndexImport.update({
   path: '/',
   getParentRoute: () => SessionSessionIdRoute,
-} as any).lazy(() =>
-  import('./routes/~session/~$sessionId/~index.lazy').then((d) => d.Route),
-)
+} as any)
 
 const SessionSessionIdUserIndexLazyRoute =
   SessionSessionIdUserIndexLazyImport.update({
@@ -115,7 +111,7 @@ declare module '@tanstack/react-router' {
       id: '/session/$sessionId/'
       path: '/'
       fullPath: '/session/$sessionId/'
-      preLoaderRoute: typeof SessionSessionIdIndexLazyImport
+      preLoaderRoute: typeof SessionSessionIdIndexImport
       parentRoute: typeof SessionSessionIdImport
     }
     '/session/$sessionId/configure/': {
@@ -154,7 +150,7 @@ declare module '@tanstack/react-router' {
 export const routeTree = rootRoute.addChildren({
   IndexLazyRoute,
   SessionSessionIdRoute: SessionSessionIdRoute.addChildren({
-    SessionSessionIdIndexLazyRoute,
+    SessionSessionIdIndexRoute,
     SessionSessionIdConfigureIndexLazyRoute,
     SessionSessionIdRankingIndexLazyRoute,
     SessionSessionIdScoreIndexLazyRoute,
@@ -188,7 +184,7 @@ export const routeTree = rootRoute.addChildren({
       ]
     },
     "/session/$sessionId/": {
-      "filePath": "~session/~$sessionId/~index.lazy.tsx",
+      "filePath": "~session/~$sessionId/~index.tsx",
       "parent": "/session/$sessionId"
     },
     "/session/$sessionId/configure/": {
