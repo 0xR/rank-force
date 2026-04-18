@@ -6,8 +6,9 @@ export default defineConfig({
   // @ts-ignore
   plugins: [react(), tsconfigPaths()],
   test: {
-    setupFiles: ['./test/setup-tests.ts'],
+    setupFiles: ['./rank-force/tests/setup-tests.ts'],
     environment: 'jsdom',
     globals: true,
+    exclude: ['**/node_modules/**', 'tests/**', 'tests-examples/**'],
   },
 });
