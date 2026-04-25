@@ -1,8 +1,9 @@
 import { RankAssignment } from '@/core/RankAssignment';
 import { User } from '@/core/User';
 import { Route } from '@/routes/~session/~$sessionId.tsx';
-import { useChildMatches, useNavigate } from '@tanstack/react-router';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useNavigatorName } from '@/shared/useNavigator';
+import { useNavigate } from '@tanstack/react-router';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useLocalStorage } from 'usehooks-ts';
 
 export function userIdStorageKey(sessionId: string) {
@@ -44,25 +45,35 @@ export function useUserState(rankAssigment: RankAssignment) {
 
 export function useUser(rankAssignment: RankAssignment) {
   const { sessionId } = Route.useParams();
-  const [user] = useUserState(rankAssignment);
-  const childMatches = useChildMatches();
+  const [user, setUserName] = useUserState(rankAssignment);
+  const [navigatorName] = useNavigatorName();
   const navigate = useNavigate();
+
+  // Stable refs so the effect can run exactly once per "bootstrap intent"
+  // without resubscribing on every re-render of setUserName / navigate.
+  const setUserNameRef = useRef(setUserName);
+  setUserNameRef.current = setUserName;
+  const navigateRef = useRef(navigate);
+  navigateRef.current = navigate;
+  const bootstrappedFor = useRef<string | null>(null);
+
   useEffect(() => {
-    console.log('useUser', sessionId, childMatches, user);
     if (user) {
+      bootstrappedFor.current = null;
       return;
     }
-    // if (childMatches) {
-    //   return;
-    // }return
-    navigate({
+    const name = navigatorName.trim();
+    if (name) {
+      if (bootstrappedFor.current === name) return;
+      bootstrappedFor.current = name;
+      setUserNameRef.current(name);
+      return;
+    }
+    navigateRef.current({
       to: '/session/$sessionId/user',
-      params: {
-        sessionId,
-      },
+      params: { sessionId },
     });
-    console.log('useUser', sessionId, childMatches, user);
-  }, [childMatches, navigate, sessionId, user]);
+  }, [navigatorName, sessionId, user]);
 
   return user;
 }

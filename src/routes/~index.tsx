@@ -1,11 +1,6 @@
-import { createFileRoute, redirect } from '@tanstack/react-router';
-import { ulid } from 'ulid';
+import { createFileRoute } from '@tanstack/react-router';
+import { Welcome } from './Welcome';
 
 export const Route = createFileRoute('/')({
-  beforeLoad: () => {
-    throw redirect({
-      to: '/session/$sessionId',
-      params: { sessionId: ulid() },
-    });
-  },
+  component: Welcome,
 });
