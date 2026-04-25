@@ -41,4 +41,40 @@ describe('session index redirect', () => {
 
     expect(await screen.findByLabelText('Your name')).toBeTruthy();
   });
+
+  it('redirects to the user page when the session root URL has a trailing slash', async () => {
+    const sessionId = '01J23ZD5YVK05BTTKZ0027G6D2';
+    const memoryHistory = createMemoryHistory({
+      initialEntries: [`/session/${sessionId}/`],
+    });
+    const router = createRouter({ routeTree, history: memoryHistory });
+
+    render(
+      <RepoContext.Provider value={repo}>
+        <RouterProvider router={router} />
+      </RepoContext.Provider>,
+    );
+
+    expect(await screen.findByLabelText('Your name')).toBeTruthy();
+  });
+
+  it('redirects to configure when navigator name is already set', async () => {
+    localStorage.setItem(
+      'rank-force-navigator-name',
+      JSON.stringify('test-user'),
+    );
+    const sessionId = '01J23ZD5YVK05BTTKZ0027G6D3';
+    const memoryHistory = createMemoryHistory({
+      initialEntries: [`/session/${sessionId}`],
+    });
+    const router = createRouter({ routeTree, history: memoryHistory });
+
+    render(
+      <RepoContext.Provider value={repo}>
+        <RouterProvider router={router} />
+      </RepoContext.Provider>,
+    );
+
+    expect(await screen.findByText('Items')).toBeTruthy();
+  });
 });

@@ -4,8 +4,6 @@ async function startSession(page: Page, name: string) {
   await page.goto('/');
   await page.getByLabel('Your name').fill(name);
   await page.getByRole('button', { name: 'Start a session' }).click();
-  await page.waitForURL(/\/session\/[0-9A-HJKMNP-TV-Z]{26}\/user/i);
-  await page.getByRole('button', { name: 'Continue' }).click();
   await page.waitForURL(/\/configure$/);
 }
 
@@ -20,7 +18,7 @@ test.describe('Rank Force', () => {
     await page.goto('/');
     await page.getByLabel('Your name').fill('testuser');
     await page.getByRole('button', { name: 'Start a session' }).click();
-    await page.waitForURL(/\/user$/);
+    await page.waitForURL(/\/configure$/);
 
     const newPage = await context.newPage();
     await newPage.goto('/');
