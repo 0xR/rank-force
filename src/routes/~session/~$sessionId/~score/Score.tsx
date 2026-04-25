@@ -86,7 +86,7 @@ function AggregateList({ scores }: { scores: RankScore[] }) {
   const [first, ...rest] = scores;
   return (
     <div className="flex flex-col gap-4">
-      <Hero first={first} />
+      <Hero first={first!} />
       {rest.length > 0 && (
         <ul className="rounded-lg border border-space-4 divide-y divide-space-4 overflow-hidden bg-space-1">
           {rest.map((s, i) => {
@@ -169,7 +169,7 @@ export function Score() {
           <h2 className="text-xl font-semibold text-cream tracking-tight">
             By participant
           </h2>
-          <Tabs defaultValue={users[0].id} className="w-full">
+          <Tabs defaultValue={users[0]!.id} className="w-full">
             <TabsList className="overflow-x-auto">
               {users.map((u) => (
                 <TabsTrigger key={u.id} value={u.id}>

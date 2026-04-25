@@ -58,6 +58,9 @@ export class UserRanking {
           throw new Error(`Ranking not found for item ${item.label}`);
         }
         const dimensionWeight = this.store.dimensionWeights[dimension.id];
+        if (dimensionWeight === undefined) {
+          throw new Error(`Dimension weight missing for ${dimension.name}`);
+        }
         return score + rankScore.score.value * dimensionWeight;
       }, 0);
 

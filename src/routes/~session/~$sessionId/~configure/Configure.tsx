@@ -326,8 +326,8 @@ function DimensionCard({
         </span>
         <Slider
           value={[percentValue]}
-          onValueChange={(v) => setPercentValue(v[0])}
-          onValueCommit={(v) => onChangeWeight(new Ratio(v[0] / 100))}
+          onValueChange={(v) => setPercentValue(v[0]!)}
+          onValueCommit={(v) => onChangeWeight(new Ratio(v[0]! / 100))}
           min={1}
           max={100}
           step={1}

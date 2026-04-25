@@ -40,7 +40,7 @@ export function buildState({
         const shift = userIndex + dimIndex;
         byDim[dim.id] = Array.from(
           { length: items.length },
-          (_, k) => items[(k + shift) % items.length].id,
+          (_, k) => items[(k + shift) % items.length]!.id,
         );
       });
       rankingsByUser[user.id] = byDim;

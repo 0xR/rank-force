@@ -43,7 +43,7 @@ export default function DevScenariosPage() {
     localStorage.setItem(docUrlKey(sessionId), handle.url);
     localStorage.setItem(
       userIdKey(sessionId),
-      JSON.stringify(state.users[0].id),
+      JSON.stringify(state.users[0]!.id),
     );
 
     await navigate({ to: target, params: { sessionId } });

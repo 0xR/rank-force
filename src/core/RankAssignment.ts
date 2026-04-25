@@ -90,7 +90,9 @@ export class RankAssignment {
       userRanking.removeDimensions(...dimensions);
     });
 
-    this.store.setDimensionWeight(dimensions[0].id, undefined);
+    if (dimensions[0]) {
+      this.store.setDimensionWeight(dimensions[0].id, undefined);
+    }
   }
 
   rank(user: User, dimension: RankDimension, items: Item[]) {
@@ -126,7 +128,7 @@ export class RankAssignment {
       .map((userRanking) => userRanking.score(this.store));
     const scores = this.store.items.map((item, index) => {
       const scoreValue = scoresForUsers.reduce(
-        (score, userScores) => score + userScores[index].score.value,
+        (score, userScores) => score + userScores[index]!.score.value,
         0,
       );
       return new RankScore(item, new Ratio(scoreValue / scoresForUsers.length));

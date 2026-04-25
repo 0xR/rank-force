@@ -21,15 +21,15 @@ describe('Domain', () => {
     const testStore = new TestStore();
     testStore.rankAssignment.addDimension(rankDimension);
     testStore.rankAssignment.addItems('item1', 'item2', 'item3');
-    testStore.rankAssignment.rank(user, testStore.dimensions[0], [
-      testStore.items[2],
-      testStore.items[0],
-      testStore.items[1],
+    testStore.rankAssignment.rank(user, testStore.dimensions[0]!, [
+      testStore.items[2]!,
+      testStore.items[0]!,
+      testStore.items[1]!,
     ]);
     expect(testStore.rankAssignment.score).toEqual([
-      new RankScore(testStore.items[1], new Ratio(1)),
-      new RankScore(testStore.items[0], new Ratio(0.5)),
-      new RankScore(testStore.items[2], new Ratio(0)),
+      new RankScore(testStore.items[1]!, new Ratio(1)),
+      new RankScore(testStore.items[0]!, new Ratio(0.5)),
+      new RankScore(testStore.items[2]!, new Ratio(0)),
     ]);
   });
 
@@ -44,15 +44,15 @@ describe('Domain', () => {
     const testStore = new TestStore();
     testStore.rankAssignment.addDimension(rankDimension);
     testStore.rankAssignment.addItems('item1', 'item2', 'item3');
-    testStore.rankAssignment.rank(user, testStore.dimensions[0], [
-      testStore.items[2],
-      testStore.items[0],
-      testStore.items[1],
+    testStore.rankAssignment.rank(user, testStore.dimensions[0]!, [
+      testStore.items[2]!,
+      testStore.items[0]!,
+      testStore.items[1]!,
     ]);
     expect(testStore.rankAssignment.score).toEqual([
-      new RankScore(testStore.items[2], new Ratio(1)),
-      new RankScore(testStore.items[0], new Ratio(0.5)),
-      new RankScore(testStore.items[1], new Ratio(0)),
+      new RankScore(testStore.items[2]!, new Ratio(1)),
+      new RankScore(testStore.items[0]!, new Ratio(0.5)),
+      new RankScore(testStore.items[1]!, new Ratio(0)),
     ]);
   });
 
@@ -73,15 +73,15 @@ describe('Domain', () => {
     const testStore = new TestStore();
     testStore.rankAssignment.addDimension(rankDimension1, rankDimension2);
     testStore.rankAssignment.addItems('item1', 'item2', 'item3');
-    testStore.rankAssignment.rank(user, testStore.dimensions[0], [
-      testStore.items[2],
-      testStore.items[0],
-      testStore.items[1],
+    testStore.rankAssignment.rank(user, testStore.dimensions[0]!, [
+      testStore.items[2]!,
+      testStore.items[0]!,
+      testStore.items[1]!,
     ]);
-    testStore.rankAssignment.rank(user, testStore.dimensions[1], [
-      testStore.items[1],
-      testStore.items[0],
-      testStore.items[2],
+    testStore.rankAssignment.rank(user, testStore.dimensions[1]!, [
+      testStore.items[1]!,
+      testStore.items[0]!,
+      testStore.items[2]!,
     ]);
     expect(testStore.rankAssignment.score?.map((score) => score.score)).toEqual(
       [new Ratio(0.5), new Ratio(0.5), new Ratio(0.5)],
@@ -105,26 +105,26 @@ describe('Domain', () => {
     const testStore = new TestStore();
     testStore.rankAssignment.addDimension(rankDimension1, rankDimension2);
     testStore.rankAssignment.addItems('item1', 'item2', 'item3');
-    testStore.rankAssignment.rank(user, testStore.dimensions[0], [
-      testStore.items[2],
-      testStore.items[0],
-      testStore.items[1],
+    testStore.rankAssignment.rank(user, testStore.dimensions[0]!, [
+      testStore.items[2]!,
+      testStore.items[0]!,
+      testStore.items[1]!,
     ]);
-    testStore.rankAssignment.rank(user, testStore.dimensions[1], [
-      testStore.items[1],
-      testStore.items[0],
-      testStore.items[2],
+    testStore.rankAssignment.rank(user, testStore.dimensions[1]!, [
+      testStore.items[1]!,
+      testStore.items[0]!,
+      testStore.items[2]!,
     ]);
 
     testStore.rankAssignment.setDimensionWeight(
-      testStore.dimensions[0],
+      testStore.dimensions[0]!,
       new Ratio(1),
     );
 
     expect(testStore.rankAssignment.score).toEqual([
-      new RankScore(testStore.items[2], new Ratio(1)),
-      new RankScore(testStore.items[0], new Ratio(0.5)),
-      new RankScore(testStore.items[1], new Ratio(0)),
+      new RankScore(testStore.items[2]!, new Ratio(1)),
+      new RankScore(testStore.items[0]!, new Ratio(0.5)),
+      new RankScore(testStore.items[1]!, new Ratio(0)),
     ]);
   });
 
@@ -231,13 +231,13 @@ describe('Domain', () => {
     const testStore = new TestStore();
     testStore.rankAssignment.addDimension(rankDimension1);
     testStore.rankAssignment.addItems('item1', 'item2');
-    testStore.rankAssignment.rank(user1, testStore.dimensions[0], [
-      testStore.items[0],
-      testStore.items[1],
+    testStore.rankAssignment.rank(user1, testStore.dimensions[0]!, [
+      testStore.items[0]!,
+      testStore.items[1]!,
     ]);
-    testStore.rankAssignment.rank(user2, testStore.dimensions[0], [
-      testStore.items[1],
-      testStore.items[0],
+    testStore.rankAssignment.rank(user2, testStore.dimensions[0]!, [
+      testStore.items[1]!,
+      testStore.items[0]!,
     ]);
 
     expect(testStore.rankAssignment.score?.map((score) => score.score)).toEqual(
@@ -266,21 +266,21 @@ describe('Domain', () => {
 
     expect(testStore.rankAssignment.rankingComplete).toBe(false);
     expect(testStore.rankAssignment.score).toBeUndefined();
-    testStore.rankAssignment.rank(user, testStore.dimensions[0], []);
-    testStore.rankAssignment.rank(user, testStore.dimensions[1], []);
+    testStore.rankAssignment.rank(user, testStore.dimensions[0]!, []);
+    testStore.rankAssignment.rank(user, testStore.dimensions[1]!, []);
     expect(testStore.rankAssignment.rankingComplete).toBe(true);
     expect(testStore.rankAssignment.score).toHaveLength(0);
     testStore.rankAssignment.addItems('item1', 'item2');
     expect(testStore.rankAssignment.rankingComplete).toBe(false);
     expect(testStore.rankAssignment.score).toBeUndefined();
-    testStore.rankAssignment.rank(user, testStore.dimensions[0], [
-      testStore.items[0],
-      testStore.items[1],
+    testStore.rankAssignment.rank(user, testStore.dimensions[0]!, [
+      testStore.items[0]!,
+      testStore.items[1]!,
     ]);
     expect(testStore.rankAssignment.rankingComplete).toBe(false);
-    testStore.rankAssignment.rank(user, testStore.dimensions[1], [
-      testStore.items[1],
-      testStore.items[0],
+    testStore.rankAssignment.rank(user, testStore.dimensions[1]!, [
+      testStore.items[1]!,
+      testStore.items[0]!,
     ]);
     expect(testStore.rankAssignment.rankingComplete).toBe(true);
     expect(testStore.rankAssignment.score).toHaveLength(2);
@@ -289,9 +289,9 @@ describe('Domain', () => {
     );
     expect(testStore.rankAssignment.rankingComplete).toBe(false);
     expect(testStore.rankAssignment.score).toBeUndefined();
-    testStore.rankAssignment.rank(user, testStore.dimensions[2], [
-      testStore.items[0],
-      testStore.items[1],
+    testStore.rankAssignment.rank(user, testStore.dimensions[2]!, [
+      testStore.items[0]!,
+      testStore.items[1]!,
     ]);
     expect(testStore.rankAssignment.rankingComplete).toBe(true);
   });
@@ -307,22 +307,22 @@ describe('Domain', () => {
     const testStore = new TestStore();
     testStore.rankAssignment.addDimension(rankDimension);
     testStore.rankAssignment.addItems('item1', 'item2');
-    testStore.rankAssignment.rank(user, testStore.dimensions[0], [
-      testStore.items[0],
-      testStore.items[1],
+    testStore.rankAssignment.rank(user, testStore.dimensions[0]!, [
+      testStore.items[0]!,
+      testStore.items[1]!,
     ]);
 
     expect(testStore.rankAssignment.score).toBeDefined();
 
-    testStore.rankAssignment.rank(user, testStore.dimensions[0], [
-      testStore.items[0],
+    testStore.rankAssignment.rank(user, testStore.dimensions[0]!, [
+      testStore.items[0]!,
     ]);
 
     // incomplete ranking ignored in the score
     expect(testStore.rankAssignment.score).toBeUndefined();
     // but the ranking is still stored
     expect(
-      testStore.rankingsByUser[user.id]?.[testStore.dimensions[0].id],
+      testStore.rankingsByUser[user.id]?.[testStore.dimensions[0]!.id],
     ).toHaveLength(1);
   });
 
@@ -337,11 +337,11 @@ describe('Domain', () => {
     const testStore = new TestStore();
     testStore.rankAssignment.addDimension(rankDimension);
     testStore.rankAssignment.addItems('item1');
-    testStore.rankAssignment.rank(user, testStore.dimensions[0], [
-      testStore.items[0],
+    testStore.rankAssignment.rank(user, testStore.dimensions[0]!, [
+      testStore.items[0]!,
     ]);
     expect(testStore.rankAssignment.score).toEqual([
-      new RankScore(testStore.items[0], new Ratio(1)),
+      new RankScore(testStore.items[0]!, new Ratio(1)),
     ]);
   });
 
@@ -354,12 +354,12 @@ describe('Domain', () => {
     testStore.rankAssignment.addItems('item1');
     testStore.rankAssignment.addItems('item2');
 
-    testStore.rankAssignment.rank(user, testStore.dimensions[0], [
-      testStore.items[0],
-      testStore.items[1],
+    testStore.rankAssignment.rank(user, testStore.dimensions[0]!, [
+      testStore.items[0]!,
+      testStore.items[1]!,
     ]);
 
-    testStore.rankAssignment.removeItems(testStore.rankAssignment.items[0]);
+    testStore.rankAssignment.removeItems(testStore.rankAssignment.items[0]!);
 
     expect(testStore.rankAssignment.score).toHaveLength(1);
   });
@@ -373,9 +373,9 @@ describe('Domain', () => {
     testStore.rankAssignment.addItems('item1');
     testStore.rankAssignment.addItems('item2');
 
-    testStore.rankAssignment.rank(user, testStore.dimensions[0], [
-      testStore.items[0],
-      testStore.items[1],
+    testStore.rankAssignment.rank(user, testStore.dimensions[0]!, [
+      testStore.items[0]!,
+      testStore.items[1]!,
     ]);
 
     testStore.rankAssignment.removeDimensions(rankDimension);

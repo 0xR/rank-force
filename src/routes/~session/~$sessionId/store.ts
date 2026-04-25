@@ -23,13 +23,13 @@ export const draftMutators = {
   removeItems(d: State, items: Item[]) {
     const ids = new Set(items.map((i) => i.id));
     for (let i = d.items.length - 1; i >= 0; i--) {
-      if (ids.has(d.items[i].id)) (d.items as Item[]).splice(i, 1);
+      if (ids.has(d.items[i]!.id)) (d.items as Item[]).splice(i, 1);
     }
   },
   removeDimensions(d: State, dimensions: RankDimension[]) {
     const ids = new Set(dimensions.map((x) => x.id));
     for (let i = d.dimensions.length - 1; i >= 0; i--) {
-      if (ids.has(d.dimensions[i].id))
+      if (ids.has(d.dimensions[i]!.id))
         (d.dimensions as RankDimension[]).splice(i, 1);
     }
   },
