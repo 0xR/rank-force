@@ -26,7 +26,7 @@ describe('session index redirect', () => {
       </RepoContext.Provider>,
     );
 
-    expect(await screen.findByLabelText('Username')).toBeTruthy();
+    expect(await screen.findByLabelText('Your name')).toBeTruthy();
   });
 
   it('redirects to the user page from the app root when no user is configured', async () => {
@@ -39,6 +39,6 @@ describe('session index redirect', () => {
       </RepoContext.Provider>,
     );
 
-    expect(await screen.findByLabelText('Username')).toBeTruthy();
+    expect(await screen.findByLabelText('Your name')).toBeTruthy();
   });
 });

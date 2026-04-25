@@ -29,11 +29,11 @@ describe('UserPage', () => {
       </RepoContext.Provider>,
     );
 
-    const userInput = await screen.findByLabelText('Username');
+    const userInput = await screen.findByLabelText('Your name');
     fireEvent.change(userInput, {
       target: { value: 'John' },
     });
-    const saveButton = screen.getByRole('button', { name: 'Save' });
+    const saveButton = screen.getByRole('button', { name: /continue/i });
     fireEvent.click(saveButton);
 
     const url = localStorage.getItem(
