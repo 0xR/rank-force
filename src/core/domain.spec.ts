@@ -383,6 +383,17 @@ describe('Domain', () => {
     expect(testStore.rankAssignment.score).toHaveLength(2);
   });
 
+  it('should produce non-NaN scores for a fully-ranked buildState', () => {
+    const testStore = TestStore.fromState(
+      buildState({ users: 3, items: 4, dimensions: 2, ranked: true }),
+    );
+
+    const scores = testStore.rankAssignment.score;
+    expect(scores).toBeDefined();
+    expect(scores!.every((s) => Number.isFinite(s.score.value))).toBe(true);
+    expect(scores!.every((s) => s.score.label !== 'NaN%')).toBe(true);
+  });
+
   it('should serialize and deserialize from teststore', () => {
     const testStore = TestStore.fromState(
       buildState({ users: 2, items: 3, dimensions: 2, ranked: true }),

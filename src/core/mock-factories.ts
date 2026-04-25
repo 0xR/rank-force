@@ -47,11 +47,19 @@ export function buildState({
     });
   }
 
+  const dimensionWeights: Record<string, number> = {};
+  if (dimensions.length > 0) {
+    const evenWeight = 1 / dimensions.length;
+    dimensions.forEach((dim) => {
+      dimensionWeights[dim.id] = evenWeight;
+    });
+  }
+
   return {
     users,
     items,
     dimensions,
     rankingsByUser,
-    dimensionWeights: {},
+    dimensionWeights,
   };
 }
