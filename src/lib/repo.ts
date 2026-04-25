@@ -10,7 +10,10 @@ import { IndexedDBStorageAdapter } from '@automerge/automerge-repo-storage-index
 
 export const repo = new Repo({
   storage: new IndexedDBStorageAdapter('rank-force'),
-  network: [new BroadcastChannelNetworkAdapter()],
+  network:
+    import.meta.env.MODE === 'test'
+      ? []
+      : [new BroadcastChannelNetworkAdapter()],
 });
 
 function sessionUrlKey(sessionId: string) {
