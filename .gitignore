@@ -23,3 +23,7 @@ dist-ssr
 *.sln
 *.sw?
 .sst/
+
+# Playwright
+playwright-report/
+test-results/
