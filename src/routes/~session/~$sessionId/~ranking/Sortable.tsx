@@ -93,8 +93,7 @@ export function Sortable({
   useEffect(() => {
     if (!itemsPropChanged) return;
     const newItems = items.filter(
-      (item) =>
-        !Item.includes(unranked, item) && !Item.includes(ranked, item),
+      (item) => !Item.includes(unranked, item) && !Item.includes(ranked, item),
     );
     if (newItems.length) {
       setUnranked((prev) => [...prev, ...newItems]);

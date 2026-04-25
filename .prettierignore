@@ -5,3 +5,7 @@ src/routeTree.gen.ts
 src/sst-env.d.ts
 sst-env.d.ts
 .sst
+.claude
+.husky
+playwright-report
+test-results

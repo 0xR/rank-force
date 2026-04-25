@@ -107,4 +107,4 @@ A static SVG of ~80 dots, varying opacity 0.15–0.6, varying size 1–2.5px, di
 
 ## Naming in code
 
-User-facing vocabulary stays plain — *item, criterion, weight, ranking, score, session, participant*. Internal identifiers match the existing data model (`sessionId`, `userId`, `dimensions`, `items`). The `StarField` / `StarMark` / `MagnitudeIndex` components are visual atoms; their names refer to what they look like, not what users call them.
+User-facing vocabulary stays plain — _item, criterion, weight, ranking, score, session, participant_. Internal identifiers match the existing data model (`sessionId`, `userId`, `dimensions`, `items`). The `StarField` / `StarMark` / `MagnitudeIndex` components are visual atoms; their names refer to what they look like, not what users call them.

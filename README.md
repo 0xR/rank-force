@@ -1,36 +1,65 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# rank-force
 
-## Getting Started
+A Vite + React + TypeScript app deployed with [SST](https://sst.dev). Local
+collaboration uses Automerge over a BroadcastChannel and is persisted to
+IndexedDB.
 
-First, run the development server:
+## Getting started
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`pnpm dev` runs `sst dev`, which starts the Vite dev server alongside any local
+SST resources.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+### Build & deploy
 
-## Learn More
+| Script             | What it does                          |
+| ------------------ | ------------------------------------- |
+| `pnpm build`       | Type-check, then build with Vite.     |
+| `pnpm preview`     | Serve the production build locally.   |
+| `pnpm deploy`      | Deploy with SST to the default stage. |
+| `pnpm deploy:prd`  | Deploy with SST to the `prd` stage.   |
+| `pnpm types:watch` | Watch-mode TypeScript type checking.  |
 
-To learn more about Next.js, take a look at the following resources:
+### Lint & format
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+ESLint enforces code correctness; Prettier owns formatting. The two are kept
+out of each other's way via [`eslint-config-prettier`][ecp], which disables
+any ESLint rules that would conflict with Prettier.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+| Script              | What it does                                                      |
+| ------------------- | ----------------------------------------------------------------- |
+| `pnpm lint`         | Run ESLint on `.ts`/`.tsx` files (no warnings allowed).           |
+| `pnpm lint:fix`     | Run ESLint with `--fix`.                                          |
+| `pnpm format`       | Format the repo with Prettier (`prettier --write .`).             |
+| `pnpm format:check` | Verify formatting without writing changes (`prettier --check .`). |
+| `pnpm check`        | CI-style gate: `format:check` + `lint`.                           |
+| `pnpm fix`          | Apply both `format` and `lint:fix`.                               |
 
-## Deploy on Vercel
+A pre-commit hook (Husky + lint-staged) runs ESLint and Prettier on staged
+files automatically, so you generally don't need to invoke these scripts by
+hand.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+[ecp]: https://github.com/prettier/eslint-config-prettier
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+### Tests
+
+| Script               | What it does                     |
+| -------------------- | -------------------------------- |
+| `pnpm test`          | Run Vitest unit tests once.      |
+| `pnpm test:watch`    | Vitest in watch mode.            |
+| `pnpm test:ui`       | Vitest with the UI.              |
+| `pnpm playwright`    | Run Playwright end-to-end tests. |
+| `pnpm playwright:ui` | Playwright with the UI.          |
+
+## Configuration
+
+- Prettier: `.prettierrc.json`, ignore list in `.prettierignore`.
+- ESLint: `.eslintrc.cjs` (extends `prettier` last so formatting rules don't
+  clash).
+- Husky hooks: `.husky/`.
