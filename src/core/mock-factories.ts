@@ -1,26 +1,57 @@
+import { Item } from '@/core/Item';
 import { RankDimension } from '@/core/RankDimension';
-import { TestStore } from '@/core/TestStore';
+import { State } from '@/core/State';
 import { User } from '@/core/User';
 
-export function createCompleteRankingAssignment() {
-  const user = User.make('~user 0');
-  const rankDimension = RankDimension.make(
-    'importance',
-    'low',
-    'high',
-    'ascending',
-  );
-  const testStore = new TestStore();
-  testStore.rankAssignment.addDimension(rankDimension);
-  testStore.rankAssignment.addItems('item1', 'item2', 'item3');
-  testStore.rankAssignment.rank(user, testStore.dimensions[0], [
-    testStore.items[2],
-    testStore.items[0],
-    testStore.items[1],
-  ]);
-  return testStore;
-}
+export type BuildStateOptions = {
+  users: number;
+  items: number;
+  dimensions: number;
+  ranked: boolean;
+};
 
-export function createDimension() {
-  return RankDimension.make('importance', 'low', 'high', 'descending');
+export function buildState({
+  users: userCount,
+  items: itemCount,
+  dimensions: dimensionCount,
+  ranked,
+}: BuildStateOptions): State {
+  const users = Array.from({ length: userCount }, (_, i) =>
+    User.make(`User ${i + 1}`, `user-${i + 1}`),
+  );
+  const items = Array.from({ length: itemCount }, (_, i) =>
+    Item.make(`Item ${i + 1}`, `item-${i + 1}`),
+  );
+  const dimensions = Array.from({ length: dimensionCount }, (_, i) =>
+    RankDimension.make(
+      `Dimension ${i + 1}`,
+      'low',
+      'high',
+      'ascending',
+      `dimension-${i + 1}`,
+    ),
+  );
+
+  const rankingsByUser: Record<string, Record<string, string[]>> = {};
+  if (ranked) {
+    users.forEach((user, userIndex) => {
+      const byDim: Record<string, string[]> = {};
+      dimensions.forEach((dim, dimIndex) => {
+        const shift = userIndex + dimIndex;
+        byDim[dim.id] = Array.from(
+          { length: items.length },
+          (_, k) => items[(k + shift) % items.length].id,
+        );
+      });
+      rankingsByUser[user.id] = byDim;
+    });
+  }
+
+  return {
+    users,
+    items,
+    dimensions,
+    rankingsByUser,
+    dimensionWeights: {},
+  };
 }

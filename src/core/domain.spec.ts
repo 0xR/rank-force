@@ -1,13 +1,13 @@
-import {
-  createCompleteRankingAssignment,
-  createDimension,
-} from '@/core/mock-factories';
+import { buildState } from '@/core/mock-factories';
 import { TestStore } from '@/core/TestStore';
 import { expect } from 'vitest';
 import { RankDimension } from './RankDimension';
 import { RankScore } from './RankScore';
 import { Ratio } from './Ratio';
 import { User } from './User';
+
+const createDimension = () =>
+  RankDimension.make('importance', 'low', 'high', 'descending');
 
 describe('Domain', () => {
   it('should rank on a single dimension', () => {
@@ -384,7 +384,9 @@ describe('Domain', () => {
   });
 
   it('should serialize and deserialize from teststore', () => {
-    const testStore = createCompleteRankingAssignment();
+    const testStore = TestStore.fromState(
+      buildState({ users: 2, items: 3, dimensions: 2, ranked: true }),
+    );
 
     const plain = testStore.toPlainObject();
     const serialized = JSON.stringify(plain, null, 2);

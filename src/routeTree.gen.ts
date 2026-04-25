@@ -13,6 +13,7 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/~__root'
+import { Route as DevImport } from './routes/~dev'
 import { Route as IndexImport } from './routes/~index'
 import { Route as SessionSessionIdImport } from './routes/~session/~$sessionId'
 
@@ -32,6 +33,11 @@ const SessionSessionIdConfigureIndexLazyImport = createFileRoute(
 )()
 
 // Create/Update Routes
+
+const DevRoute = DevImport.update({
+  path: '/dev',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const IndexRoute = IndexImport.update({
   path: '/',
@@ -94,6 +100,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
+    '/dev': {
+      id: '/dev'
+      path: '/dev'
+      fullPath: '/dev'
+      preLoaderRoute: typeof DevImport
+      parentRoute: typeof rootRoute
+    }
     '/session/$sessionId': {
       id: '/session/$sessionId'
       path: '/session/$sessionId'
@@ -136,6 +149,7 @@ declare module '@tanstack/react-router' {
 
 export const routeTree = rootRoute.addChildren({
   IndexRoute,
+  DevRoute,
   SessionSessionIdRoute: SessionSessionIdRoute.addChildren({
     SessionSessionIdConfigureIndexLazyRoute,
     SessionSessionIdRankingIndexLazyRoute,
@@ -153,11 +167,15 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "~__root.tsx",
       "children": [
         "/",
+        "/dev",
         "/session/$sessionId"
       ]
     },
     "/": {
       "filePath": "~index.tsx"
+    },
+    "/dev": {
+      "filePath": "~dev.tsx"
     },
     "/session/$sessionId": {
       "filePath": "~session/~$sessionId.tsx",
