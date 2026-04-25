@@ -8,19 +8,10 @@ import { ArrowRight, Compass, Layers, Telescope } from 'lucide-react';
 import { FormEvent, useState } from 'react';
 import { ulid } from 'ulid';
 
-const SESSION_ID_LENGTH = 26; // ULID length
-
-function isValidSessionId(input: string) {
-  return /^[0-9A-HJKMNP-TV-Z]{26}$/.test(input.toUpperCase());
-}
-
 export function Welcome() {
   const navigate = useNavigate();
   const [navName, setNavName] = useNavigatorName();
   const [draftName, setDraftName] = useState(navName);
-  const [joinOpen, setJoinOpen] = useState(false);
-  const [joinCode, setJoinCode] = useState('');
-  const [joinError, setJoinError] = useState<string | null>(null);
 
   function commitName() {
     const trimmed = draftName.trim();
@@ -35,19 +26,6 @@ export function Welcome() {
     if (!commitName()) return;
     const sessionId = ulid();
     navigate({ to: '/session/$sessionId', params: { sessionId } });
-  }
-
-  function handleJoin(e: FormEvent) {
-    e.preventDefault();
-    setJoinError(null);
-    const name = commitName();
-    if (!name) return;
-    const code = joinCode.trim();
-    if (!isValidSessionId(code)) {
-      setJoinError('That doesn’t look like a session code.');
-      return;
-    }
-    navigate({ to: '/session/$sessionId', params: { sessionId: code } });
   }
 
   const nameValid = draftName.trim().length > 0;
@@ -109,44 +87,8 @@ export function Welcome() {
               Start a session
               <ArrowRight className="h-5 w-5 transition-transform duration-200 ease-out-quart group-hover:translate-x-0.5" />
             </Button>
-            <Button
-              type="button"
-              variant="secondary"
-              size="xl"
-              onClick={() => setJoinOpen((v) => !v)}
-            >
-              <Compass className="h-5 w-5 text-space-6" />
-              Join a session
-            </Button>
           </div>
         </form>
-
-        {joinOpen && (
-          <form
-            onSubmit={handleJoin}
-            className="mt-4 flex flex-col sm:flex-row gap-2 animate-fade-up"
-          >
-            <Input
-              value={joinCode}
-              onChange={(e) => {
-                setJoinCode(e.target.value);
-                setJoinError(null);
-              }}
-              placeholder="Paste session code"
-              className="font-mono uppercase tracking-coord text-base h-12"
-              maxLength={SESSION_ID_LENGTH}
-              autoFocus
-            />
-            <Button type="submit" size="lg" variant="default">
-              Join
-            </Button>
-          </form>
-        )}
-        {joinError && (
-          <p className="mt-2 text-sm text-destructive font-medium">
-            {joinError}
-          </p>
-        )}
 
         <div
           className="mt-24 grid gap-px bg-space-3 rounded-lg overflow-hidden border border-space-4 sm:grid-cols-3 animate-fade-up"

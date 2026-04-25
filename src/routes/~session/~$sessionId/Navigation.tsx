@@ -5,15 +5,13 @@ import { useUserState } from '@/routes/~session/~$sessionId/shared/useUser';
 import { useRankAssignment } from '@/routes/~session/~$sessionId/shared/UseRankAssignment';
 import { Link, useMatchRoute } from '@tanstack/react-router';
 import {
-  Check,
   Compass,
-  Copy,
   Layers,
   LucideIcon,
   Telescope,
   UserCircle2,
 } from 'lucide-react';
-import { PropsWithChildren, useState } from 'react';
+import { PropsWithChildren } from 'react';
 
 const tabs = [
   { to: '/session/$sessionId/configure', label: 'Configure', icon: Layers },
@@ -62,40 +60,6 @@ function TopTab({
   );
 }
 
-function SessionCode({ sessionId }: { sessionId: string }) {
-  const [copied, setCopied] = useState(false);
-  const short = sessionId.slice(-6).toUpperCase();
-  const onCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(window.location.href);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1600);
-    } catch {
-      // best-effort; ignore.
-    }
-  };
-  return (
-    <button
-      type="button"
-      onClick={onCopy}
-      className="group inline-flex items-center gap-2 h-9 pl-3 pr-2 rounded-md bg-space-1 border border-space-4 hover:border-cyan/60 transition-colors duration-150 ease-out-quart focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan"
-      aria-label={copied ? 'Session link copied' : 'Copy session link'}
-      title="Copy session link"
-    >
-      <span className="font-mono text-sm tracking-coord text-cream">
-        {short}
-      </span>
-      <span className="ml-1 inline-flex items-center justify-center h-6 w-6 rounded text-space-6 group-hover:text-cream group-hover:bg-space-3">
-        {copied ? (
-          <Check className="h-3.5 w-3.5 text-cyan" strokeWidth={2} />
-        ) : (
-          <Copy className="h-3.5 w-3.5" strokeWidth={1.5} />
-        )}
-      </span>
-    </button>
-  );
-}
-
 function NavigatorChip({
   name,
 }: PropsWithChildren<{ name: string | undefined }>) {
@@ -115,7 +79,6 @@ function NavigatorChip({
 }
 
 export function NavigationMenuDemo() {
-  const params = Route.useParams();
   const rankAssignment = useRankAssignment();
   const [user] = useUserState(rankAssignment);
 
@@ -131,7 +94,6 @@ export function NavigationMenuDemo() {
           ))}
         </nav>
         <div className="flex items-center gap-2">
-          <SessionCode sessionId={params.sessionId} />
           <NavigatorChip name={user?.name} />
         </div>
       </div>
