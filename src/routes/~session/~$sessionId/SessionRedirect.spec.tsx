@@ -1,4 +1,6 @@
+import { repo } from '@/lib/repo';
 import { routeTree } from '@/routeTree.gen.ts';
+import { RepoContext } from '@automerge/automerge-repo-react-hooks';
 import {
   createMemoryHistory,
   createRouter,
@@ -18,7 +20,11 @@ describe('session index redirect', () => {
     });
     const router = createRouter({ routeTree, history: memoryHistory });
 
-    render(<RouterProvider router={router} />);
+    render(
+      <RepoContext.Provider value={repo}>
+        <RouterProvider router={router} />
+      </RepoContext.Provider>,
+    );
 
     expect(await screen.findByLabelText('Username')).toBeTruthy();
   });
@@ -27,7 +33,11 @@ describe('session index redirect', () => {
     const memoryHistory = createMemoryHistory({ initialEntries: ['/'] });
     const router = createRouter({ routeTree, history: memoryHistory });
 
-    render(<RouterProvider router={router} />);
+    render(
+      <RepoContext.Provider value={repo}>
+        <RouterProvider router={router} />
+      </RepoContext.Provider>,
+    );
 
     expect(await screen.findByLabelText('Username')).toBeTruthy();
   });

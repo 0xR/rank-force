@@ -73,7 +73,7 @@ export default defineConfig({
 
   /* Build once and serve the production bundle before tests. */
   webServer: {
-    command: 'pnpm build && pnpm preview --port 4173',
+    command: 'pnpm build && pnpm preview --port 4173 --host 127.0.0.1',
     url: 'http://127.0.0.1:4173',
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

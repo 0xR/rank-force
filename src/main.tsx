@@ -1,3 +1,5 @@
+import { repo } from '@/lib/repo';
+import { RepoContext } from '@automerge/automerge-repo-react-hooks';
 import { createRouter, RouterProvider } from '@tanstack/react-router';
 import './index.css';
 import { StrictMode } from 'react';
@@ -22,7 +24,9 @@ if (!rootElement.innerHTML) {
   const root = createRoot(rootElement);
   root.render(
     <StrictMode>
-      <RouterProvider router={router} />
+      <RepoContext.Provider value={repo}>
+        <RouterProvider router={router} />
+      </RepoContext.Provider>
     </StrictMode>,
   );
 }

@@ -21,7 +21,12 @@ export default defineConfig({
     setupFiles: ['./test/setup.ts'],
     environment: 'jsdom',
     globals: true,
-    exclude: ['**/node_modules/**', 'tests/**', 'dist/**'],
+    exclude: [
+      '**/node_modules/**',
+      'tests/**',
+      'dist/**',
+      '.claude/worktrees/**',
+    ],
   },
   resolve: {
     alias: {

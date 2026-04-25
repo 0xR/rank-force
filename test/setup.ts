@@ -1,3 +1,5 @@
+import 'fake-indexeddb/auto';
+
 const ResizeObserverMock = vi.fn(() => ({
   observe: vi.fn(),
   unobserve: vi.fn(),
