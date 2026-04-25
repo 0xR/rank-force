@@ -1,7 +1,4 @@
-import {
-  assertIsNonEmptyString,
-  assertIsObject,
-} from './type-assertions';
+import { assertIsNonEmptyString, assertIsObject } from './type-assertions';
 import { decodeTime } from 'ulid';
 
 export type MqttToken = {

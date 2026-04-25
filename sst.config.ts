@@ -1,3 +1,5 @@
+// SST scaffolds this reference to expose the $config / sst.* globals; there is no import alternative.
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference path="./.sst/platform/config.d.ts" />
 
 export default $config({

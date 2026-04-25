@@ -48,7 +48,11 @@ export const draftMutators = {
       delete d.rankingsByUser[userId][dimensionId];
     }
   },
-  setDimensionWeight(d: State, dimensionId: string, weight: number | undefined) {
+  setDimensionWeight(
+    d: State,
+    dimensionId: string,
+    weight: number | undefined,
+  ) {
     if (weight === undefined) {
       delete d.dimensionWeights[dimensionId];
     } else {

@@ -3,8 +3,8 @@ import {
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
-  navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu';
+import { navigationMenuTriggerStyle } from '@/components/ui/navigation-menu-variants';
 import { Route } from '@/routes/~session/~$sessionId.tsx';
 import { Link } from '@tanstack/react-router';
 import { PropsWithChildren } from 'react';
@@ -16,7 +16,7 @@ function MyMenuItem({ to, children }: PropsWithChildren<{ to: string }>) {
       <Link
         to={to}
         params={params}
-        // @ts-expect-error
+        // @ts-expect-error _asChild is a runtime alias understood by TanStack Router but not typed
         _asChild={NavigationMenuLink}
         className={navigationMenuTriggerStyle()}
       >

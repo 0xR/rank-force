@@ -5,9 +5,7 @@ export const Route = createFileRoute('/session/$sessionId/')({
   beforeLoad: ({ params: { sessionId } }) => {
     const userId = window.localStorage.getItem(userIdStorageKey(sessionId));
     throw redirect({
-      to: userId
-        ? '/session/$sessionId/ranking'
-        : '/session/$sessionId/user',
+      to: userId ? '/session/$sessionId/ranking' : '/session/$sessionId/user',
       params: { sessionId },
     });
   },
