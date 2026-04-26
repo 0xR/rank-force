@@ -18,16 +18,18 @@
     "test:ui": "vitest --ui",
     "types:watch": "tsc --noEmit --watch -p tsconfig.app.json",
     "deploy": "sst deploy",
+    "deploy:dev": "sst deploy",
     "deploy:prd": "sst deploy --stage=prd",
     "playwright": "playwright test",
     "playwright:ui": "pnpm run playwright --ui",
     "prepare": "husky"
   },
   "lint-staged": {
-    "*.{ts,tsx}": [
+    "!(*.d).{ts,tsx}": [
       "eslint --fix --max-warnings 0 --report-unused-disable-directives",
       "prettier --write"
     ],
+    "*.d.ts": "prettier --write",
     "*.{json,md,css,html,yml,yaml}": "prettier --write"
   },
   "dependencies": {
@@ -51,10 +53,12 @@
     "aws-iot-device-sdk-v2": "^1.19.5",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "events": "^3.3.0",
     "lucide-react": "^0.395.0",
+    "mqtt": "^5.15.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "sst": "^3.0.33",
+    "sst": "^4.12.2",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
     "ulid": "^2.3.0",

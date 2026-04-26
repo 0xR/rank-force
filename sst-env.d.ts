@@ -11,6 +11,11 @@ declare module "sst" {
       "endpoint": string
       "type": "sst.aws.Realtime"
     }
+    "Snapshot": {
+      "name": string
+      "type": "sst.aws.Function"
+      "url": string
+    }
     "Table": {
       "name": string
       "type": "sst.aws.Dynamo"
@@ -21,7 +26,6 @@ declare module "sst" {
     }
   }
 }
-/// <reference path="sst-env.d.ts" />
 
 import "sst"
 export {}

@@ -8,6 +8,7 @@ interface ImportMetaEnv {
   readonly VITE_REALTIME_ENDPOINT: string
   readonly VITE_REALTIME_TOPIC_PREFIX: string
   readonly VITE_REALTIME_AUTHORIZER: string
+  readonly VITE_SNAPSHOT_URL: string
 }
 interface ImportMeta {
   readonly env: ImportMetaEnv

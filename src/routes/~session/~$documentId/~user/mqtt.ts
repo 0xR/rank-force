@@ -1,68 +1,57 @@
 import { MqttToken } from '@/shared/MqttToken';
-
-import { iot, mqtt } from 'aws-iot-device-sdk-v2';
+import mqtt, { type MqttClient as MqttJsClient } from 'mqtt';
 import { ulid } from 'ulid';
 
 export class MqttClient {
   private endpoint = import.meta.env.VITE_REALTIME_ENDPOINT!;
   private authorizer = import.meta.env.VITE_REALTIME_AUTHORIZER!;
-  private connection: mqtt.MqttClientConnection | undefined;
   private topic: string;
+  private connection: MqttJsClient;
+  private ready: Promise<MqttJsClient>;
 
-  constructor(private token: MqttToken) {
+  constructor(token: MqttToken) {
     this.topic = import.meta.env.VITE_REALTIME_TOPIC_PREFIX! + token.documentId;
-    this.setupConnection();
+    this.connection = mqtt.connect(
+      `wss://${this.endpoint}/mqtt?x-amz-customauthorizer-name=${this.authorizer}`,
+      {
+        protocolVersion: 5,
+        manualConnect: true,
+        username: '',
+        password: JSON.stringify(token),
+        clientId: `client_${ulid()}`,
+      },
+    );
+    this.ready = new Promise((resolve, reject) => {
+      this.connection.once('connect', () => resolve(this.connection));
+      this.connection.once('error', reject);
+    });
+    this.connection.on('error', (err) => console.error('mqtt error', err));
+    this.connection.connect();
   }
 
-  async setupConnection() {
-    if (this.connection) {
-      return this.connection;
-    }
-    const config = iot.AwsIotMqttConnectionConfigBuilder.new_with_websockets()
-      .with_clean_session(true)
-      .with_client_id('client_' + ulid())
-      .with_endpoint(this.endpoint)
-      .with_custom_authorizer(
-        '',
-        this.authorizer,
-        '',
-        JSON.stringify(this.token),
-      )
-      .with_keep_alive_seconds(1200)
-      .build();
-    const client = new mqtt.MqttClient();
-    const connection = client.new_connection(config);
-    this.connection = connection;
-    connection.on('connect', async () => {
-      console.log('WS connected');
-      if (!connection) {
-        return;
-      }
-      await connection.subscribe(this.topic, mqtt.QoS.AtLeastOnce);
-      console.log('WS subscribed to chat');
-    });
-    connection.on('error', (e) => {
-      console.log('connection error', e);
-    });
-    connection.on('resume', console.log);
-    connection.on('disconnect', console.log);
-    connection.on('interrupt', (e) => {
-      console.log('interrupted, restarting', e, JSON.stringify(e));
-      this.setupConnection();
-    });
-    await connection.connect();
-    return this.connection;
+  async subscribe() {
+    const c = await this.ready;
+    await c.subscribeAsync(this.topic, { qos: 1 });
   }
 
   async publishMessage(message: string) {
-    console.log('publishing', message);
-    this.connection?.publish(this.topic, message, mqtt.QoS.AtLeastOnce);
+    const c = await this.ready;
+    await c.publishAsync(this.topic, message, { qos: 1 });
   }
 
-  onMessage(callback: (message: string) => void) {
-    this.connection?.on('message', (_fullTopic, payload) => {
-      const message = new TextDecoder('utf8').decode(new Uint8Array(payload));
-      callback(message);
+  async publish(bytes: Uint8Array) {
+    const c = await this.ready;
+    // mqtt.js types insist on Buffer but the runtime accepts any Uint8Array.
+    await c.publishAsync(this.topic, bytes as unknown as Buffer, { qos: 1 });
+  }
+
+  async close() {
+    await this.connection.endAsync();
+  }
+
+  onMessage(callback: (bytes: Uint8Array) => void) {
+    this.connection.on('message', (_topic, payload) => {
+      callback(new Uint8Array(payload));
     });
   }
 }

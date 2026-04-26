@@ -16,6 +16,7 @@ export default defineConfig({
   ],
   optimizeDeps: {
     exclude: ['@automerge/automerge-wasm'],
+    include: ['events'],
   },
   test: {
     setupFiles: ['./test/setup.ts'],
