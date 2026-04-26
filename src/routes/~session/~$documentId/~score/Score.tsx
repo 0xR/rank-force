@@ -4,8 +4,8 @@ import { MagnitudeIndex } from '@/components/brand/MagnitudeIndex';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { RankScore } from '@/core/RankScore';
-import { useRankAssignment } from '@/routes/~session/~$sessionId/shared/UseRankAssignment';
-import { useUser } from '@/routes/~session/~$sessionId/shared/useUser';
+import { useRankAssignment } from '@/routes/~session/~$documentId/shared/UseRankAssignment';
+import { useUser } from '@/routes/~session/~$documentId/shared/useUser';
 import { Sparkles, UserCircle2 } from 'lucide-react';
 import { useMemo } from 'react';
 

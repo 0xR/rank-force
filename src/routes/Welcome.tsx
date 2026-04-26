@@ -2,11 +2,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Wordmark } from '@/components/brand/Logo';
 import { StarField } from '@/components/brand/StarField';
+import { createSession } from '@/lib/repo';
 import { useNavigatorName } from '@/shared/useNavigator';
 import { useNavigate } from '@tanstack/react-router';
 import { ArrowRight, Compass, Layers, Telescope } from 'lucide-react';
 import { FormEvent, useState } from 'react';
-import { ulid } from 'ulid';
 
 export function Welcome() {
   const navigate = useNavigate();
@@ -21,11 +21,11 @@ export function Welcome() {
     return trimmed;
   }
 
-  function handleBegin(e: FormEvent) {
+  async function handleBegin(e: FormEvent) {
     e.preventDefault();
     if (!commitName()) return;
-    const sessionId = ulid();
-    navigate({ to: '/session/$sessionId', params: { sessionId } });
+    const documentId = await createSession();
+    navigate({ to: '/session/$documentId', params: { documentId } });
   }
 
   const nameValid = draftName.trim().length > 0;

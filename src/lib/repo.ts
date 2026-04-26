@@ -1,9 +1,9 @@
 import { State } from '@/core/State';
 import {
-  AutomergeUrl,
   DocHandle,
-  isValidAutomergeUrl,
+  DocumentId,
   Repo,
+  stringifyAutomergeUrl,
 } from '@automerge/automerge-repo';
 import { BroadcastChannelNetworkAdapter } from '@automerge/automerge-repo-network-broadcastchannel';
 import { IndexedDBStorageAdapter } from '@automerge/automerge-repo-storage-indexeddb';
@@ -16,10 +16,6 @@ export const repo = new Repo({
       : [new BroadcastChannelNetworkAdapter()],
 });
 
-function sessionUrlKey(sessionId: string) {
-  return `rank-force-${sessionId}-doc-url`;
-}
-
 const emptyState: State = {
   items: [],
   dimensions: [],
@@ -28,17 +24,16 @@ const emptyState: State = {
   dimensionWeights: {},
 };
 
-export async function getOrCreateSessionDocHandle(
-  sessionId: string,
-): Promise<DocHandle<State>> {
-  const stored = localStorage.getItem(sessionUrlKey(sessionId));
-  if (stored && isValidAutomergeUrl(stored)) {
-    return repo.find<State>(stored);
-  }
+export async function createSession(): Promise<string> {
   const handle = repo.create<State>(emptyState);
-  localStorage.setItem(sessionUrlKey(sessionId), handle.url);
   await handle.whenReady();
-  return handle;
+  return handle.documentId;
 }
 
-export type SessionDocUrl = AutomergeUrl;
+export async function loadDocHandle(
+  documentId: string,
+): Promise<DocHandle<State>> {
+  return repo.find<State>(
+    stringifyAutomergeUrl({ documentId: documentId as DocumentId }),
+  );
+}

@@ -1,18 +1,18 @@
 import { RankAssignment } from '@/core/RankAssignment';
 import { User } from '@/core/User';
-import { Route } from '@/routes/~session/~$sessionId.tsx';
+import { Route } from '@/routes/~session/~$documentId.tsx';
 import { useNavigatorName } from '@/shared/useNavigator';
 import { useNavigate } from '@tanstack/react-router';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useLocalStorage } from 'usehooks-ts';
 
-export function userIdStorageKey(sessionId: string) {
-  return `rank-force-${sessionId}-userid`;
+export function userIdStorageKey(documentId: string) {
+  return `rank-force-${documentId}-userid`;
 }
 
 export function useUserId() {
-  const { sessionId } = Route.useParams();
-  return useLocalStorage<string | null>(userIdStorageKey(sessionId), null);
+  const { documentId } = Route.useParams();
+  return useLocalStorage<string | null>(userIdStorageKey(documentId), null);
 }
 
 export function useUserState(rankAssigment: RankAssignment) {
@@ -44,7 +44,7 @@ export function useUserState(rankAssigment: RankAssignment) {
 }
 
 export function useUser(rankAssignment: RankAssignment) {
-  const { sessionId } = Route.useParams();
+  const { documentId } = Route.useParams();
   const [user, setUserName] = useUserState(rankAssignment);
   const [navigatorName] = useNavigatorName();
   const navigate = useNavigate();
@@ -70,10 +70,10 @@ export function useUser(rankAssignment: RankAssignment) {
       return;
     }
     navigateRef.current({
-      to: '/session/$sessionId/user',
-      params: { sessionId },
+      to: '/session/$documentId/user',
+      params: { documentId },
     });
-  }, [navigatorName, sessionId, user]);
+  }, [navigatorName, documentId, user]);
 
   return user;
 }

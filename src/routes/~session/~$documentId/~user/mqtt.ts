@@ -10,7 +10,7 @@ export class MqttClient {
   private topic: string;
 
   constructor(private token: MqttToken) {
-    this.topic = import.meta.env.VITE_REALTIME_TOPIC_PREFIX! + token.sessionId;
+    this.topic = import.meta.env.VITE_REALTIME_TOPIC_PREFIX! + token.documentId;
     this.setupConnection();
   }
 

@@ -1,9 +1,9 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Route } from '@/routes/~session/~$sessionId.tsx';
-import { useRankAssignment } from '@/routes/~session/~$sessionId/shared/UseRankAssignment';
-import { useUserState } from '@/routes/~session/~$sessionId/shared/useUser';
+import { Route } from '@/routes/~session/~$documentId.tsx';
+import { useRankAssignment } from '@/routes/~session/~$documentId/shared/UseRankAssignment';
+import { useUserState } from '@/routes/~session/~$documentId/shared/useUser';
 import { useNavigatorName } from '@/shared/useNavigator';
 import { useNavigate } from '@tanstack/react-router';
 import { ArrowRight, UserCircle2 } from 'lucide-react';
@@ -47,7 +47,7 @@ export default function UserPage() {
           const trimmed = userName.trim();
           setNavigatorName(trimmed);
           setUserNameServer(trimmed);
-          navigate({ to: '/session/$sessionId/configure', params });
+          navigate({ to: '/session/$documentId/configure', params });
         }}
         className="flex flex-col gap-4"
       >

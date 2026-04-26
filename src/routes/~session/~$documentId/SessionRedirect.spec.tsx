@@ -1,4 +1,4 @@
-import { repo } from '@/lib/repo';
+import { createSession, repo } from '@/lib/repo';
 import { routeTree } from '@/routeTree.gen.ts';
 import { RepoContext } from '@automerge/automerge-repo-react-hooks';
 import {
@@ -14,9 +14,9 @@ describe('session index redirect', () => {
   });
 
   it('redirects to the user page when no user is configured', async () => {
-    const sessionId = '01J23ZD5YVK05BTTKZ0027G6D2';
+    const documentId = await createSession();
     const memoryHistory = createMemoryHistory({
-      initialEntries: [`/session/${sessionId}`],
+      initialEntries: [`/session/${documentId}`],
     });
     const router = createRouter({ routeTree, history: memoryHistory });
 
@@ -43,9 +43,9 @@ describe('session index redirect', () => {
   });
 
   it('redirects to the user page when the session root URL has a trailing slash', async () => {
-    const sessionId = '01J23ZD5YVK05BTTKZ0027G6D2';
+    const documentId = await createSession();
     const memoryHistory = createMemoryHistory({
-      initialEntries: [`/session/${sessionId}/`],
+      initialEntries: [`/session/${documentId}/`],
     });
     const router = createRouter({ routeTree, history: memoryHistory });
 
@@ -63,9 +63,9 @@ describe('session index redirect', () => {
       'rank-force-navigator-name',
       JSON.stringify('test-user'),
     );
-    const sessionId = '01J23ZD5YVK05BTTKZ0027G6D3';
+    const documentId = await createSession();
     const memoryHistory = createMemoryHistory({
-      initialEntries: [`/session/${sessionId}`],
+      initialEntries: [`/session/${documentId}`],
     });
     const router = createRouter({ routeTree, history: memoryHistory });
 

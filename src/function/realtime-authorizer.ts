@@ -6,7 +6,7 @@ export const handler = realtime.authorizer(async (token) => {
   const parsed = JSON.parse(token);
   assertIsToken(parsed);
   validateToken(parsed);
-  const topic = `${process.env.SST_TOPIC_PREFIX!}${parsed.sessionId}`;
+  const topic = `${process.env.SST_TOPIC_PREFIX!}${parsed.documentId}`;
   return {
     subscribe: [topic],
     publish: [topic],

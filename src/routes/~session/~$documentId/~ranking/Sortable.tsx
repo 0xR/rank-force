@@ -1,6 +1,6 @@
 import { Item } from '@/core/Item';
 import { RankDimension } from '@/core/RankDimension';
-import { useChanged } from '@/routes/~session/~$sessionId/~ranking/UseChanged';
+import { useChanged } from '@/routes/~session/~$documentId/~ranking/UseChanged';
 import {
   closestCenter,
   DndContext,

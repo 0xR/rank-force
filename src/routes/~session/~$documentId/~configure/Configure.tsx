@@ -6,8 +6,8 @@ import { Slider } from '@/components/ui/slider';
 import { Item } from '@/core/Item';
 import { RankDimension } from '@/core/RankDimension';
 import { Ratio } from '@/core/Ratio';
-import { useRankAssignment } from '@/routes/~session/~$sessionId/shared/UseRankAssignment';
-import { useUser } from '@/routes/~session/~$sessionId/shared/useUser';
+import { useRankAssignment } from '@/routes/~session/~$documentId/shared/UseRankAssignment';
+import { useUser } from '@/routes/~session/~$documentId/shared/useUser';
 import {
   ArrowDown,
   ArrowUp,

@@ -1,6 +1,6 @@
 'use client';
-import { MqttClient } from '@/routes/~session/~$sessionId/~user/mqtt';
-import { useMqttToken } from '@/routes/~session/~$sessionId/~user/useMqttToken';
+import { MqttClient } from '@/routes/~session/~$documentId/~user/mqtt';
+import { useMqttToken } from '@/routes/~session/~$documentId/~user/useMqttToken';
 import { Button } from '@/components/ui/button';
 import { useEffect, useMemo, useState } from 'react';
 

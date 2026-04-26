@@ -15,21 +15,21 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Route as rootRoute } from './routes/~__root'
 import { Route as DevImport } from './routes/~dev'
 import { Route as IndexImport } from './routes/~index'
-import { Route as SessionSessionIdImport } from './routes/~session/~$sessionId'
+import { Route as SessionDocumentIdImport } from './routes/~session/~$documentId'
 
 // Create Virtual Routes
 
-const SessionSessionIdUserIndexLazyImport = createFileRoute(
-  '/session/$sessionId/user/',
+const SessionDocumentIdUserIndexLazyImport = createFileRoute(
+  '/session/$documentId/user/',
 )()
-const SessionSessionIdScoreIndexLazyImport = createFileRoute(
-  '/session/$sessionId/score/',
+const SessionDocumentIdScoreIndexLazyImport = createFileRoute(
+  '/session/$documentId/score/',
 )()
-const SessionSessionIdRankingIndexLazyImport = createFileRoute(
-  '/session/$sessionId/ranking/',
+const SessionDocumentIdRankingIndexLazyImport = createFileRoute(
+  '/session/$documentId/ranking/',
 )()
-const SessionSessionIdConfigureIndexLazyImport = createFileRoute(
-  '/session/$sessionId/configure/',
+const SessionDocumentIdConfigureIndexLazyImport = createFileRoute(
+  '/session/$documentId/configure/',
 )()
 
 // Create/Update Routes
@@ -44,47 +44,47 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const SessionSessionIdRoute = SessionSessionIdImport.update({
-  path: '/session/$sessionId',
+const SessionDocumentIdRoute = SessionDocumentIdImport.update({
+  path: '/session/$documentId',
   getParentRoute: () => rootRoute,
 } as any)
 
-const SessionSessionIdUserIndexLazyRoute =
-  SessionSessionIdUserIndexLazyImport.update({
+const SessionDocumentIdUserIndexLazyRoute =
+  SessionDocumentIdUserIndexLazyImport.update({
     path: '/user/',
-    getParentRoute: () => SessionSessionIdRoute,
+    getParentRoute: () => SessionDocumentIdRoute,
   } as any).lazy(() =>
-    import('./routes/~session/~$sessionId/~user/~index.lazy').then(
+    import('./routes/~session/~$documentId/~user/~index.lazy').then(
       (d) => d.Route,
     ),
   )
 
-const SessionSessionIdScoreIndexLazyRoute =
-  SessionSessionIdScoreIndexLazyImport.update({
+const SessionDocumentIdScoreIndexLazyRoute =
+  SessionDocumentIdScoreIndexLazyImport.update({
     path: '/score/',
-    getParentRoute: () => SessionSessionIdRoute,
+    getParentRoute: () => SessionDocumentIdRoute,
   } as any).lazy(() =>
-    import('./routes/~session/~$sessionId/~score/~index.lazy').then(
+    import('./routes/~session/~$documentId/~score/~index.lazy').then(
       (d) => d.Route,
     ),
   )
 
-const SessionSessionIdRankingIndexLazyRoute =
-  SessionSessionIdRankingIndexLazyImport.update({
+const SessionDocumentIdRankingIndexLazyRoute =
+  SessionDocumentIdRankingIndexLazyImport.update({
     path: '/ranking/',
-    getParentRoute: () => SessionSessionIdRoute,
+    getParentRoute: () => SessionDocumentIdRoute,
   } as any).lazy(() =>
-    import('./routes/~session/~$sessionId/~ranking/~index.lazy').then(
+    import('./routes/~session/~$documentId/~ranking/~index.lazy').then(
       (d) => d.Route,
     ),
   )
 
-const SessionSessionIdConfigureIndexLazyRoute =
-  SessionSessionIdConfigureIndexLazyImport.update({
+const SessionDocumentIdConfigureIndexLazyRoute =
+  SessionDocumentIdConfigureIndexLazyImport.update({
     path: '/configure/',
-    getParentRoute: () => SessionSessionIdRoute,
+    getParentRoute: () => SessionDocumentIdRoute,
   } as any).lazy(() =>
-    import('./routes/~session/~$sessionId/~configure/~index.lazy').then(
+    import('./routes/~session/~$documentId/~configure/~index.lazy').then(
       (d) => d.Route,
     ),
   )
@@ -107,40 +107,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DevImport
       parentRoute: typeof rootRoute
     }
-    '/session/$sessionId': {
-      id: '/session/$sessionId'
-      path: '/session/$sessionId'
-      fullPath: '/session/$sessionId'
-      preLoaderRoute: typeof SessionSessionIdImport
+    '/session/$documentId': {
+      id: '/session/$documentId'
+      path: '/session/$documentId'
+      fullPath: '/session/$documentId'
+      preLoaderRoute: typeof SessionDocumentIdImport
       parentRoute: typeof rootRoute
     }
-    '/session/$sessionId/configure/': {
-      id: '/session/$sessionId/configure/'
+    '/session/$documentId/configure/': {
+      id: '/session/$documentId/configure/'
       path: '/configure'
-      fullPath: '/session/$sessionId/configure'
-      preLoaderRoute: typeof SessionSessionIdConfigureIndexLazyImport
-      parentRoute: typeof SessionSessionIdImport
+      fullPath: '/session/$documentId/configure'
+      preLoaderRoute: typeof SessionDocumentIdConfigureIndexLazyImport
+      parentRoute: typeof SessionDocumentIdImport
     }
-    '/session/$sessionId/ranking/': {
-      id: '/session/$sessionId/ranking/'
+    '/session/$documentId/ranking/': {
+      id: '/session/$documentId/ranking/'
       path: '/ranking'
-      fullPath: '/session/$sessionId/ranking'
-      preLoaderRoute: typeof SessionSessionIdRankingIndexLazyImport
-      parentRoute: typeof SessionSessionIdImport
+      fullPath: '/session/$documentId/ranking'
+      preLoaderRoute: typeof SessionDocumentIdRankingIndexLazyImport
+      parentRoute: typeof SessionDocumentIdImport
     }
-    '/session/$sessionId/score/': {
-      id: '/session/$sessionId/score/'
+    '/session/$documentId/score/': {
+      id: '/session/$documentId/score/'
       path: '/score'
-      fullPath: '/session/$sessionId/score'
-      preLoaderRoute: typeof SessionSessionIdScoreIndexLazyImport
-      parentRoute: typeof SessionSessionIdImport
+      fullPath: '/session/$documentId/score'
+      preLoaderRoute: typeof SessionDocumentIdScoreIndexLazyImport
+      parentRoute: typeof SessionDocumentIdImport
     }
-    '/session/$sessionId/user/': {
-      id: '/session/$sessionId/user/'
+    '/session/$documentId/user/': {
+      id: '/session/$documentId/user/'
       path: '/user'
-      fullPath: '/session/$sessionId/user'
-      preLoaderRoute: typeof SessionSessionIdUserIndexLazyImport
-      parentRoute: typeof SessionSessionIdImport
+      fullPath: '/session/$documentId/user'
+      preLoaderRoute: typeof SessionDocumentIdUserIndexLazyImport
+      parentRoute: typeof SessionDocumentIdImport
     }
   }
 }
@@ -150,11 +150,11 @@ declare module '@tanstack/react-router' {
 export const routeTree = rootRoute.addChildren({
   IndexRoute,
   DevRoute,
-  SessionSessionIdRoute: SessionSessionIdRoute.addChildren({
-    SessionSessionIdConfigureIndexLazyRoute,
-    SessionSessionIdRankingIndexLazyRoute,
-    SessionSessionIdScoreIndexLazyRoute,
-    SessionSessionIdUserIndexLazyRoute,
+  SessionDocumentIdRoute: SessionDocumentIdRoute.addChildren({
+    SessionDocumentIdConfigureIndexLazyRoute,
+    SessionDocumentIdRankingIndexLazyRoute,
+    SessionDocumentIdScoreIndexLazyRoute,
+    SessionDocumentIdUserIndexLazyRoute,
   }),
 })
 
@@ -168,7 +168,7 @@ export const routeTree = rootRoute.addChildren({
       "children": [
         "/",
         "/dev",
-        "/session/$sessionId"
+        "/session/$documentId"
       ]
     },
     "/": {
@@ -177,30 +177,30 @@ export const routeTree = rootRoute.addChildren({
     "/dev": {
       "filePath": "~dev.tsx"
     },
-    "/session/$sessionId": {
-      "filePath": "~session/~$sessionId.tsx",
+    "/session/$documentId": {
+      "filePath": "~session/~$documentId.tsx",
       "children": [
-        "/session/$sessionId/configure/",
-        "/session/$sessionId/ranking/",
-        "/session/$sessionId/score/",
-        "/session/$sessionId/user/"
+        "/session/$documentId/configure/",
+        "/session/$documentId/ranking/",
+        "/session/$documentId/score/",
+        "/session/$documentId/user/"
       ]
     },
-    "/session/$sessionId/configure/": {
-      "filePath": "~session/~$sessionId/~configure/~index.lazy.tsx",
-      "parent": "/session/$sessionId"
+    "/session/$documentId/configure/": {
+      "filePath": "~session/~$documentId/~configure/~index.lazy.tsx",
+      "parent": "/session/$documentId"
     },
-    "/session/$sessionId/ranking/": {
-      "filePath": "~session/~$sessionId/~ranking/~index.lazy.tsx",
-      "parent": "/session/$sessionId"
+    "/session/$documentId/ranking/": {
+      "filePath": "~session/~$documentId/~ranking/~index.lazy.tsx",
+      "parent": "/session/$documentId"
     },
-    "/session/$sessionId/score/": {
-      "filePath": "~session/~$sessionId/~score/~index.lazy.tsx",
-      "parent": "/session/$sessionId"
+    "/session/$documentId/score/": {
+      "filePath": "~session/~$documentId/~score/~index.lazy.tsx",
+      "parent": "/session/$documentId"
     },
-    "/session/$sessionId/user/": {
-      "filePath": "~session/~$sessionId/~user/~index.lazy.tsx",
-      "parent": "/session/$sessionId"
+    "/session/$documentId/user/": {
+      "filePath": "~session/~$documentId/~user/~index.lazy.tsx",
+      "parent": "/session/$documentId"
     }
   }
 }

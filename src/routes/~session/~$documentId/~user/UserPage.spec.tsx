@@ -1,7 +1,6 @@
-import { repo } from '@/lib/repo';
 import { State } from '@/core/State';
+import { createSession, loadDocHandle, repo } from '@/lib/repo';
 import { routeTree } from '@/routeTree.gen.ts';
-import { AutomergeUrl } from '@automerge/automerge-repo';
 import { RepoContext } from '@automerge/automerge-repo-react-hooks';
 import {
   createMemoryHistory,
@@ -16,9 +15,9 @@ describe('UserPage', () => {
   });
 
   it('should should store the user once', async () => {
-    const sessionId = '01J23ZD5YVK05BTTKZ0027G6D2';
+    const documentId = await createSession();
     const memoryHistory = createMemoryHistory({
-      initialEntries: [`/session/${sessionId}/user`],
+      initialEntries: [`/session/${documentId}/user`],
     });
 
     const router = createRouter({ routeTree, history: memoryHistory });
@@ -36,14 +35,10 @@ describe('UserPage', () => {
     const saveButton = screen.getByRole('button', { name: /continue/i });
     fireEvent.click(saveButton);
 
-    const url = localStorage.getItem(
-      `rank-force-${sessionId}-doc-url`,
-    ) as AutomergeUrl | null;
-    expect(url).not.toBeNull();
-    const handle = await repo.find<State>(url!);
+    const handle = await loadDocHandle(documentId);
 
     await waitFor(() => {
-      const users = handle.doc().users;
+      const users = (handle.doc() as State).users;
       expect(users).toHaveLength(1);
       expect(users[0]).toHaveProperty('name', 'John');
     });

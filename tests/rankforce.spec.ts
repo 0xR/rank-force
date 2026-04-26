@@ -7,9 +7,9 @@ async function startSession(page: Page, name: string) {
   await page.waitForURL(/\/configure$/);
 }
 
-function sessionIdFromUrl(url: string) {
-  const match = url.match(/\/session\/([0-9A-HJKMNP-TV-Z]{26})/i);
-  if (!match) throw new Error(`No session id in url: ${url}`);
+function documentIdFromUrl(url: string) {
+  const match = url.match(/\/session\/([^/]+)/);
+  if (!match) throw new Error(`No document id in url: ${url}`);
   return match[1];
 }
 
@@ -28,10 +28,10 @@ test.describe('Rank Force', () => {
   test('syncs items across tabs in the same browser', async ({ context }) => {
     const page1 = await context.newPage();
     await startSession(page1, 'user 1');
-    const sessionId = sessionIdFromUrl(page1.url());
+    const documentId = documentIdFromUrl(page1.url());
 
     const page2 = await context.newPage();
-    await page2.goto(`/session/${sessionId}/configure`);
+    await page2.goto(`/session/${documentId}/configure`);
     await page2.waitForURL(/\/configure$/);
 
     await page1.getByLabel('Item label').fill('item1');

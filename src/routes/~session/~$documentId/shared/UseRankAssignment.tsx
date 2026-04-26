@@ -1,7 +1,7 @@
 import { RankAssignment } from '@/core/RankAssignment';
 import { Store } from '@/core/State';
-import { Route } from '@/routes/~session/~$sessionId.tsx';
-import { useSessionStore } from '@/routes/~session/~$sessionId/store.ts';
+import { Route } from '@/routes/~session/~$documentId.tsx';
+import { useSessionStore } from '@/routes/~session/~$documentId/store.ts';
 import { useMemo } from 'react';
 
 export function useRankAssignment() {

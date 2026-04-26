@@ -1,18 +1,22 @@
-import { assertIsNonEmptyString, assertIsObject } from './type-assertions';
+import { isValidDocumentId } from '@automerge/automerge-repo';
 import { decodeTime } from 'ulid';
 
+import { assertIsNonEmptyString, assertIsObject } from './type-assertions';
+
 export type MqttToken = {
-  sessionId: string;
+  documentId: string;
   userId: string;
 };
 
 export function assertIsToken(parsed: unknown): asserts parsed is MqttToken {
   assertIsObject(parsed);
-  assertIsNonEmptyString(parsed.sessionId);
+  assertIsNonEmptyString(parsed.documentId);
   assertIsNonEmptyString(parsed.userId);
 }
 
 export function validateToken(token: MqttToken) {
-  decodeTime(token.sessionId);
+  if (!isValidDocumentId(token.documentId)) {
+    throw new Error('Invalid documentId');
+  }
   decodeTime(token.userId);
 }

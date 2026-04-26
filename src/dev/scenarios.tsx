@@ -6,47 +6,40 @@ import { useNavigate } from '@tanstack/react-router';
 
 type Scenario = {
   label: string;
-  sessionId: string;
   options: BuildStateOptions;
-  target: '/session/$sessionId/ranking' | '/session/$sessionId/score';
+  target: '/session/$documentId/ranking' | '/session/$documentId/score';
 };
 
 const scenarios: Scenario[] = [
   {
     label: 'Configured (no rankings)',
-    sessionId: 'dev-without-ranking',
     options: { users: 3, items: 4, dimensions: 2, ranked: false },
-    target: '/session/$sessionId/ranking',
+    target: '/session/$documentId/ranking',
   },
   {
     label: 'Complete with score',
-    sessionId: 'dev-with-ranking',
     options: { users: 3, items: 4, dimensions: 2, ranked: true },
-    target: '/session/$sessionId/score',
+    target: '/session/$documentId/score',
   },
 ];
 
-const docUrlKey = (sessionId: string) => `rank-force-${sessionId}-doc-url`;
-const userIdKey = (sessionId: string) => `rank-force-${sessionId}-userid`;
+const userIdKey = (documentId: string) => `rank-force-${documentId}-userid`;
 
 export default function DevScenariosPage() {
   const navigate = useNavigate();
 
-  async function seed({ sessionId, options, target }: Scenario) {
-    localStorage.removeItem(docUrlKey(sessionId));
-    localStorage.removeItem(userIdKey(sessionId));
-
+  async function seed({ options, target }: Scenario) {
     const state = buildState(options);
     const handle = repo.create<State>(state);
     await handle.whenReady();
+    const documentId = handle.documentId;
 
-    localStorage.setItem(docUrlKey(sessionId), handle.url);
     localStorage.setItem(
-      userIdKey(sessionId),
+      userIdKey(documentId),
       JSON.stringify(state.users[0]!.id),
     );
 
-    await navigate({ to: target, params: { sessionId } });
+    await navigate({ to: target, params: { documentId } });
   }
 
   return (
@@ -58,7 +51,7 @@ export default function DevScenariosPage() {
       <div className="flex flex-col gap-2">
         {scenarios.map((scenario) => (
           <Button
-            key={scenario.sessionId}
+            key={scenario.label}
             variant="outline"
             onClick={() => seed(scenario)}
           >

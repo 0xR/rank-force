@@ -4,10 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Item } from '@/core/Item';
 import { RankDimension } from '@/core/RankDimension';
 import { UserRanking } from '@/core/UserRanking';
-import { useRankAssignment } from '@/routes/~session/~$sessionId/shared/UseRankAssignment';
-import { useUser } from '@/routes/~session/~$sessionId/shared/useUser';
-import { Sortable } from '@/routes/~session/~$sessionId/~ranking/Sortable';
-import { Route } from '@/routes/~session/~$sessionId/~ranking/~index.lazy.tsx';
+import { useRankAssignment } from '@/routes/~session/~$documentId/shared/UseRankAssignment';
+import { useUser } from '@/routes/~session/~$documentId/shared/useUser';
+import { Sortable } from '@/routes/~session/~$documentId/~ranking/Sortable';
+import { Route } from '@/routes/~session/~$documentId/~ranking/~index.lazy.tsx';
 import { Link } from '@tanstack/react-router';
 import { ArrowRight, Layers, Telescope } from 'lucide-react';
 
@@ -122,7 +122,7 @@ export function Ranking() {
             title="No criteria yet"
             body="Add at least one criterion before ranking. A criterion is the dimension you're ranking along."
             cta={{
-              to: '/session/$sessionId/configure',
+              to: '/session/$documentId/configure',
               label: 'Set up criteria',
             }}
           />
@@ -131,7 +131,7 @@ export function Ranking() {
             title="No items to rank"
             body="Add at least two items, then come back to rank them."
             cta={{
-              to: '/session/$sessionId/configure',
+              to: '/session/$documentId/configure',
               label: 'Add items',
             }}
           />
@@ -171,7 +171,7 @@ export function Ranking() {
             : 'Drag the remaining items to complete each ranking.'}
         </div>
         <Button asChild variant={allComplete ? 'default' : 'secondary'}>
-          <Link to="/session/$sessionId/score" params={params}>
+          <Link to="/session/$documentId/score" params={params}>
             View score
             <ArrowRight className="h-4 w-4" />
           </Link>

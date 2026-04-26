@@ -1,6 +1,6 @@
-import { SessionShell } from '@/routes/~session/~$sessionId/Navigation.tsx';
-import { userIdStorageKey } from '@/routes/~session/~$sessionId/shared/useUser';
-import { getOrCreateSessionDocHandle } from '@/lib/repo';
+import { SessionShell } from '@/routes/~session/~$documentId/Navigation.tsx';
+import { userIdStorageKey } from '@/routes/~session/~$documentId/shared/useUser';
+import { loadDocHandle } from '@/lib/repo';
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
 
 const NAVIGATOR_NAME_KEY = 'rank-force-navigator-name';
@@ -24,29 +24,29 @@ function SessionLayout() {
   );
 }
 
-export const Route = createFileRoute('/session/$sessionId')({
-  beforeLoad: ({ params: { sessionId }, location }) => {
-    const sessionRoot = `/session/${sessionId}`;
+export const Route = createFileRoute('/session/$documentId')({
+  beforeLoad: ({ params: { documentId }, location }) => {
+    const sessionRoot = `/session/${documentId}`;
     const trimmed = location.pathname.replace(/\/+$/, '');
     if (trimmed !== sessionRoot) return;
 
-    const userId = window.localStorage.getItem(userIdStorageKey(sessionId));
+    const userId = window.localStorage.getItem(userIdStorageKey(documentId));
     if (userId) {
       throw redirect({
-        to: '/session/$sessionId/ranking',
-        params: { sessionId },
+        to: '/session/$documentId/ranking',
+        params: { documentId },
       });
     }
     const navigatorName = readNavigatorName();
     throw redirect({
       to: navigatorName
-        ? '/session/$sessionId/configure'
-        : '/session/$sessionId/user',
-      params: { sessionId },
+        ? '/session/$documentId/configure'
+        : '/session/$documentId/user',
+      params: { documentId },
     });
   },
   loader: async ({ params }) => {
-    const handle = await getOrCreateSessionDocHandle(params.sessionId);
+    const handle = await loadDocHandle(params.documentId);
     return { docUrl: handle.url };
   },
   pendingComponent: () => <div className="p-5">Loading session…</div>,

@@ -1,8 +1,8 @@
 import { Wordmark } from '@/components/brand/Logo';
 import { cn } from '@/lib/utils';
-import { Route } from '@/routes/~session/~$sessionId.tsx';
-import { useUserState } from '@/routes/~session/~$sessionId/shared/useUser';
-import { useRankAssignment } from '@/routes/~session/~$sessionId/shared/UseRankAssignment';
+import { Route } from '@/routes/~session/~$documentId.tsx';
+import { useUserState } from '@/routes/~session/~$documentId/shared/useUser';
+import { useRankAssignment } from '@/routes/~session/~$documentId/shared/UseRankAssignment';
 import { Link, useMatchRoute } from '@tanstack/react-router';
 import {
   Compass,
@@ -14,9 +14,9 @@ import {
 import { PropsWithChildren } from 'react';
 
 const tabs = [
-  { to: '/session/$sessionId/configure', label: 'Configure', icon: Layers },
-  { to: '/session/$sessionId/ranking', label: 'Ranking', icon: Compass },
-  { to: '/session/$sessionId/score', label: 'Score', icon: Telescope },
+  { to: '/session/$documentId/configure', label: 'Configure', icon: Layers },
+  { to: '/session/$documentId/ranking', label: 'Ranking', icon: Compass },
+  { to: '/session/$documentId/score', label: 'Score', icon: Telescope },
 ] as const;
 
 function TopTab({
@@ -66,7 +66,7 @@ function NavigatorChip({
   const params = Route.useParams();
   return (
     <Link
-      to="/session/$sessionId/user"
+      to="/session/$documentId/user"
       params={params}
       className="inline-flex items-center gap-2 h-9 pl-2 pr-3 rounded-md text-cream hover:bg-space-2 transition-colors duration-150 ease-out-quart"
     >
