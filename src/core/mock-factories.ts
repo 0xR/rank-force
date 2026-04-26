@@ -17,7 +17,7 @@ export function buildState({
   ranked,
 }: BuildStateOptions): State {
   const users = Array.from({ length: userCount }, (_, i) =>
-    User.make(`User ${i + 1}`, `user-${i + 1}`),
+    User.make(`User ${i + 1}`),
   );
   const items = Array.from({ length: itemCount }, (_, i) =>
     Item.make(`Item ${i + 1}`, `item-${i + 1}`),

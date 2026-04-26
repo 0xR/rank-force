@@ -1,6 +1,13 @@
+import { State } from '@/core/State';
 import { SessionShell } from '@/routes/~session/~$documentId/Navigation.tsx';
-import { userIdStorageKey } from '@/routes/~session/~$documentId/shared/useUser';
+import {
+  useUserId,
+  userIdStorageKey,
+} from '@/routes/~session/~$documentId/shared/useUser';
+import { useSyncBridge } from '@/routes/~session/~$documentId/useSyncBridge';
 import { loadDocHandle } from '@/lib/repo';
+import { DocHandle, DocumentId } from '@automerge/automerge-repo';
+import { useDocHandle } from '@automerge/automerge-repo-react-hooks';
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
 
 const NAVIGATOR_NAME_KEY = 'rank-force-navigator-name';
@@ -16,9 +23,35 @@ function readNavigatorName(): string {
   }
 }
 
+function SyncBridgeMount() {
+  const { documentId } = Route.useParams();
+  const [userId] = useUserId();
+  const handle = useDocHandle<State>(documentId as DocumentId, {
+    suspense: false,
+  });
+  if (!handle || !userId) return null;
+  return (
+    <ActiveSyncBridge handle={handle} documentId={documentId} userId={userId} />
+  );
+}
+
+function ActiveSyncBridge({
+  handle,
+  documentId,
+  userId,
+}: {
+  handle: DocHandle<State>;
+  documentId: string;
+  userId: string;
+}) {
+  useSyncBridge(handle, documentId, userId);
+  return null;
+}
+
 function SessionLayout() {
   return (
     <SessionShell>
+      <SyncBridgeMount />
       <Outlet />
     </SessionShell>
   );

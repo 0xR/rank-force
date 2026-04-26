@@ -34,11 +34,6 @@ export class MqttClient {
     await c.subscribeAsync(this.topic, { qos: 1 });
   }
 
-  async publishMessage(message: string) {
-    const c = await this.ready;
-    await c.publishAsync(this.topic, message, { qos: 1 });
-  }
-
   async publish(bytes: Uint8Array) {
     const c = await this.ready;
     // mqtt.js types insist on Buffer but the runtime accepts any Uint8Array.

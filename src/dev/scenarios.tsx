@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { BuildStateOptions, buildState } from '@/core/mock-factories';
 import { State } from '@/core/State';
 import { createSession, repo } from '@/lib/repo';
-import { MqttClient } from '@/routes/~session/~$documentId/~user/mqtt';
+import { MqttClient } from '@/routes/~session/~$documentId/mqtt';
 import * as Automerge from '@automerge/automerge';
 import { useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
