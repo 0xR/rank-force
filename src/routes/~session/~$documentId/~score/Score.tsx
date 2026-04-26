@@ -174,7 +174,7 @@ export function Score() {
               {users.map((u) => (
                 <TabsTrigger key={u.id} value={u.id}>
                   <UserCircle2
-                    className="h-3.5 w-3.5 mr-2 -ml-0.5 text-space-6"
+                    className="h-3.5 w-3.5 mr-2 text-space-6"
                     strokeWidth={1.5}
                   />
                   {u.name}
