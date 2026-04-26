@@ -67,6 +67,16 @@ export function useSyncBridge(
     void (async () => {
       try {
         await client.subscribe();
+        // Bootstrap: the persister builds the snapshot incrementally from
+        // change bytes only — it never sees a doc's initial-state change
+        // unless someone publishes it. Push every change we already have
+        // so a fresh persister can reconstruct the full history. Idempotent
+        // at the persister (same change hashes → same save bytes).
+        const initialChanges = Automerge.getAllChanges(handle.doc());
+        for (const change of initialChanges) {
+          if (!mounted) return;
+          await client.publish(change);
+        }
         const snapshot = await fetchSnapshot(documentId);
         if (!mounted || !snapshot) return;
         handle.update((doc) => Automerge.loadIncremental(doc, snapshot));
