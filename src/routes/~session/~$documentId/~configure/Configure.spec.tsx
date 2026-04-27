@@ -143,6 +143,56 @@ describe('Configure / Participants', () => {
     confirmSpy.mockRestore();
   });
 
+  it('lets the user edit a criterion in place and saves the change', async () => {
+    const alice = User.make('Alice', 'u-alice');
+    const dim = RankDimension.make(
+      'Quality',
+      'Bad',
+      'Good',
+      'ascending',
+      'd-1',
+    );
+    const documentId = await createSession();
+    const handle = await loadDocHandle(documentId);
+    handle.change((d) => {
+      d.users.push(alice);
+      d.dimensions.push(dim);
+      d.dimensionWeights[dim.id] = 1;
+    });
+
+    localStorage.setItem(NAVIGATOR_NAME_KEY, JSON.stringify('Alice'));
+    localStorage.setItem(NAVIGATOR_ID_KEY, JSON.stringify(alice.id));
+
+    const memoryHistory = createMemoryHistory({
+      initialEntries: [`/session/${documentId}/configure`],
+    });
+    const router = createRouter({ routeTree, history: memoryHistory });
+    render(
+      <RepoContext.Provider value={repo}>
+        <RouterProvider router={router} />
+      </RepoContext.Provider>,
+    );
+
+    const editBtn = await screen.findByRole('button', {
+      name: /Edit Quality/,
+    });
+    fireEvent.click(editBtn);
+
+    const nameInputs = (await screen.findAllByLabelText(
+      /Criterion/,
+    )) as HTMLInputElement[];
+    const editInput = nameInputs.find((el) => el.value === 'Quality')!;
+    fireEvent.change(editInput, { target: { value: 'Quality of fit' } });
+
+    fireEvent.click(screen.getByRole('button', { name: /Save criterion/ }));
+
+    await waitFor(() => {
+      const updated = (handle.doc() as State).dimensions[0]!;
+      expect(updated.id).toBe(dim.id);
+      expect(updated.name).toBe('Quality of fit');
+    });
+  });
+
   it('disables the remove button for the current viewer', async () => {
     const alice = User.make('Alice', 'u-alice');
     const bob = User.make('Bob', 'u-bob');

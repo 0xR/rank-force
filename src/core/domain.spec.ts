@@ -31,6 +31,7 @@ function makeSnapshotStore(initial?: {
     removeDimensions: () => {},
     setUserRanking: () => {},
     addDimension: () => {},
+    editDimension: () => {},
     setDimensionWeight: (id, weight) => {
       if (weight === undefined) delete applied[id];
       else applied[id] = weight;
@@ -472,6 +473,101 @@ describe('Domain', () => {
 
     expect(applied[a.id]).toBeCloseTo(0.5, 8);
     expect(applied[b.id]).toBeCloseTo(0.5, 8);
+  });
+
+  it('editDimension replaces a dimension by id, preserving position', () => {
+    const a = RankDimension.make('importance', 'low', 'high', 'ascending');
+    const b = RankDimension.make('urgency', 'low', 'high', 'ascending');
+    const c = RankDimension.make('cost', 'low', 'high', 'descending');
+    const testStore = new TestStore();
+    testStore.rankAssignment.addDimension(a, b, c);
+
+    const renamed = RankDimension.make(
+      'how urgent',
+      'soon',
+      'eventually',
+      'descending',
+      b.id,
+    );
+    testStore.editDimension(renamed);
+
+    expect(testStore.dimensions.map((d) => d.id)).toEqual([a.id, b.id, c.id]);
+    expect(testStore.dimensions[1]).toEqual(renamed);
+  });
+
+  it('editDimension on RankAssignment preserves the existing weight', () => {
+    const a = RankDimension.make('importance', 'low', 'high', 'ascending');
+    const b = RankDimension.make('urgency', 'low', 'high', 'ascending');
+    const testStore = new TestStore();
+    testStore.rankAssignment.addDimension(a, b);
+    testStore.rankAssignment.setDimensionWeight(a, new Ratio(0.7));
+
+    const renamed = RankDimension.make(
+      'how important',
+      'minor',
+      'critical',
+      'ascending',
+      a.id,
+    );
+    testStore.rankAssignment.editDimension(renamed);
+
+    expect(
+      testStore.rankAssignment.dimensionWeight.get(renamed)?.value,
+    ).toBeCloseTo(0.7, 8);
+  });
+
+  it('editDimension preserves existing user rankings (score still computes)', () => {
+    const user = User.make('user', '0');
+    const dim = RankDimension.make('importance', 'low', 'high', 'ascending');
+    const testStore = new TestStore();
+    testStore.rankAssignment.addDimension(dim);
+    testStore.rankAssignment.addItems('item1', 'item2');
+    testStore.rankAssignment.rank(user, testStore.dimensions[0]!, [
+      testStore.items[0]!,
+      testStore.items[1]!,
+    ]);
+    const before = testStore.rankAssignment.score;
+
+    const renamed = RankDimension.make(
+      'how important',
+      'minor',
+      'critical',
+      'ascending',
+      dim.id,
+    );
+    testStore.rankAssignment.editDimension(renamed);
+
+    expect(testStore.rankAssignment.score).toEqual(before);
+  });
+
+  it('editDimension flipping direction flips score sense', () => {
+    const user = User.make('user', '0');
+    const dim = RankDimension.make('importance', 'low', 'high', 'ascending');
+    const testStore = new TestStore();
+    testStore.rankAssignment.addDimension(dim);
+    testStore.rankAssignment.addItems('item1', 'item2');
+    testStore.rankAssignment.rank(user, testStore.dimensions[0]!, [
+      testStore.items[0]!,
+      testStore.items[1]!,
+    ]);
+    const top = testStore.rankAssignment.score![0]!.item;
+
+    const flipped = RankDimension.make(
+      dim.name,
+      dim.labelStart,
+      dim.labelEnd,
+      'descending',
+      dim.id,
+    );
+    testStore.rankAssignment.editDimension(flipped);
+
+    expect(testStore.rankAssignment.score![0]!.item).not.toBe(top);
+  });
+
+  it('editDimension throws when the id is unknown', () => {
+    const testStore = new TestStore();
+    const ghost = RankDimension.make('ghost', 'low', 'high', 'ascending');
+    expect(() => testStore.rankAssignment.editDimension(ghost)).toThrow();
   });
 
   it('addDimension preserves existing weight proportions when extending', () => {

@@ -17,6 +17,13 @@ export const draftMutators = {
   addDimension(d: State, dimensions: RankDimension[]) {
     d.dimensions.push(...dimensions);
   },
+  editDimension(d: State, updated: RankDimension) {
+    const index = d.dimensions.findIndex((dim) => dim.id === updated.id);
+    if (index === -1) {
+      throw new Error(`Dimension ${updated.id} not found`);
+    }
+    (d.dimensions as RankDimension[])[index] = updated;
+  },
   addUsers(d: State, users: User[]) {
     d.users.push(...users);
   },
@@ -86,6 +93,8 @@ export function useSessionStore(docUrl: AnyDocumentId): SharedStore {
         changeDoc((d) => draftMutators.addItems(d, items)),
       addDimension: (...dimensions) =>
         changeDoc((d) => draftMutators.addDimension(d, dimensions)),
+      editDimension: (updated) =>
+        changeDoc((d) => draftMutators.editDimension(d, updated)),
       addUsers: (...users) =>
         changeDoc((d) => draftMutators.addUsers(d, users)),
       removeUsers: (...users) =>

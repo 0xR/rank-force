@@ -101,6 +101,10 @@ export class RankAssignment {
     });
   }
 
+  editDimension(updated: RankDimension) {
+    this.store.editDimension(updated);
+  }
+
   removeDimensions(...dimensions: RankDimension[]) {
     this.store.removeDimensions(...dimensions);
 

@@ -16,6 +16,7 @@ export function useRankAssignment() {
       dimensionWeights: s.doc.dimensionWeights,
       addItems: s.addItems,
       addDimension: s.addDimension,
+      editDimension: s.editDimension,
       addUsers: s.addUsers,
       removeUsers: s.removeUsers,
       renameUser: s.renameUser,

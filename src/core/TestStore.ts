@@ -65,6 +65,14 @@ export class TestStore implements Store {
     this.dimensions.push(...dimensions);
   }
 
+  editDimension(updated: RankDimension) {
+    const index = this.dimensions.findIndex((d) => d.id === updated.id);
+    if (index === -1) {
+      throw new Error(`Dimension ${updated.id} not found`);
+    }
+    this.dimensions[index] = updated;
+  }
+
   removeDimensions(...dimensions: RankDimension[]) {
     this.dimensions = this.dimensions.filter(
       (dimension) => !dimensions.includes(dimension),

@@ -14,6 +14,7 @@ export type State = {
 export type Mutators = {
   addItems(...items: Item[]): void;
   addDimension(...dimensions: RankDimension[]): void;
+  editDimension(updated: RankDimension): void;
   removeDimensions(...dimensions: RankDimension[]): void;
   addUsers(...users: User[]): void;
   removeUsers(...users: User[]): void;

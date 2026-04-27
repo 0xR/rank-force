@@ -13,8 +13,10 @@ import { useUser } from '@/routes/~session/~$documentId/shared/useUser';
 import {
   ArrowDown,
   ArrowUp,
+  Check,
   Compass,
   Layers,
+  Pencil,
   Plus,
   Telescope,
   UserCircle2,
@@ -183,6 +185,103 @@ function DirectionToggle({
   );
 }
 
+function DimensionFields({
+  idPrefix,
+  name,
+  setName,
+  worse,
+  setWorse,
+  better,
+  setBetter,
+  direction,
+  setDirection,
+  namePlaceholder,
+  worsePlaceholder,
+  betterPlaceholder,
+}: {
+  idPrefix: string;
+  name: string;
+  setName: (v: string) => void;
+  worse: string;
+  setWorse: (v: string) => void;
+  better: string;
+  setBetter: (v: string) => void;
+  direction: 'ascending' | 'descending';
+  setDirection: (v: 'ascending' | 'descending') => void;
+  namePlaceholder?: string;
+  worsePlaceholder?: string;
+  betterPlaceholder?: string;
+}) {
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-1.5">
+        <Label
+          htmlFor={`${idPrefix}-name`}
+          className="text-space-6 text-2xs font-mono uppercase tracking-coord"
+        >
+          Criterion
+        </Label>
+        <Input
+          id={`${idPrefix}-name`}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder={namePlaceholder}
+          required
+        />
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="flex flex-col gap-1.5">
+          <Label
+            htmlFor={`${idPrefix}-worse`}
+            className="text-space-6 text-2xs font-mono uppercase tracking-coord"
+          >
+            Lower end
+          </Label>
+          <Input
+            id={`${idPrefix}-worse`}
+            value={worse}
+            onChange={(e) => setWorse(e.target.value)}
+            placeholder={worsePlaceholder}
+            required
+          />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <Label
+            htmlFor={`${idPrefix}-better`}
+            className="text-space-6 text-2xs font-mono uppercase tracking-coord"
+          >
+            Higher end
+          </Label>
+          <Input
+            id={`${idPrefix}-better`}
+            value={better}
+            onChange={(e) => setBetter(e.target.value)}
+            placeholder={betterPlaceholder}
+            required
+          />
+        </div>
+      </div>
+
+      <div className="pt-1">
+        <DirectionToggle value={direction} onChange={setDirection} />
+      </div>
+    </div>
+  );
+}
+
+function buildDimension(
+  name: string,
+  worse: string,
+  better: string,
+  direction: 'ascending' | 'descending',
+  id?: string,
+): RankDimension {
+  const labelStart = direction === 'ascending' ? worse.trim() : better.trim();
+  const labelEnd = direction === 'ascending' ? better.trim() : worse.trim();
+  return RankDimension.make(name.trim(), labelStart, labelEnd, direction, id);
+}
+
 function DimensionForm({
   onSubmit,
 }: {
@@ -202,69 +301,27 @@ function DimensionForm({
       onSubmit={(e) => {
         e.preventDefault();
         if (!valid) return;
-        const labelStart =
-          direction === 'ascending' ? worse.trim() : better.trim();
-        const labelEnd =
-          direction === 'ascending' ? better.trim() : worse.trim();
-        onSubmit(
-          RankDimension.make(name.trim(), labelStart, labelEnd, direction),
-        );
+        onSubmit(buildDimension(name, worse, better, direction));
         setName('');
         setWorse('');
         setBetter('');
       }}
     >
-      <div className="flex flex-col gap-1.5">
-        <Label
-          htmlFor="dim-name"
-          className="text-space-6 text-2xs font-mono uppercase tracking-coord"
-        >
-          Criterion
-        </Label>
-        <Input
-          id="dim-name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="e.g. Technical depth, Time to ship, Risk"
-          required
-        />
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="flex flex-col gap-1.5">
-          <Label
-            htmlFor="dim-worse"
-            className="text-space-6 text-2xs font-mono uppercase tracking-coord"
-          >
-            Lower end
-          </Label>
-          <Input
-            id="dim-worse"
-            value={worse}
-            onChange={(e) => setWorse(e.target.value)}
-            placeholder="e.g. Shallow"
-            required
-          />
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <Label
-            htmlFor="dim-better"
-            className="text-space-6 text-2xs font-mono uppercase tracking-coord"
-          >
-            Higher end
-          </Label>
-          <Input
-            id="dim-better"
-            value={better}
-            onChange={(e) => setBetter(e.target.value)}
-            placeholder="e.g. Deep"
-            required
-          />
-        </div>
-      </div>
-
-      <div className="flex items-center justify-between flex-wrap gap-3 pt-1">
-        <DirectionToggle value={direction} onChange={setDirection} />
+      <DimensionFields
+        idPrefix="dim-new"
+        name={name}
+        setName={setName}
+        worse={worse}
+        setWorse={setWorse}
+        better={better}
+        setBetter={setBetter}
+        direction={direction}
+        setDirection={setDirection}
+        namePlaceholder="e.g. Technical depth, Time to ship, Risk"
+        worsePlaceholder="e.g. Shallow"
+        betterPlaceholder="e.g. Deep"
+      />
+      <div className="flex items-center justify-end pt-1">
         <Button type="submit" disabled={!valid}>
           <Plus className="h-4 w-4" />
           Add criterion
@@ -278,11 +335,13 @@ function DimensionCard({
   dimension,
   weight,
   onRemove,
+  onEdit,
   onChangeWeight,
 }: {
   dimension: RankDimension;
   weight: Ratio;
   onRemove: () => void;
+  onEdit: (updated: RankDimension) => void;
   onChangeWeight: (ratio: Ratio) => void;
 }) {
   const [percentValue, setPercentValue] = useState(
@@ -292,37 +351,103 @@ function DimensionCard({
     setPercentValue(Math.round(weight.value * 100));
   }, [weight.value]);
 
-  const worse =
+  const initialWorse =
     dimension.direction === 'ascending'
       ? dimension.labelStart
       : dimension.labelEnd;
-  const better =
+  const initialBetter =
     dimension.direction === 'ascending'
       ? dimension.labelEnd
       : dimension.labelStart;
 
+  const [editing, setEditing] = useState(false);
+  const [name, setName] = useState(dimension.name);
+  const [worse, setWorse] = useState(initialWorse);
+  const [better, setBetter] = useState(initialBetter);
+  const [direction, setDirection] = useState(dimension.direction);
+  const valid = name.trim() && worse.trim() && better.trim();
+
+  function reset() {
+    setName(dimension.name);
+    setWorse(initialWorse);
+    setBetter(initialBetter);
+    setDirection(dimension.direction);
+  }
+
   return (
     <div className="rounded-lg border border-space-4 bg-space-1 p-5 flex flex-col gap-4">
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <h3 className="text-lg font-semibold text-cream tracking-tight truncate">
-            {dimension.name}
-          </h3>
-          <p className="mt-1 text-sm text-space-6 truncate">
-            <span className="text-space-5">{worse}</span>
-            <span className="mx-2 text-space-5">→</span>
-            <span className="text-cream">{better}</span>
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={onRemove}
-          className="inline-flex items-center justify-center h-8 w-8 rounded text-space-6 hover:text-destructive hover:bg-space-3 transition duration-150 ease-out-quart"
-          aria-label="Remove criterion"
+      {editing ? (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (!valid) return;
+            onEdit(
+              buildDimension(name, worse, better, direction, dimension.id),
+            );
+            setEditing(false);
+          }}
+          className="flex flex-col gap-4"
         >
-          <X className="h-4 w-4" strokeWidth={1.5} />
-        </button>
-      </div>
+          <DimensionFields
+            idPrefix={`dim-${dimension.id}`}
+            name={name}
+            setName={setName}
+            worse={worse}
+            setWorse={setWorse}
+            better={better}
+            setBetter={setBetter}
+            direction={direction}
+            setDirection={setDirection}
+          />
+          <div className="flex items-center justify-end gap-2 pt-1">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => {
+                reset();
+                setEditing(false);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={!valid}>
+              <Check className="h-4 w-4" />
+              Save criterion
+            </Button>
+          </div>
+        </form>
+      ) : (
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h3 className="text-lg font-semibold text-cream tracking-tight truncate">
+              {dimension.name}
+            </h3>
+            <p className="mt-1 text-sm text-space-6 truncate">
+              <span className="text-space-5">{initialWorse}</span>
+              <span className="mx-2 text-space-5">→</span>
+              <span className="text-cream">{initialBetter}</span>
+            </p>
+          </div>
+          <div className="flex items-center gap-1 shrink-0">
+            <button
+              type="button"
+              onClick={() => setEditing(true)}
+              className="inline-flex items-center justify-center h-8 w-8 rounded text-space-6 hover:text-cream hover:bg-space-3 transition duration-150 ease-out-quart"
+              aria-label={`Edit ${dimension.name}`}
+            >
+              <Pencil className="h-4 w-4" strokeWidth={1.5} />
+            </button>
+            <button
+              type="button"
+              onClick={onRemove}
+              className="inline-flex items-center justify-center h-8 w-8 rounded text-space-6 hover:text-destructive hover:bg-space-3 transition duration-150 ease-out-quart"
+              aria-label={`Remove ${dimension.name}`}
+            >
+              <X className="h-4 w-4" strokeWidth={1.5} />
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="flex items-center gap-4 pt-1">
         <span className="text-2xs font-mono uppercase tracking-coord text-space-6 w-16 shrink-0">
@@ -348,10 +473,12 @@ function DimensionCard({
 function DimensionList({
   dimensions,
   onRemove,
+  onEdit,
   onChangeWeight,
 }: {
   dimensions: [RankDimension, Ratio][];
   onRemove: (dimension: RankDimension) => void;
+  onEdit: (updated: RankDimension) => void;
   onChangeWeight: (dimension: RankDimension, ratio: Ratio) => void;
 }) {
   if (dimensions.length === 0) return null;
@@ -363,6 +490,7 @@ function DimensionList({
           dimension={dimension}
           weight={ratio}
           onRemove={() => onRemove(dimension)}
+          onEdit={onEdit}
           onChangeWeight={(r) => onChangeWeight(dimension, r)}
         />
       ))}
@@ -523,6 +651,7 @@ export function Configure() {
               onRemove={(dimension) =>
                 rankAssigment.removeDimensions(dimension)
               }
+              onEdit={(updated) => rankAssigment.editDimension(updated)}
               onChangeWeight={(dimension, ratio) =>
                 rankAssigment.setDimensionWeight(dimension, ratio)
               }

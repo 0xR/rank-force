@@ -48,6 +48,29 @@ describe('draftMutators', () => {
     expect(d.dimensions).toEqual([d2]);
   });
 
+  it('editDimension replaces a dimension by id, preserving position', () => {
+    const d = emptyState();
+    const a = RankDimension.make('a', 'lo', 'hi', 'ascending');
+    const b = RankDimension.make('b', 'lo', 'hi', 'ascending');
+    draftMutators.addDimension(d, [a, b]);
+    const renamed = RankDimension.make(
+      'b prime',
+      'low',
+      'high',
+      'descending',
+      b.id,
+    );
+    draftMutators.editDimension(d, renamed);
+    expect(d.dimensions[0]).toEqual(a);
+    expect(d.dimensions[1]).toEqual(renamed);
+  });
+
+  it('editDimension throws when the id is unknown', () => {
+    const d = emptyState();
+    const ghost = RankDimension.make('ghost', 'lo', 'hi', 'ascending');
+    expect(() => draftMutators.editDimension(d, ghost)).toThrow();
+  });
+
   it('addUsers appends users', () => {
     const d = emptyState();
     const u = User.make('alice');
