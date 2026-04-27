@@ -2,6 +2,7 @@ import { Wordmark } from '@/components/brand/Logo';
 import { cn } from '@/lib/utils';
 import { Route } from '@/routes/~session/~$documentId.tsx';
 import { ShareSessionButton } from '@/routes/~session/~$documentId/ShareSessionButton';
+import { SyncStatus } from '@/routes/~session/~$documentId/SyncStatus';
 import { useUserState } from '@/routes/~session/~$documentId/shared/useUser';
 import { useRankAssignment } from '@/routes/~session/~$documentId/shared/UseRankAssignment';
 import { Link, useMatchRoute } from '@tanstack/react-router';
@@ -103,6 +104,7 @@ function NavigationMenuDemo() {
         <div className="flex items-center gap-2">
           <ShareSessionButton url={buildShareUrl(documentId)} />
           <NavigatorChip name={user?.name} />
+          <SyncStatus />
         </div>
       </div>
       <nav

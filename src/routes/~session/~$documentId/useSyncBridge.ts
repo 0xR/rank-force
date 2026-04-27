@@ -1,5 +1,6 @@
 import { State } from '@/core/State';
 import { MqttClient } from '@/routes/~session/~$documentId/mqtt';
+import { setSyncStatus } from '@/routes/~session/~$documentId/syncStatus';
 import { MqttToken } from '@/shared/MqttToken';
 import * as Automerge from '@automerge/automerge';
 import { DocHandle } from '@automerge/automerge-repo';
@@ -9,6 +10,7 @@ export type SyncBridgeClient = {
   subscribe(): Promise<void>;
   publish(bytes: Uint8Array): Promise<void>;
   onMessage(callback: (bytes: Uint8Array) => void): void;
+  onStatus(callback: (state: 'connected' | 'disconnected') => void): void;
   close(): Promise<void>;
 };
 
@@ -41,12 +43,37 @@ export function useSyncBridge(
 
   useEffect(() => {
     let mounted = true;
+    let connected = false;
+    let pending = 0;
+
+    const emitStatus = () => {
+      if (!mounted) return;
+      const status = !connected ? 'offline' : pending > 0 ? 'syncing' : 'live';
+      setSyncStatus({ status, pending });
+    };
+
     const client = createClient({ documentId, userId });
+
+    client.onStatus((state) => {
+      connected = state === 'connected';
+      emitStatus();
+    });
 
     client.onMessage((bytes) => {
       if (!mounted) return;
       handle.update((doc) => Automerge.applyChanges(doc, [bytes])[0]);
     });
+
+    const trackedPublish = async (bytes: Uint8Array) => {
+      pending += 1;
+      emitStatus();
+      try {
+        await client.publish(bytes);
+      } finally {
+        pending = Math.max(0, pending - 1);
+        emitStatus();
+      }
+    };
 
     const onChange = ({
       patchInfo,
@@ -59,7 +86,7 @@ export function useSyncBridge(
         patchInfo.after,
       );
       for (const change of newChanges) {
-        void client.publish(change);
+        void trackedPublish(change);
       }
     };
     handle.on('change', onChange);
@@ -75,7 +102,7 @@ export function useSyncBridge(
         const initialChanges = Automerge.getAllChanges(handle.doc());
         for (const change of initialChanges) {
           if (!mounted) return;
-          await client.publish(change);
+          await trackedPublish(change);
         }
         const snapshot = await fetchSnapshot(documentId);
         if (!mounted || !snapshot) return;
@@ -89,6 +116,7 @@ export function useSyncBridge(
       mounted = false;
       handle.off('change', onChange);
       void client.close();
+      setSyncStatus({ status: 'offline', pending: 0 });
     };
   }, [handle, documentId, userId, createClient, fetchSnapshot]);
 }

@@ -49,4 +49,13 @@ export class MqttClient {
       callback(new Uint8Array(payload));
     });
   }
+
+  onStatus(callback: (state: 'connected' | 'disconnected') => void) {
+    this.connection.on('connect', () => callback('connected'));
+    this.connection.on('close', () => callback('disconnected'));
+    this.connection.on('offline', () => callback('disconnected'));
+    this.connection.on('end', () => callback('disconnected'));
+    this.connection.on('error', () => callback('disconnected'));
+    callback(this.connection.connected ? 'connected' : 'disconnected');
+  }
 }
