@@ -78,7 +78,7 @@ function NavigatorChip({
   );
 }
 
-export function NavigationMenuDemo() {
+function NavigationMenuDemo() {
   const rankAssignment = useRankAssignment();
   const [user] = useUserState(rankAssignment);
 

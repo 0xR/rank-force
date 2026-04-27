@@ -6,7 +6,7 @@ import { AnyDocumentId } from '@automerge/automerge-repo';
 import { useDocument } from '@automerge/automerge-repo-react-hooks';
 import { useMemo } from 'react';
 
-export type SharedStore = Mutators & {
+type SharedStore = Mutators & {
   doc: State;
 };
 

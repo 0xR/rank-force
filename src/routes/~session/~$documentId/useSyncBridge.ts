@@ -12,7 +12,7 @@ export type SyncBridgeClient = {
   close(): Promise<void>;
 };
 
-export type SyncBridgeOptions = {
+type SyncBridgeOptions = {
   createClient?: (token: MqttToken) => SyncBridgeClient;
   fetchSnapshot?: (documentId: string) => Promise<Uint8Array | null>;
 };

@@ -13,7 +13,7 @@ export function useNavigatorName() {
   return useLocalStorage<string>(NAVIGATOR_NAME_KEY, '');
 }
 
-export function readOrCreateNavigatorId(): string {
+function readOrCreateNavigatorId(): string {
   const raw = window.localStorage.getItem(NAVIGATOR_ID_KEY);
   if (raw) {
     try {

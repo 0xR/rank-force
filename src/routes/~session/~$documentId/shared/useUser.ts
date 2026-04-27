@@ -1,15 +1,9 @@
 import { RankAssignment } from '@/core/RankAssignment';
 import { User } from '@/core/User';
 import { Route } from '@/routes/~session/~$documentId.tsx';
-import {
-  NAVIGATOR_ID_KEY,
-  useNavigatorId,
-  useNavigatorName,
-} from '@/shared/useNavigator';
+import { useNavigatorId, useNavigatorName } from '@/shared/useNavigator';
 import { useNavigate } from '@tanstack/react-router';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-
-export const navigatorIdStorageKey = NAVIGATOR_ID_KEY;
 
 export function useUserId() {
   const id = useNavigatorId();

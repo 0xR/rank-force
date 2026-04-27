@@ -1,6 +1,6 @@
 import { RankDimension, RankDimensionDirection } from './RankDimension';
 
-export type RankTemplateDimension = {
+type RankTemplateDimension = {
   readonly name: string;
   readonly labelStart: string;
   readonly labelEnd: string;
