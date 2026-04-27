@@ -16,6 +16,10 @@ pnpm build
 
 `pnpm build` runs `tsc` and is the only step that catches type errors — `eslint` does not type-check.
 
+## Unused-code check (`pnpm knip`)
+
+Run occasionally to surface unused files, exports, and dependencies. Not part of the standard validation gate — it's a triage tool. Exits non-zero when issues are found; that's expected.
+
 ## Commit Attribution
 
 AI commits MUST include:
