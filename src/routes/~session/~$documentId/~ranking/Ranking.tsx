@@ -23,8 +23,8 @@ function PageHeader() {
         </h1>
       </div>
       <p className="max-w-md text-sm text-space-6 leading-relaxed">
-        For each criterion, drag items from left to right and place them in
-        order. Top is best.
+        For each criterion, tap or drag an item to rank it, then drag ranked
+        items to reorder. Top is best.
       </p>
     </div>
   );
@@ -168,7 +168,7 @@ export function Ranking() {
           <Telescope className="h-4 w-4" strokeWidth={1.5} />
           {allComplete
             ? 'All ranked. View the score.'
-            : 'Drag the remaining items to complete each ranking.'}
+            : 'Tap the remaining items to complete each ranking.'}
         </div>
         <Button asChild variant={allComplete ? 'default' : 'secondary'}>
           <Link to="/session/$documentId/score" params={params}>
