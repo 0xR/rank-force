@@ -4,7 +4,7 @@ import { State } from '@/core/State';
 import { User } from '@/core/User';
 import { createSession, loadDocHandle, repo } from '@/lib/repo';
 import { routeTree } from '@/routeTree.gen.ts';
-import { userIdStorageKey } from '@/routes/~session/~$documentId/shared/useUser';
+import { NAVIGATOR_ID_KEY } from '@/shared/useNavigator';
 import { RepoContext } from '@automerge/automerge-repo-react-hooks';
 import {
   createMemoryHistory,
@@ -34,7 +34,7 @@ async function setupSession(opts: {
   localStorage.setItem(NAVIGATOR_NAME_KEY, JSON.stringify('Tester'));
   if (opts.selfId !== null) {
     localStorage.setItem(
-      userIdStorageKey(documentId),
+      NAVIGATOR_ID_KEY,
       JSON.stringify(opts.selfId ?? opts.users[0]!.id),
     );
   }
@@ -106,10 +106,7 @@ describe('Configure / Participants', () => {
     });
 
     localStorage.setItem(NAVIGATOR_NAME_KEY, JSON.stringify('Alice'));
-    localStorage.setItem(
-      userIdStorageKey(documentId),
-      JSON.stringify(alice.id),
-    );
+    localStorage.setItem(NAVIGATOR_ID_KEY, JSON.stringify(alice.id));
 
     const memoryHistory = createMemoryHistory({
       initialEntries: [`/session/${documentId}/configure`],

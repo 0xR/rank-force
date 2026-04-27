@@ -33,6 +33,10 @@ export class TestStore implements Store {
     this.users.push(...users);
   }
 
+  renameUser(userId: string, name: string): void {
+    this.users = this.users.map((u) => (u.id === userId ? { ...u, name } : u));
+  }
+
   setUserRanking(userId: string, dimensionId: string, itemIds: string[]): void {
     const userRanking = this.rankingsByUser[userId] ?? {};
     if (itemIds) {

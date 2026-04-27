@@ -29,6 +29,12 @@ export const draftMutators = {
       delete d.rankingsByUser[id];
     }
   },
+  renameUser(d: State, userId: string, name: string) {
+    const user = d.users.find((u) => u.id === userId);
+    if (user) {
+      (user as { name: string }).name = name;
+    }
+  },
   removeItems(d: State, items: Item[]) {
     const ids = new Set(items.map((i) => i.id));
     for (let i = d.items.length - 1; i >= 0; i--) {
@@ -84,6 +90,8 @@ export function useSessionStore(docUrl: AnyDocumentId): SharedStore {
         changeDoc((d) => draftMutators.addUsers(d, users)),
       removeUsers: (...users) =>
         changeDoc((d) => draftMutators.removeUsers(d, users)),
+      renameUser: (userId, name) =>
+        changeDoc((d) => draftMutators.renameUser(d, userId, name)),
       removeItems: (...items) =>
         changeDoc((d) => draftMutators.removeItems(d, items)),
       removeDimensions: (...dimensions) =>

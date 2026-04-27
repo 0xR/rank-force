@@ -1,16 +1,12 @@
 import { State } from '@/core/State';
 import { SessionShell } from '@/routes/~session/~$documentId/Navigation.tsx';
-import {
-  useUserId,
-  userIdStorageKey,
-} from '@/routes/~session/~$documentId/shared/useUser';
+import { useUserId } from '@/routes/~session/~$documentId/shared/useUser';
 import { useSyncBridge } from '@/routes/~session/~$documentId/useSyncBridge';
 import { loadDocHandle } from '@/lib/repo';
+import { NAVIGATOR_NAME_KEY } from '@/shared/useNavigator';
 import { DocHandle, DocumentId } from '@automerge/automerge-repo';
 import { useDocHandle } from '@automerge/automerge-repo-react-hooks';
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
-
-const NAVIGATOR_NAME_KEY = 'rank-force-navigator-name';
 
 function readNavigatorName(): string {
   const raw = window.localStorage.getItem(NAVIGATOR_NAME_KEY);
@@ -63,13 +59,6 @@ export const Route = createFileRoute('/session/$documentId')({
     const trimmed = location.pathname.replace(/\/+$/, '');
     if (trimmed !== sessionRoot) return;
 
-    const userId = window.localStorage.getItem(userIdStorageKey(documentId));
-    if (userId) {
-      throw redirect({
-        to: '/session/$documentId/ranking',
-        params: { documentId },
-      });
-    }
     const navigatorName = readNavigatorName();
     throw redirect({
       to: navigatorName

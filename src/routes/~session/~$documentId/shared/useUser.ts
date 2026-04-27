@@ -1,43 +1,42 @@
 import { RankAssignment } from '@/core/RankAssignment';
 import { User } from '@/core/User';
 import { Route } from '@/routes/~session/~$documentId.tsx';
-import { useNavigatorName } from '@/shared/useNavigator';
+import {
+  NAVIGATOR_ID_KEY,
+  useNavigatorId,
+  useNavigatorName,
+} from '@/shared/useNavigator';
 import { useNavigate } from '@tanstack/react-router';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { useLocalStorage } from 'usehooks-ts';
 
-export function userIdStorageKey(documentId: string) {
-  return `rank-force-${documentId}-userid`;
-}
+export const navigatorIdStorageKey = NAVIGATOR_ID_KEY;
 
 export function useUserId() {
-  const { documentId } = Route.useParams();
-  return useLocalStorage<string | null>(userIdStorageKey(documentId), null);
+  const id = useNavigatorId();
+  return [id] as const;
 }
 
 export function useUserState(rankAssigment: RankAssignment) {
-  const [userId, setUserId] = useUserId();
+  const userId = useNavigatorId();
 
-  const user = useMemo(() => {
-    if (!userId) {
-      return undefined;
-    }
-    return rankAssigment.usersById.get(userId);
-  }, [rankAssigment, userId]);
+  const user = useMemo(
+    () => rankAssigment.usersById.get(userId),
+    [rankAssigment, userId],
+  );
 
   const setUserName = useCallback(
     (name: string) => {
-      if (name === '') {
+      const trimmed = name.trim();
+      if (!trimmed) return;
+      const existing = rankAssigment.usersById.get(userId);
+      if (existing) {
+        if (existing.name === trimmed) return;
+        rankAssigment.renameUser(userId, trimmed);
         return;
       }
-      if (name === user?.name) {
-        return;
-      }
-      const newUser = User.make(name);
-      rankAssigment.addUser(newUser);
-      setUserId(newUser.id);
+      rankAssigment.addUser(User.make(trimmed, userId));
     },
-    [rankAssigment, setUserId, user?.name],
+    [rankAssigment, userId],
   );
 
   return [user, setUserName] as const;

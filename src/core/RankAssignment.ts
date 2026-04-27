@@ -178,6 +178,14 @@ export class RankAssignment {
     this.store.removeUsers(...users);
   }
 
+  renameUser(userId: string, name: string) {
+    this.store.renameUser(userId, name);
+    const existing = this.usersById.get(userId);
+    if (existing) {
+      this.usersById.set(userId, { ...existing, name });
+    }
+  }
+
   setDimensionWeight(rankDimension: RankDimension, ratio: Ratio) {
     const previousWeight = this.dimensionWeight.get(rankDimension);
 

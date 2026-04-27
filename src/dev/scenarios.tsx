@@ -3,6 +3,7 @@ import { BuildStateOptions, buildState } from '@/core/mock-factories';
 import { State } from '@/core/State';
 import { createSession, repo } from '@/lib/repo';
 import { MqttClient } from '@/routes/~session/~$documentId/mqtt';
+import { NAVIGATOR_ID_KEY } from '@/shared/useNavigator';
 import * as Automerge from '@automerge/automerge';
 import { useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
@@ -27,8 +28,6 @@ const scenarios: Scenario[] = [
   },
 ];
 
-const userIdKey = (documentId: string) => `rank-force-${documentId}-userid`;
-
 export default function DevScenariosPage() {
   const navigate = useNavigate();
 
@@ -38,10 +37,7 @@ export default function DevScenariosPage() {
     await handle.whenReady();
     const documentId = handle.documentId;
 
-    localStorage.setItem(
-      userIdKey(documentId),
-      JSON.stringify(state.users[0]!.id),
-    );
+    localStorage.setItem(NAVIGATOR_ID_KEY, JSON.stringify(state.users[0]!.id));
 
     await navigate({ to: target, params: { documentId } });
   }

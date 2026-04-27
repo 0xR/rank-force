@@ -17,6 +17,7 @@ export type Mutators = {
   removeDimensions(...dimensions: RankDimension[]): void;
   addUsers(...users: User[]): void;
   removeUsers(...users: User[]): void;
+  renameUser(userId: string, name: string): void;
   removeItems(...items: Item[]): void;
   setUserRanking(
     userId: string,

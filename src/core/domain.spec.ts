@@ -26,6 +26,7 @@ function makeSnapshotStore(initial?: {
     addItems: () => {},
     addUsers: () => {},
     removeUsers: () => {},
+    renameUser: () => {},
     removeItems: () => {},
     removeDimensions: () => {},
     setUserRanking: () => {},
@@ -437,6 +438,28 @@ describe('Domain', () => {
 
     const testStore2 = TestStore.fromState(deserialized);
     expect(testStore.rankAssignment).toEqual(testStore2.rankAssignment);
+  });
+
+  it('renames a user without changing their id or rankings', () => {
+    const user = User.make('Alice', 'u-alice');
+    const dimension = createDimension();
+    const testStore = new TestStore();
+    testStore.rankAssignment.addDimension(dimension);
+    testStore.rankAssignment.addItems('item1', 'item2');
+    testStore.rankAssignment.rank(user, testStore.dimensions[0]!, [
+      testStore.items[0]!,
+      testStore.items[1]!,
+    ]);
+
+    testStore.rankAssignment.renameUser('u-alice', 'Alicia');
+
+    expect(testStore.users.map((u) => ({ id: u.id, name: u.name }))).toEqual([
+      { id: 'u-alice', name: 'Alicia' },
+    ]);
+    expect(testStore.rankingsByUser['u-alice']?.[dimension.id]).toEqual([
+      testStore.items[0]!.id,
+      testStore.items[1]!.id,
+    ]);
   });
 
   it('addDimension batch yields equal weights against a snapshot-read store', () => {

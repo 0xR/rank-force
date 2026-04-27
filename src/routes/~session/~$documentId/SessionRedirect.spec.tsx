@@ -1,7 +1,7 @@
 import { State } from '@/core/State';
 import { createSession, loadDocHandle, repo } from '@/lib/repo';
 import { routeTree } from '@/routeTree.gen.ts';
-import { userIdStorageKey } from '@/routes/~session/~$documentId/shared/useUser';
+import { NAVIGATOR_ID_KEY } from '@/shared/useNavigator';
 import { RepoContext } from '@automerge/automerge-repo-react-hooks';
 import {
   createMemoryHistory,
@@ -60,13 +60,10 @@ describe('session index redirect', () => {
     expect(await screen.findByLabelText('Your name')).toBeTruthy();
   });
 
-  it('auto-rejoins when localStorage userId points at a user no longer in the doc', async () => {
+  it('joins a new session under the existing navigator id', async () => {
     localStorage.setItem('rank-force-navigator-name', JSON.stringify('Alice'));
+    localStorage.setItem(NAVIGATOR_ID_KEY, JSON.stringify('nav-stable-id'));
     const documentId = await createSession();
-    localStorage.setItem(
-      userIdStorageKey(documentId),
-      JSON.stringify('orphaned-user-id'),
-    );
 
     const memoryHistory = createMemoryHistory({
       initialEntries: [`/session/${documentId}`],
@@ -84,16 +81,12 @@ describe('session index redirect', () => {
       const users = (handle.doc() as State).users;
       expect(users).toHaveLength(1);
       expect(users[0]!.name).toBe('Alice');
-      expect(users[0]!.id).not.toBe('orphaned-user-id');
+      expect(users[0]!.id).toBe('nav-stable-id');
     });
   });
 
-  it('redirects to /user when localStorage userId is stale and no navigator name is set', async () => {
+  it('redirects to /user when no navigator name is set', async () => {
     const documentId = await createSession();
-    localStorage.setItem(
-      userIdStorageKey(documentId),
-      JSON.stringify('orphaned-user-id'),
-    );
 
     const memoryHistory = createMemoryHistory({
       initialEntries: [`/session/${documentId}/configure`],

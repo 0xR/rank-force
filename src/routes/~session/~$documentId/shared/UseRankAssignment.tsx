@@ -18,6 +18,7 @@ export function useRankAssignment() {
       addDimension: s.addDimension,
       addUsers: s.addUsers,
       removeUsers: s.removeUsers,
+      renameUser: s.renameUser,
       removeItems: s.removeItems,
       removeDimensions: s.removeDimensions,
       setUserRanking: s.setUserRanking,
