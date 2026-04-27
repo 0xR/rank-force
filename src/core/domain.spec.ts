@@ -1,10 +1,41 @@
 import { buildState } from '@/core/mock-factories';
 import { TestStore } from '@/core/TestStore';
 import { expect } from 'vitest';
+import { RankAssignment } from './RankAssignment';
 import { RankDimension } from './RankDimension';
 import { RankScore } from './RankScore';
 import { Ratio } from './Ratio';
+import { Store } from './State';
 import { User } from './User';
+
+function makeSnapshotStore(initial?: {
+  dimensions?: RankDimension[];
+  dimensionWeights?: Record<string, number>;
+}): { store: Store; applied: Record<string, number> } {
+  const dimensions: RankDimension[] = [...(initial?.dimensions ?? [])];
+  const dimensionWeights: Record<string, number> = {
+    ...(initial?.dimensionWeights ?? {}),
+  };
+  const applied: Record<string, number> = { ...dimensionWeights };
+  const store: Store = {
+    items: [],
+    dimensions,
+    users: [],
+    rankingsByUser: {},
+    dimensionWeights,
+    addItems: () => {},
+    addUsers: () => {},
+    removeItems: () => {},
+    removeDimensions: () => {},
+    setUserRanking: () => {},
+    addDimension: () => {},
+    setDimensionWeight: (id, weight) => {
+      if (weight === undefined) delete applied[id];
+      else applied[id] = weight;
+    },
+  };
+  return { store, applied };
+}
 
 const createDimension = () =>
   RankDimension.make('importance', 'low', 'high', 'descending');
@@ -405,5 +436,32 @@ describe('Domain', () => {
 
     const testStore2 = TestStore.fromState(deserialized);
     expect(testStore.rankAssignment).toEqual(testStore2.rankAssignment);
+  });
+
+  it('addDimension batch yields equal weights against a snapshot-read store', () => {
+    const { store, applied } = makeSnapshotStore();
+    const assignment = new RankAssignment(store);
+
+    const a = RankDimension.make('Urgency', 'low', 'high', 'ascending');
+    const b = RankDimension.make('Importance', 'low', 'high', 'ascending');
+    assignment.addDimension(a, b);
+
+    expect(applied[a.id]).toBeCloseTo(0.5, 8);
+    expect(applied[b.id]).toBeCloseTo(0.5, 8);
+  });
+
+  it('addDimension preserves existing weight proportions when extending', () => {
+    const existing = RankDimension.make('Speed', 'slow', 'fast', 'ascending');
+    const { store, applied } = makeSnapshotStore({
+      dimensions: [existing],
+      dimensionWeights: { [existing.id]: 1 },
+    });
+    const assignment = new RankAssignment(store);
+
+    const fresh = RankDimension.make('Cost', 'low', 'high', 'descending');
+    assignment.addDimension(fresh);
+
+    expect(applied[existing.id]).toBeCloseTo(0.5, 8);
+    expect(applied[fresh.id]).toBeCloseTo(0.5, 8);
   });
 });

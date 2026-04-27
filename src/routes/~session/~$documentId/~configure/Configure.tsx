@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Item } from '@/core/Item';
 import { RankDimension } from '@/core/RankDimension';
+import { RankTemplate, rankTemplates } from '@/core/RankTemplate';
 import { Ratio } from '@/core/Ratio';
 import { useRankAssignment } from '@/routes/~session/~$documentId/shared/UseRankAssignment';
 import { useUser } from '@/routes/~session/~$documentId/shared/useUser';
@@ -370,6 +371,39 @@ function EmptyHint({ children }: { children: React.ReactNode }) {
   return <p className="text-sm text-space-5 italic">{children}</p>;
 }
 
+function TemplatePicker({
+  onApply,
+}: {
+  onApply: (template: RankTemplate) => void;
+}) {
+  return (
+    <ul className="rounded-lg border border-space-4 divide-y divide-space-4 overflow-hidden">
+      {rankTemplates.map((template) => (
+        <li key={template.id}>
+          <button
+            type="button"
+            onClick={() => onApply(template)}
+            className="w-full text-left px-4 py-3 bg-space-1 hover:bg-space-2 transition-colors duration-150 ease-out-quart focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-space-0"
+            aria-label={`Apply ${template.name} template`}
+          >
+            <div className="flex items-baseline gap-3">
+              <span className="text-cream font-semibold tracking-tight">
+                {template.name}
+              </span>
+              <span className="font-mono text-2xs uppercase tracking-coord text-space-5 truncate">
+                {template.dimensions.map((d) => d.name).join(' · ')}
+              </span>
+            </div>
+            <p className="mt-1.5 text-sm text-space-6 leading-relaxed">
+              {template.description}
+            </p>
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export function Configure() {
   const rankAssigment = useRankAssignment();
   const user = useUser(rankAssigment);
@@ -409,18 +443,19 @@ export function Configure() {
         icon={Compass}
       >
         <div className="flex flex-col gap-5">
+          {dimensionEntries.length === 0 && (
+            <TemplatePicker
+              onApply={(template) =>
+                rankAssigment.addDimension(
+                  ...RankTemplate.toDimensions(template),
+                )
+              }
+            />
+          )}
           <DimensionForm
             onSubmit={(dimension) => rankAssigment.addDimension(dimension)}
           />
-          {dimensionEntries.length === 0 ? (
-            <EmptyHint>
-              No criteria yet. For example:
-              <em className="not-italic text-space-6"> Technical depth</em>,
-              from
-              <em className="not-italic text-space-6"> shallow</em> to
-              <em className="not-italic text-space-6"> deep</em>.
-            </EmptyHint>
-          ) : (
+          {dimensionEntries.length > 0 && (
             <DimensionList
               dimensions={dimensionEntries}
               onRemove={(dimension) =>
