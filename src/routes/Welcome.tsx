@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Wordmark } from '@/components/brand/Logo';
 import { StarField } from '@/components/brand/StarField';
+import { rankTemplates } from '@/core/RankTemplate';
 import { createSession } from '@/lib/repo';
 import { useNavigatorName } from '@/shared/useNavigator';
 import { useNavigate } from '@tanstack/react-router';
@@ -44,7 +45,7 @@ export function Welcome() {
       <main className="relative z-10 mx-auto max-w-3xl px-6 pt-20 pb-24">
         <div className="animate-fade-up">
           <p className="text-2xs font-mono uppercase tracking-coord text-plasma mb-6">
-            ⟢ Forced ranking · For group decisions
+            ⟢ Forced ranking · For groups that need a real answer
           </p>
           <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight text-cream text-balance leading-[0.95]">
             Force a ranking.
@@ -52,8 +53,8 @@ export function Welcome() {
             <span className="text-space-6">Get the signal.</span>
           </h1>
           <p className="mt-6 max-w-xl text-lg text-space-6 leading-relaxed">
-            List your options. Pick the criteria. Everyone ranks, no ties. The
-            weighted score is your answer.
+            Every participant commits to a strict order. The weighted aggregate
+            is your decision. Minutes, not a week of meetings.
           </p>
         </div>
 
@@ -90,9 +91,39 @@ export function Welcome() {
           </div>
         </form>
 
-        <div
-          className="mt-24 grid gap-px bg-space-3 rounded-lg overflow-hidden border border-space-4 sm:grid-cols-3 animate-fade-up"
+        <section
+          className="mt-16 animate-fade-up"
           style={{ animationDelay: '240ms' }}
+          aria-labelledby="why-heading"
+        >
+          <h2
+            id="why-heading"
+            className="text-2xs font-mono uppercase tracking-coord text-space-6"
+          >
+            Why it works
+          </h2>
+          <div className="mt-5 grid gap-8 sm:grid-cols-3">
+            <Reason
+              tag="Experts"
+              title="Use the experts you already have."
+              body="The people who know the decision best are in the room. Forced ranking pulls a sharper signal from their judgment than a spreadsheet matrix or a Slack thread will. Same logic behind structured expert panels and Delphi forecasts."
+            />
+            <Reason
+              tag="Realtime"
+              title="Live, together."
+              body="Everyone ranks at the same time on their own screen. Changes sync as they happen. No one waits on a facilitator. No one collates results in a deck after the fact."
+            />
+            <Reason
+              tag="Speed"
+              title="Faster than research. Harder to ignore."
+              body="A session ends with a number, not a debate. Compared with extensive desk research or escalating to one decider, the cost is minutes and the buy-in is everyone in the room."
+            />
+          </div>
+        </section>
+
+        <div
+          className="mt-16 grid gap-px bg-space-3 rounded-lg overflow-hidden border border-space-4 sm:grid-cols-3 animate-fade-up"
+          style={{ animationDelay: '360ms' }}
         >
           <BriefingStep
             index="01"
@@ -113,7 +144,61 @@ export function Welcome() {
             body="Everyone ranks, no ties. The weighted score reveals the call."
           />
         </div>
+
+        <section
+          className="mt-16 animate-fade-up"
+          style={{ animationDelay: '480ms' }}
+          aria-labelledby="templates-heading"
+        >
+          <h2
+            id="templates-heading"
+            className="text-2xs font-mono uppercase tracking-coord text-space-6"
+          >
+            Start from a pattern you already know
+          </h2>
+          <p className="mt-3 max-w-xl text-sm text-space-6 leading-relaxed">
+            Pick a built-in set of criteria when you start a session, or write
+            your own.
+          </p>
+          <ul className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {rankTemplates.map((template) => (
+              <li
+                key={template.id}
+                className="bg-space-1 border border-space-4 rounded-md p-4 flex flex-col gap-1.5"
+              >
+                <span className="font-mono text-sm tracking-coord text-cream">
+                  {template.name}
+                </span>
+                <span className="text-sm text-space-6 leading-snug">
+                  {template.description}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
       </main>
+    </div>
+  );
+}
+
+function Reason({
+  tag,
+  title,
+  body,
+}: {
+  tag: string;
+  title: string;
+  body: string;
+}) {
+  return (
+    <div className="flex flex-col gap-3">
+      <span className="text-2xs font-mono uppercase tracking-coord text-plasma">
+        {tag}
+      </span>
+      <h3 className="text-xl font-semibold text-cream tracking-tight leading-snug">
+        {title}
+      </h3>
+      <p className="text-sm text-space-6 leading-relaxed">{body}</p>
     </div>
   );
 }
@@ -130,7 +215,7 @@ function BriefingStep({
   body: string;
 }) {
   return (
-    <div className="bg-space-1 p-6 flex flex-col gap-3">
+    <div className="bg-space-1 p-5 flex flex-col gap-3">
       <div className="flex items-center justify-between">
         <span className="text-2xs font-mono tracking-coord text-space-6">
           {index}
