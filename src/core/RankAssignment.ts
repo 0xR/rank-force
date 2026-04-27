@@ -174,6 +174,30 @@ export class RankAssignment {
     }
   }
 
+  replaceItems(labels: string[]) {
+    const trimmed = labels
+      .map((label) => label.trim())
+      .filter((label) => label.length > 0);
+    const seen = new Set<string>();
+    const unique: string[] = [];
+    for (const label of trimmed) {
+      if (seen.has(label)) continue;
+      seen.add(label);
+      unique.push(label);
+    }
+
+    const existingByLabel = new Map<string, Item>();
+    for (const item of this.store.items) {
+      if (!existingByLabel.has(item.label))
+        existingByLabel.set(item.label, item);
+    }
+
+    const next = unique.map(
+      (label) => existingByLabel.get(label) ?? Item.make(label),
+    );
+    this.store.replaceItems(next);
+  }
+
   addUser(user: User) {
     this.store.addUsers(user);
   }

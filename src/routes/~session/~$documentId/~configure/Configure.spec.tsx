@@ -204,3 +204,136 @@ describe('Configure / Participants', () => {
     expect(removeAlice.hasAttribute('disabled')).toBe(true);
   });
 });
+
+async function setupSessionWithItems(items: Item[]) {
+  const alice = User.make('Alice', 'u-alice');
+  const documentId = await createSession();
+  const handle = await loadDocHandle(documentId);
+  handle.change((d) => {
+    d.users.push(alice);
+    d.items.push(...items);
+  });
+
+  localStorage.setItem(NAVIGATOR_NAME_KEY, JSON.stringify('Alice'));
+  localStorage.setItem(NAVIGATOR_ID_KEY, JSON.stringify(alice.id));
+
+  const memoryHistory = createMemoryHistory({
+    initialEntries: [`/session/${documentId}/configure`],
+  });
+  const router = createRouter({ routeTree, history: memoryHistory });
+  render(
+    <RepoContext.Provider value={repo}>
+      <RouterProvider router={router} />
+    </RepoContext.Provider>,
+  );
+  return { documentId, handle };
+}
+
+describe('Configure / Items bulk-edit', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it('toggles into bulk mode and pre-fills the textarea with current labels', async () => {
+    const apple = Item.make('Apple', 'i-apple');
+    const banana = Item.make('Banana', 'i-banana');
+    await setupSessionWithItems([apple, banana]);
+
+    fireEvent.click(
+      await screen.findByRole('button', { name: /Edit as list/ }),
+    );
+
+    const textarea = (await screen.findByLabelText(
+      /Items, one per line/,
+    )) as HTMLTextAreaElement;
+    expect(textarea.value).toBe('Apple\nBanana');
+    expect(screen.queryByPlaceholderText(/Add an item/)).toBeNull();
+    expect(screen.queryByLabelText(/Remove Apple/)).toBeNull();
+  });
+
+  it('saves an unchanged textarea without changing item ids', async () => {
+    const apple = Item.make('Apple', 'i-apple');
+    const banana = Item.make('Banana', 'i-banana');
+    const { handle } = await setupSessionWithItems([apple, banana]);
+
+    fireEvent.click(
+      await screen.findByRole('button', { name: /Edit as list/ }),
+    );
+    fireEvent.click(await screen.findByRole('button', { name: /Save list/ }));
+
+    await waitFor(() => {
+      expect((handle.doc() as State).items.map((i) => i.id)).toEqual([
+        apple.id,
+        banana.id,
+      ]);
+    });
+  });
+
+  it('saves an edited list (add, remove, reorder)', async () => {
+    const apple = Item.make('Apple', 'i-apple');
+    const banana = Item.make('Banana', 'i-banana');
+    const cherry = Item.make('Cherry', 'i-cherry');
+    const { handle } = await setupSessionWithItems([apple, banana, cherry]);
+
+    fireEvent.click(
+      await screen.findByRole('button', { name: /Edit as list/ }),
+    );
+    const textarea = (await screen.findByLabelText(
+      /Items, one per line/,
+    )) as HTMLTextAreaElement;
+    fireEvent.change(textarea, {
+      target: { value: 'Cherry\nApple\nDate\n   \nApple' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /Save list/ }));
+
+    await waitFor(() => {
+      const items = (handle.doc() as State).items;
+      expect(items.map((i) => i.label)).toEqual(['Cherry', 'Apple', 'Date']);
+      expect(items[0]!.id).toBe(cherry.id);
+      expect(items[1]!.id).toBe(apple.id);
+      expect(items[2]!.id).not.toBe(banana.id);
+    });
+    expect(screen.queryByLabelText(/Items, one per line/)).toBeNull();
+  });
+
+  it('Cmd/Ctrl+Enter inside the textarea saves the list', async () => {
+    const apple = Item.make('Apple', 'i-apple');
+    const { handle } = await setupSessionWithItems([apple]);
+
+    fireEvent.click(
+      await screen.findByRole('button', { name: /Edit as list/ }),
+    );
+    const textarea = (await screen.findByLabelText(
+      /Items, one per line/,
+    )) as HTMLTextAreaElement;
+    fireEvent.change(textarea, { target: { value: 'Apple\nBanana' } });
+    fireEvent.keyDown(textarea, { key: 'Enter', ctrlKey: true });
+
+    await waitFor(() => {
+      expect((handle.doc() as State).items.map((i) => i.label)).toEqual([
+        'Apple',
+        'Banana',
+      ]);
+    });
+    expect(screen.queryByLabelText(/Items, one per line/)).toBeNull();
+  });
+
+  it('Cancel discards textarea edits and returns to list mode', async () => {
+    const apple = Item.make('Apple', 'i-apple');
+    const { handle } = await setupSessionWithItems([apple]);
+
+    fireEvent.click(
+      await screen.findByRole('button', { name: /Edit as list/ }),
+    );
+    const textarea = (await screen.findByLabelText(
+      /Items, one per line/,
+    )) as HTMLTextAreaElement;
+    fireEvent.change(textarea, { target: { value: 'Banana' } });
+    fireEvent.click(screen.getByRole('button', { name: /Cancel/ }));
+
+    await waitFor(() => {
+      expect(screen.queryByLabelText(/Items, one per line/)).toBeNull();
+    });
+    expect((handle.doc() as State).items.map((i) => i.id)).toEqual([apple.id]);
+  });
+});

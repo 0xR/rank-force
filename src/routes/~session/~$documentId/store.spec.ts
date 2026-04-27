@@ -32,6 +32,44 @@ describe('draftMutators', () => {
     expect(d.items).toEqual([b]);
   });
 
+  it('replaceItems sets items to the provided list in order', () => {
+    const d = emptyState();
+    const a = Item.make('a');
+    const b = Item.make('b');
+    draftMutators.addItems(d, [a, b]);
+    draftMutators.replaceItems(d, [b, a]);
+    expect(d.items.map((i) => i.id)).toEqual([b.id, a.id]);
+  });
+
+  it('replaceItems with an empty list clears items', () => {
+    const d = emptyState();
+    draftMutators.addItems(d, [Item.make('a'), Item.make('b')]);
+    draftMutators.replaceItems(d, []);
+    expect(d.items).toEqual([]);
+  });
+
+  it('replaceItems scrubs removed item ids from rankings', () => {
+    const d = emptyState();
+    const a = Item.make('a');
+    const b = Item.make('b');
+    const c = Item.make('c');
+    draftMutators.addItems(d, [a, b, c]);
+    draftMutators.setUserRanking(d, 'u1', 'd1', [a.id, b.id, c.id]);
+    draftMutators.replaceItems(d, [a, c]);
+    expect(d.items.map((i) => i.id)).toEqual([a.id, c.id]);
+    expect(d.rankingsByUser.u1?.d1).toEqual([a.id, c.id]);
+  });
+
+  it('replaceItems leaves rankings untouched when nothing was removed', () => {
+    const d = emptyState();
+    const a = Item.make('a');
+    const b = Item.make('b');
+    draftMutators.addItems(d, [a, b]);
+    draftMutators.setUserRanking(d, 'u1', 'd1', [a.id, b.id]);
+    draftMutators.replaceItems(d, [b, a]);
+    expect(d.rankingsByUser.u1?.d1).toEqual([a.id, b.id]);
+  });
+
   it('addDimension appends dimensions', () => {
     const d = emptyState();
     const dim = RankDimension.make('importance', 'low', 'high', 'ascending');

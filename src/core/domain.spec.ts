@@ -28,6 +28,7 @@ function makeSnapshotStore(initial?: {
     removeUsers: () => {},
     renameUser: () => {},
     removeItems: () => {},
+    replaceItems: () => {},
     removeDimensions: () => {},
     setUserRanking: () => {},
     addDimension: () => {},
@@ -568,6 +569,92 @@ describe('Domain', () => {
     const testStore = new TestStore();
     const ghost = RankDimension.make('ghost', 'low', 'high', 'ascending');
     expect(() => testStore.rankAssignment.editDimension(ghost)).toThrow();
+  });
+
+  it('replaceItems preserves item ids for unchanged labels and reorders', () => {
+    const testStore = new TestStore();
+    testStore.rankAssignment.addItems('Apple', 'Banana', 'Cherry');
+    const [apple, banana, cherry] = testStore.items;
+
+    testStore.rankAssignment.replaceItems(['Cherry', 'Apple', 'Banana']);
+
+    expect(testStore.items.map((i) => i.id)).toEqual([
+      cherry!.id,
+      apple!.id,
+      banana!.id,
+    ]);
+    expect(testStore.items.map((i) => i.label)).toEqual([
+      'Cherry',
+      'Apple',
+      'Banana',
+    ]);
+  });
+
+  it('replaceItems trims whitespace and drops empty/whitespace-only lines', () => {
+    const testStore = new TestStore();
+    testStore.rankAssignment.replaceItems(['  Apple  ', '', '   ', 'Banana']);
+    expect(testStore.items.map((i) => i.label)).toEqual(['Apple', 'Banana']);
+  });
+
+  it('replaceItems dedupes within the batch, first occurrence wins', () => {
+    const testStore = new TestStore();
+    testStore.rankAssignment.replaceItems(['Apple', 'Banana', 'Apple']);
+    expect(testStore.items.map((i) => i.label)).toEqual(['Apple', 'Banana']);
+  });
+
+  it('replaceItems removes items whose labels are no longer present', () => {
+    const testStore = new TestStore();
+    testStore.rankAssignment.addItems('Apple', 'Banana');
+    testStore.rankAssignment.replaceItems(['Apple']);
+    expect(testStore.items.map((i) => i.label)).toEqual(['Apple']);
+  });
+
+  it('replaceItems mints new items for new labels', () => {
+    const testStore = new TestStore();
+    testStore.rankAssignment.addItems('Apple');
+    const [apple] = testStore.items;
+    testStore.rankAssignment.replaceItems(['Apple', 'Banana']);
+    expect(testStore.items[0]!.id).toBe(apple!.id);
+    expect(testStore.items[1]!.label).toBe('Banana');
+    expect(testStore.items[1]!.id).not.toBe(apple!.id);
+  });
+
+  it('replaceItems with [] removes everything and scrubs rankings', () => {
+    const user = User.make('user', '0');
+    const rankDimension = createDimension();
+    const testStore = new TestStore();
+    testStore.rankAssignment.addDimension(rankDimension);
+    testStore.rankAssignment.addItems('item1', 'item2');
+    testStore.rankAssignment.rank(user, testStore.dimensions[0]!, [
+      testStore.items[0]!,
+      testStore.items[1]!,
+    ]);
+
+    testStore.rankAssignment.replaceItems([]);
+
+    expect(testStore.items).toEqual([]);
+    expect(
+      testStore.rankingsByUser[user.id]?.[testStore.dimensions[0]!.id],
+    ).toEqual([]);
+  });
+
+  it('replaceItems preserves rankings for items whose labels are kept', () => {
+    const user = User.make('user', '0');
+    const rankDimension = createDimension();
+    const testStore = new TestStore();
+    testStore.rankAssignment.addDimension(rankDimension);
+    testStore.rankAssignment.addItems('Apple', 'Banana');
+    const [apple, banana] = testStore.items;
+    testStore.rankAssignment.rank(user, testStore.dimensions[0]!, [
+      apple!,
+      banana!,
+    ]);
+
+    testStore.rankAssignment.replaceItems(['Apple']);
+
+    expect(
+      testStore.rankingsByUser[user.id]?.[testStore.dimensions[0]!.id],
+    ).toEqual([apple!.id]);
   });
 
   it('addDimension preserves existing weight proportions when extending', () => {

@@ -48,6 +48,31 @@ export const draftMutators = {
       if (ids.has(d.items[i]!.id)) (d.items as Item[]).splice(i, 1);
     }
   },
+  replaceItems(d: State, items: Item[]) {
+    const nextIds = new Set(items.map((i) => i.id));
+    const removedIds = new Set<string>();
+    for (const existing of d.items) {
+      if (!nextIds.has(existing.id)) removedIds.add(existing.id);
+    }
+
+    for (let i = d.items.length - 1; i >= 0; i--) {
+      (d.items as Item[]).splice(i, 1);
+    }
+    d.items.push(...items.map(({ id, label }) => ({ id, label })));
+
+    if (removedIds.size === 0) return;
+    for (const userId of Object.keys(d.rankingsByUser)) {
+      const byDim = d.rankingsByUser[userId];
+      if (!byDim) continue;
+      for (const dimId of Object.keys(byDim)) {
+        const arr = byDim[dimId];
+        if (!arr) continue;
+        for (let i = arr.length - 1; i >= 0; i--) {
+          if (removedIds.has(arr[i]!)) arr.splice(i, 1);
+        }
+      }
+    }
+  },
   removeDimensions(d: State, dimensions: RankDimension[]) {
     const ids = new Set(dimensions.map((x) => x.id));
     for (let i = d.dimensions.length - 1; i >= 0; i--) {
@@ -103,6 +128,8 @@ export function useSessionStore(docUrl: AnyDocumentId): SharedStore {
         changeDoc((d) => draftMutators.renameUser(d, userId, name)),
       removeItems: (...items) =>
         changeDoc((d) => draftMutators.removeItems(d, items)),
+      replaceItems: (items) =>
+        changeDoc((d) => draftMutators.replaceItems(d, items)),
       removeDimensions: (...dimensions) =>
         changeDoc((d) => draftMutators.removeDimensions(d, dimensions)),
       setUserRanking: (userId, dimensionId, itemIds) =>

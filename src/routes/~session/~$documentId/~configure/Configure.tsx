@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
+import { Textarea } from '@/components/ui/textarea';
 import { Item } from '@/core/Item';
 import { RankDimension } from '@/core/RankDimension';
 import { RankTemplate, rankTemplates } from '@/core/RankTemplate';
@@ -16,6 +17,7 @@ import {
   Check,
   Compass,
   Layers,
+  ListPlus,
   Pencil,
   Plus,
   Telescope,
@@ -96,6 +98,48 @@ function ItemForm({ onSubmit }: { onSubmit: (label: string) => void }) {
         <Plus className="h-4 w-4" />
         Add
       </Button>
+    </form>
+  );
+}
+
+function BulkItemEditor({
+  initialValue,
+  onSave,
+  onCancel,
+}: {
+  initialValue: string;
+  onSave: (labels: string[]) => void;
+  onCancel: () => void;
+}) {
+  const [value, setValue] = useState(initialValue);
+  return (
+    <form
+      className="flex flex-col gap-3"
+      onSubmit={(e) => {
+        e.preventDefault();
+        onSave(value.split('\n'));
+      }}
+    >
+      <Textarea
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+            e.preventDefault();
+            onSave(value.split('\n'));
+          }
+        }}
+        placeholder={'One item per line…'}
+        aria-label="Items, one per line"
+        rows={Math.max(6, value.split('\n').length + 1)}
+        autoFocus
+      />
+      <div className="flex items-center justify-end gap-2">
+        <Button type="button" variant="ghost" onClick={onCancel}>
+          Cancel
+        </Button>
+        <Button type="submit">Save list</Button>
+      </div>
     </form>
   );
 }
@@ -594,6 +638,56 @@ function TemplatePicker({
   );
 }
 
+function ItemsPanel({
+  items,
+  itemCount,
+  onAdd,
+  onRemove,
+  onReplace,
+}: {
+  items: Item[];
+  itemCount: number;
+  onAdd: (label: string) => void;
+  onRemove: (item: Item) => void;
+  onReplace: (labels: string[]) => void;
+}) {
+  const [mode, setMode] = useState<'list' | 'bulk'>('list');
+
+  if (mode === 'bulk') {
+    return (
+      <BulkItemEditor
+        initialValue={items.map((i) => i.label).join('\n')}
+        onSave={(labels) => {
+          onReplace(labels);
+          setMode('list');
+        }}
+        onCancel={() => setMode('list')}
+      />
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      <ItemForm onSubmit={onAdd} />
+      <ItemList items={items} onRemove={onRemove} />
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-2xs font-mono uppercase tracking-coord text-space-6">
+          {itemCount} item{itemCount === 1 ? '' : 's'}
+        </p>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => setMode('bulk')}
+        >
+          <ListPlus className="h-4 w-4" strokeWidth={1.5} />
+          Edit as list
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 export function Configure() {
   const rankAssigment = useRankAssignment();
   const user = useUser(rankAssigment);
@@ -614,16 +708,13 @@ export function Configure() {
         caption="The things you're choosing between. Two minimum; eight or fewer keeps ranking quick."
         icon={Layers}
       >
-        <div className="flex flex-col gap-4">
-          <ItemForm onSubmit={(label) => rankAssigment.addItems(label)} />
-          <ItemList
-            items={rankAssigment.items}
-            onRemove={(item) => rankAssigment.removeItems(item)}
-          />
-          <p className="text-2xs font-mono uppercase tracking-coord text-space-6">
-            {itemCount} item{itemCount === 1 ? '' : 's'}
-          </p>
-        </div>
+        <ItemsPanel
+          items={rankAssigment.items}
+          itemCount={itemCount}
+          onAdd={(label) => rankAssigment.addItems(label)}
+          onRemove={(item) => rankAssigment.removeItems(item)}
+          onReplace={(labels) => rankAssigment.replaceItems(labels)}
+        />
       </Section>
 
       <Section

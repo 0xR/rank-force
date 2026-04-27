@@ -87,6 +87,24 @@ export class TestStore implements Store {
     this.items = this.items.filter((item) => !items.includes(item));
   }
 
+  replaceItems(items: Item[]) {
+    const nextIds = new Set(items.map((i) => i.id));
+    const removedIds = new Set(
+      this.items.filter((i) => !nextIds.has(i.id)).map((i) => i.id),
+    );
+    this.items = [...items];
+    if (removedIds.size === 0) return;
+    for (const userId of Object.keys(this.rankingsByUser)) {
+      const byDim = this.rankingsByUser[userId];
+      if (!byDim) continue;
+      for (const dimId of Object.keys(byDim)) {
+        const arr = byDim[dimId];
+        if (!arr) continue;
+        byDim[dimId] = arr.filter((id) => !removedIds.has(id));
+      }
+    }
+  }
+
   toPlainObject(): State {
     return {
       items: this.items,
