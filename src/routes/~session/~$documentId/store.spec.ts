@@ -55,6 +55,43 @@ describe('draftMutators', () => {
     expect(d.users).toEqual([u]);
   });
 
+  it('removeUsers removes by id', () => {
+    const d = emptyState();
+    const a = User.make('alice');
+    const b = User.make('bob');
+    draftMutators.addUsers(d, [a, b]);
+    draftMutators.removeUsers(d, [a]);
+    expect(d.users).toEqual([b]);
+  });
+
+  it('removeUsers also clears the user’s rankings', () => {
+    const d = emptyState();
+    const a = User.make('alice');
+    draftMutators.addUsers(d, [a]);
+    draftMutators.setUserRanking(d, a.id, 'd1', ['i1']);
+    draftMutators.removeUsers(d, [a]);
+    expect(d.rankingsByUser[a.id]).toBeUndefined();
+  });
+
+  it('removeUsers is a no-op for an unknown user', () => {
+    const d = emptyState();
+    const a = User.make('alice');
+    draftMutators.addUsers(d, [a]);
+    const ghost = User.make('ghost');
+    draftMutators.removeUsers(d, [ghost]);
+    expect(d.users).toEqual([a]);
+  });
+
+  it('removeUsers accepts multiple users at once', () => {
+    const d = emptyState();
+    const a = User.make('alice');
+    const b = User.make('bob');
+    const c = User.make('carol');
+    draftMutators.addUsers(d, [a, b, c]);
+    draftMutators.removeUsers(d, [a, c]);
+    expect(d.users).toEqual([b]);
+  });
+
   it('setUserRanking stores item ids per user/dimension', () => {
     const d = emptyState();
     draftMutators.setUserRanking(d, 'u1', 'd1', ['i1', 'i2']);

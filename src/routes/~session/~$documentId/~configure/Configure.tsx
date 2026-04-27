@@ -7,6 +7,7 @@ import { Item } from '@/core/Item';
 import { RankDimension } from '@/core/RankDimension';
 import { RankTemplate, rankTemplates } from '@/core/RankTemplate';
 import { Ratio } from '@/core/Ratio';
+import { User } from '@/core/User';
 import { useRankAssignment } from '@/routes/~session/~$documentId/shared/UseRankAssignment';
 import { useUser } from '@/routes/~session/~$documentId/shared/useUser';
 import {
@@ -16,6 +17,8 @@ import {
   Layers,
   Plus,
   Telescope,
+  UserCircle2,
+  Users,
   X,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -371,6 +374,65 @@ function EmptyHint({ children }: { children: React.ReactNode }) {
   return <p className="text-sm text-space-5 italic">{children}</p>;
 }
 
+function ParticipantList({
+  users,
+  currentUserId,
+  hasData,
+  onRemove,
+}: {
+  users: User[];
+  currentUserId: string | undefined;
+  hasData: (userId: string) => boolean;
+  onRemove: (user: User) => void;
+}) {
+  if (users.length === 0) {
+    return (
+      <EmptyHint>
+        No one's joined yet. Share the session URL to bring people in.
+      </EmptyHint>
+    );
+  }
+  return (
+    <ul className="rounded-lg border border-space-4 divide-y divide-space-4 overflow-hidden">
+      {users.map((u) => {
+        const isSelf = u.id === currentUserId;
+        return (
+          <li
+            key={u.id}
+            className="group flex items-center gap-3 px-3 py-2.5 bg-space-1 hover:bg-space-2 transition-colors duration-150 ease-out-quart"
+          >
+            <UserCircle2 className="h-4 w-4 text-space-5" strokeWidth={1.5} />
+            <span className="flex-1 text-cream truncate">
+              {u.name}
+              {isSelf && (
+                <span className="ml-2 text-2xs font-mono uppercase tracking-coord text-space-5">
+                  you
+                </span>
+              )}
+            </span>
+            <button
+              type="button"
+              onClick={() => onRemove(u)}
+              disabled={isSelf}
+              title={
+                isSelf
+                  ? "You can't remove yourself"
+                  : hasData(u.id)
+                    ? `${u.name} has rankings — confirm before removing`
+                    : `Remove ${u.name}`
+              }
+              className="opacity-0 group-hover:opacity-100 focus:opacity-100 inline-flex items-center justify-center h-7 w-7 rounded text-space-6 hover:text-destructive hover:bg-space-3 transition duration-150 ease-out-quart disabled:opacity-30 disabled:hover:text-space-6 disabled:hover:bg-transparent disabled:cursor-not-allowed"
+              aria-label={`Remove ${u.name}`}
+            >
+              <X className="h-4 w-4" strokeWidth={1.5} />
+            </button>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
 function TemplatePicker({
   onApply,
 }: {
@@ -467,6 +529,28 @@ export function Configure() {
             />
           )}
         </div>
+      </Section>
+
+      <Section
+        step="C · Participants"
+        title="Participants"
+        caption="Everyone who's joined this session. Remove anyone who shouldn't be here — their rankings go with them."
+        icon={Users}
+      >
+        <ParticipantList
+          users={rankAssigment.users}
+          currentUserId={user.id}
+          hasData={(userId) => rankAssigment.hasRankings(userId)}
+          onRemove={(target) => {
+            if (rankAssigment.hasRankings(target.id)) {
+              const ok = window.confirm(
+                `Remove ${target.name}? They've already submitted rankings — these will be deleted.`,
+              );
+              if (!ok) return;
+            }
+            rankAssigment.removeUsers(target);
+          }}
+        />
       </Section>
 
       <div className="flex items-center justify-between gap-3 pt-6 border-t border-space-4">

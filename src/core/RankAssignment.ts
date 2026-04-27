@@ -64,6 +64,16 @@ export class RankAssignment {
     return this.store.dimensions;
   }
 
+  get users() {
+    return this.store.users;
+  }
+
+  hasRankings(userId: string): boolean {
+    const byDimension = this.store.rankingsByUser[userId];
+    if (!byDimension) return false;
+    return Object.values(byDimension).some((ids) => ids.length > 0);
+  }
+
   get firstUser(): User | undefined {
     return this.store.users[0];
   }
@@ -162,6 +172,10 @@ export class RankAssignment {
 
   addUser(user: User) {
     this.store.addUsers(user);
+  }
+
+  removeUsers(...users: User[]) {
+    this.store.removeUsers(...users);
   }
 
   setDimensionWeight(rankDimension: RankDimension, ratio: Ratio) {

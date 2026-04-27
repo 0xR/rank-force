@@ -20,6 +20,15 @@ export const draftMutators = {
   addUsers(d: State, users: User[]) {
     d.users.push(...users);
   },
+  removeUsers(d: State, users: User[]) {
+    const ids = new Set(users.map((u) => u.id));
+    for (let i = d.users.length - 1; i >= 0; i--) {
+      if (ids.has(d.users[i]!.id)) (d.users as User[]).splice(i, 1);
+    }
+    for (const id of ids) {
+      delete d.rankingsByUser[id];
+    }
+  },
   removeItems(d: State, items: Item[]) {
     const ids = new Set(items.map((i) => i.id));
     for (let i = d.items.length - 1; i >= 0; i--) {
@@ -73,6 +82,8 @@ export function useSessionStore(docUrl: AnyDocumentId): SharedStore {
         changeDoc((d) => draftMutators.addDimension(d, dimensions)),
       addUsers: (...users) =>
         changeDoc((d) => draftMutators.addUsers(d, users)),
+      removeUsers: (...users) =>
+        changeDoc((d) => draftMutators.removeUsers(d, users)),
       removeItems: (...items) =>
         changeDoc((d) => draftMutators.removeItems(d, items)),
       removeDimensions: (...dimensions) =>
