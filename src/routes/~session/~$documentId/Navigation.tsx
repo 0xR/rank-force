@@ -1,6 +1,7 @@
 import { Wordmark } from '@/components/brand/Logo';
 import { cn } from '@/lib/utils';
 import { Route } from '@/routes/~session/~$documentId.tsx';
+import { ShareSessionButton } from '@/routes/~session/~$documentId/ShareSessionButton';
 import { useUserState } from '@/routes/~session/~$documentId/shared/useUser';
 import { useRankAssignment } from '@/routes/~session/~$documentId/shared/UseRankAssignment';
 import { Link, useMatchRoute } from '@tanstack/react-router';
@@ -78,9 +79,15 @@ function NavigatorChip({
   );
 }
 
+function buildShareUrl(documentId: string): string {
+  if (typeof window === 'undefined') return '';
+  return `${window.location.origin}/session/${documentId}`;
+}
+
 function NavigationMenuDemo() {
   const rankAssignment = useRankAssignment();
   const [user] = useUserState(rankAssignment);
+  const { documentId } = Route.useParams();
 
   return (
     <header className="border-b border-space-4 bg-space-0/90 backdrop-blur-sm sticky top-0 z-30">
@@ -94,6 +101,7 @@ function NavigationMenuDemo() {
           ))}
         </nav>
         <div className="flex items-center gap-2">
+          <ShareSessionButton url={buildShareUrl(documentId)} />
           <NavigatorChip name={user?.name} />
         </div>
       </div>

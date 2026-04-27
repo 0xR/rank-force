@@ -1,5 +1,7 @@
-import { isValidDocumentId } from '@automerge/automerge-repo';
-import { describe, expect, it } from 'vitest';
+import { State } from '@/core/State';
+import * as Automerge from '@automerge/automerge';
+import { isValidDocumentId, Repo } from '@automerge/automerge-repo';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { createSession, loadDocHandle } from './repo';
 
@@ -18,6 +20,11 @@ describe('repo', () => {
   });
 
   describe('loadDocHandle', () => {
+    afterEach(() => {
+      vi.unstubAllEnvs();
+      vi.unstubAllGlobals();
+    });
+
     it('loads a handle for a documentId previously returned by createSession', async () => {
       const documentId = await createSession();
       const handle = await loadDocHandle(documentId);
@@ -25,6 +32,33 @@ describe('repo', () => {
       const doc = handle.doc();
       expect(doc?.items).toEqual([]);
       expect(doc?.dimensions).toEqual([]);
+    });
+
+    it('hydrates from the snapshot endpoint when the doc is not local and no peer is available', async () => {
+      const remoteRepo = new Repo({ network: [] });
+      const seed = remoteRepo.create<State>({
+        items: [{ id: 'item-1', label: 'Mars' }],
+        dimensions: [],
+        users: [],
+        rankingsByUser: {},
+        dimensionWeights: {},
+      });
+      await seed.whenReady();
+      const documentId = seed.documentId;
+      const bytes = Automerge.save(seed.doc());
+
+      vi.stubEnv('VITE_SNAPSHOT_URL', 'https://snapshots.test/load');
+      const fetchSpy = vi.fn(async (input: RequestInfo | URL) => {
+        const url = typeof input === 'string' ? input : input.toString();
+        expect(url).toContain(encodeURIComponent(documentId));
+        return new Response(bytes, { status: 200 });
+      });
+      vi.stubGlobal('fetch', fetchSpy);
+
+      const handle = await loadDocHandle(documentId);
+      expect(handle.documentId).toBe(documentId);
+      expect(handle.doc()?.items).toEqual([{ id: 'item-1', label: 'Mars' }]);
+      expect(fetchSpy).toHaveBeenCalled();
     });
   });
 });

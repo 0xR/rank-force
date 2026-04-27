@@ -9,6 +9,8 @@ import { RankDimension } from '@/core/RankDimension';
 import { RankTemplate, rankTemplates } from '@/core/RankTemplate';
 import { Ratio } from '@/core/Ratio';
 import { User } from '@/core/User';
+import { Route } from '@/routes/~session/~$documentId.tsx';
+import { ShareSessionButton } from '@/routes/~session/~$documentId/ShareSessionButton';
 import { useRankAssignment } from '@/routes/~session/~$documentId/shared/UseRankAssignment';
 import { useUser } from '@/routes/~session/~$documentId/shared/useUser';
 import {
@@ -546,6 +548,22 @@ function EmptyHint({ children }: { children: React.ReactNode }) {
   return <p className="text-sm text-space-5 italic">{children}</p>;
 }
 
+function InviteStrip({ shareUrl }: { shareUrl: string }) {
+  return (
+    <div className="flex flex-col gap-2">
+      <span className="text-2xs font-mono uppercase tracking-coord text-space-6">
+        Invite link
+      </span>
+      <div className="flex items-center gap-2">
+        <code className="flex-1 min-w-0 truncate rounded-md border border-space-4 bg-space-1 px-3 py-2 text-xs font-mono text-cream">
+          {shareUrl}
+        </code>
+        <ShareSessionButton url={shareUrl} variant="secondary" />
+      </div>
+    </div>
+  );
+}
+
 function ParticipantList({
   users,
   currentUserId,
@@ -557,13 +575,7 @@ function ParticipantList({
   hasData: (userId: string) => boolean;
   onRemove: (user: User) => void;
 }) {
-  if (users.length === 0) {
-    return (
-      <EmptyHint>
-        No one's joined yet. Share the session URL to bring people in.
-      </EmptyHint>
-    );
-  }
+  if (users.length === 0) return null;
   return (
     <ul className="rounded-lg border border-space-4 divide-y divide-space-4 overflow-hidden">
       {users.map((u) => {
@@ -691,12 +703,17 @@ function ItemsPanel({
 export function Configure() {
   const rankAssigment = useRankAssignment();
   const user = useUser(rankAssigment);
+  const { documentId } = Route.useParams();
 
   if (!user) return null;
 
   const dimensionEntries = Array.from(rankAssigment.dimensionWeight.entries());
   const itemCount = rankAssigment.items.length;
   const ready = dimensionEntries.length > 0 && itemCount >= 2;
+  const shareUrl =
+    typeof window === 'undefined'
+      ? ''
+      : `${window.location.origin}/session/${documentId}`;
 
   return (
     <div className="flex flex-col gap-12">
@@ -754,23 +771,26 @@ export function Configure() {
       <Section
         step="C · Participants"
         title="Participants"
-        caption="Everyone who's joined this session. Remove anyone who shouldn't be here — their rankings go with them."
+        caption="Send the invite link to everyone in the session. Remove anyone who shouldn't be here, and their rankings go with them."
         icon={Users}
       >
-        <ParticipantList
-          users={rankAssigment.users}
-          currentUserId={user.id}
-          hasData={(userId) => rankAssigment.hasRankings(userId)}
-          onRemove={(target) => {
-            if (rankAssigment.hasRankings(target.id)) {
-              const ok = window.confirm(
-                `Remove ${target.name}? They've already submitted rankings — these will be deleted.`,
-              );
-              if (!ok) return;
-            }
-            rankAssigment.removeUsers(target);
-          }}
-        />
+        <div className="flex flex-col gap-5">
+          <InviteStrip shareUrl={shareUrl} />
+          <ParticipantList
+            users={rankAssigment.users}
+            currentUserId={user.id}
+            hasData={(userId) => rankAssigment.hasRankings(userId)}
+            onRemove={(target) => {
+              if (rankAssigment.hasRankings(target.id)) {
+                const ok = window.confirm(
+                  `Remove ${target.name}? They've already submitted rankings, and the rankings will be deleted.`,
+                );
+                if (!ok) return;
+              }
+              rankAssigment.removeUsers(target);
+            }}
+          />
+        </div>
       </Section>
 
       <div className="flex items-center justify-between gap-3 pt-6 border-t border-space-4">
