@@ -25,6 +25,7 @@ function makeSnapshotStore(initial?: {
     dimensionWeights,
     addItems: () => {},
     addUsers: () => {},
+    removeUsers: () => {},
     removeItems: () => {},
     removeDimensions: () => {},
     setUserRanking: () => {},

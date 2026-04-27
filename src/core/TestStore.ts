@@ -8,10 +8,18 @@ export class TestStore implements Store {
   constructor(
     public items: Item[] = [],
     public dimensions: RankDimension[] = [],
-    readonly users: User[] = [],
+    public users: User[] = [],
     readonly rankingsByUser: Record<string, Record<string, string[]>> = {},
     readonly dimensionWeights: Record<string, number> = {},
   ) {}
+
+  removeUsers(...users: User[]) {
+    const ids = new Set(users.map((u) => u.id));
+    this.users = this.users.filter((user) => !ids.has(user.id));
+    for (const id of ids) {
+      delete this.rankingsByUser[id];
+    }
+  }
 
   setDimensionWeight(dimensionId: string, weight: number | undefined): void {
     if (weight === undefined) {

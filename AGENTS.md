@@ -11,7 +11,10 @@ Run before completing any change:
 ```
 pnpm lint
 pnpm test
+pnpm build
 ```
+
+`pnpm build` runs `tsc` and is the only step that catches type errors — `eslint` does not type-check.
 
 ## Commit Attribution
 
