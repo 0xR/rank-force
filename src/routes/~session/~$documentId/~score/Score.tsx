@@ -263,7 +263,7 @@ function ParticipantQuadrants({
                 variant="small"
               />
             ) : (
-              <div className="aspect-square w-full rounded-md border border-dashed border-space-4 bg-space-1 flex items-center justify-center">
+              <div className="aspect-[5/4] w-full rounded-md border border-dashed border-space-4 bg-space-1 flex items-center justify-center">
                 <span className="text-2xs font-mono uppercase tracking-coord text-space-5 text-center px-2">
                   Ranking in progress
                 </span>
@@ -320,18 +320,14 @@ export function Score() {
         </div>
 
         {showMatrix && (
-          <figure className="mx-auto flex w-full max-w-md flex-col gap-3">
+          <div className="w-full">
             <Quadrant
               yDimension={yDimension}
               xDimension={xDimension}
               points={aggregateMatrixPoints}
               variant="aggregate"
             />
-            <figcaption className="text-2xs font-mono uppercase tracking-coord text-space-6 text-center">
-              {yDimension.name} <span className="text-space-5">×</span>{' '}
-              {xDimension.name}
-            </figcaption>
-          </figure>
+          </div>
         )}
 
         <AggregateList scores={aggregate} />

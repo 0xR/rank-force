@@ -40,7 +40,8 @@ export function Quadrant({
   const plot = (
     <div
       className={cn(
-        'relative w-full aspect-square rounded-md border border-space-4 bg-space-1',
+        'relative w-full rounded-md border border-space-4 bg-space-1',
+        isSmall ? 'aspect-[5/4]' : 'aspect-[3/2] sm:aspect-[2/1]',
       )}
     >
       <div
@@ -63,8 +64,10 @@ export function Quadrant({
             <div
               title={p.label}
               className={cn(
-                'absolute flex items-center justify-center rounded-full font-mono tabular-nums select-none',
-                isSmall ? 'h-[18px] w-[18px] text-[10px]' : 'h-6 w-6 text-xs',
+                'absolute grid place-items-center rounded-full font-mono tabular-nums select-none',
+                isSmall
+                  ? 'h-[18px] w-[18px] text-[10px] leading-none'
+                  : 'h-6 w-6 text-xs leading-none',
                 isWinner
                   ? 'bg-plasma text-plasma-fg ring-[3px] ring-plasma-bg/70'
                   : 'bg-space-2 text-cream border border-space-4',
@@ -103,24 +106,40 @@ export function Quadrant({
   return (
     <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] grid-rows-[auto_minmax(0,1fr)_auto] gap-x-3 gap-y-2 items-center justify-items-center">
       <div />
-      <span
-        title={labelTop}
-        className="text-2xs font-mono uppercase tracking-coord text-space-6 truncate max-w-full"
-      >
-        {labelTop}
-      </span>
+      <div className="flex flex-col items-center gap-0.5 max-w-full">
+        <span
+          title={yDimension.name}
+          className="text-2xs font-mono font-medium uppercase tracking-coord text-cream truncate max-w-full"
+        >
+          {yDimension.name}
+        </span>
+        <span
+          title={labelTop}
+          className="text-[10px] font-mono uppercase tracking-coord text-space-5 truncate max-w-full"
+        >
+          {labelTop}
+        </span>
+      </div>
       <div />
 
-      <span
-        title={labelLeft}
-        className="text-2xs font-mono uppercase tracking-coord text-space-6 truncate max-w-[6rem] text-right"
-      >
-        {labelLeft}
-      </span>
+      <div className="flex flex-col items-end gap-0.5 max-w-[7rem]">
+        <span
+          title={xDimension.name}
+          className="text-2xs font-mono font-medium uppercase tracking-coord text-cream truncate max-w-full"
+        >
+          {xDimension.name}
+        </span>
+        <span
+          title={labelLeft}
+          className="text-[10px] font-mono uppercase tracking-coord text-space-5 truncate max-w-full"
+        >
+          {labelLeft}
+        </span>
+      </div>
       <div className="w-full">{plot}</div>
       <span
         title={labelRight}
-        className="text-2xs font-mono uppercase tracking-coord text-space-6 truncate max-w-[6rem] text-left"
+        className="text-[10px] font-mono uppercase tracking-coord text-space-5 truncate max-w-[7rem] text-left"
       >
         {labelRight}
       </span>
@@ -128,7 +147,7 @@ export function Quadrant({
       <div />
       <span
         title={labelBottom}
-        className="text-2xs font-mono uppercase tracking-coord text-space-6 truncate max-w-full"
+        className="text-[10px] font-mono uppercase tracking-coord text-space-5 truncate max-w-full"
       >
         {labelBottom}
       </span>
