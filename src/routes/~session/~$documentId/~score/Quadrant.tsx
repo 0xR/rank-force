@@ -104,54 +104,44 @@ export function Quadrant({
   if (isSmall) return plot;
 
   return (
-    <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] grid-rows-[auto_minmax(0,1fr)_auto] gap-x-3 gap-y-2 items-center justify-items-center">
-      <div />
-      <div className="flex flex-col items-center gap-0.5 max-w-full">
+    <div className="flex flex-col">
+      <div className="flex flex-col items-start gap-0.5 pb-2 max-w-full">
         <span
           title={yDimension.name}
           className="text-2xs font-mono font-medium uppercase tracking-coord text-cream truncate max-w-full"
         >
           {yDimension.name}
         </span>
-        <span
-          title={labelTop}
-          className="text-[10px] font-mono uppercase tracking-coord text-space-5 truncate max-w-full"
-        >
-          {labelTop}
-        </span>
+        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 text-[10px] font-mono uppercase tracking-coord text-space-5 max-w-full">
+          <span title={labelTop} className="truncate max-w-full">
+            <span aria-hidden>↑ </span>
+            {labelTop}
+          </span>
+          <span title={labelBottom} className="truncate max-w-full">
+            <span aria-hidden>↓ </span>
+            {labelBottom}
+          </span>
+        </div>
       </div>
-      <div />
-
-      <div className="flex flex-col items-end gap-0.5 max-w-[7rem]">
+      {plot}
+      <div className="flex flex-col items-end gap-0.5 pt-2 max-w-full">
+        <div className="flex flex-wrap items-baseline justify-end gap-x-3 gap-y-0.5 text-[10px] font-mono uppercase tracking-coord text-space-5 max-w-full">
+          <span title={labelLeft} className="truncate max-w-full">
+            <span aria-hidden>← </span>
+            {labelLeft}
+          </span>
+          <span title={labelRight} className="truncate max-w-full">
+            {labelRight}
+            <span aria-hidden> →</span>
+          </span>
+        </div>
         <span
           title={xDimension.name}
           className="text-2xs font-mono font-medium uppercase tracking-coord text-cream truncate max-w-full"
         >
           {xDimension.name}
         </span>
-        <span
-          title={labelLeft}
-          className="text-[10px] font-mono uppercase tracking-coord text-space-5 truncate max-w-full"
-        >
-          {labelLeft}
-        </span>
       </div>
-      <div className="w-full">{plot}</div>
-      <span
-        title={labelRight}
-        className="text-[10px] font-mono uppercase tracking-coord text-space-5 truncate max-w-[7rem] text-left"
-      >
-        {labelRight}
-      </span>
-
-      <div />
-      <span
-        title={labelBottom}
-        className="text-[10px] font-mono uppercase tracking-coord text-space-5 truncate max-w-full"
-      >
-        {labelBottom}
-      </span>
-      <div />
     </div>
   );
 }
