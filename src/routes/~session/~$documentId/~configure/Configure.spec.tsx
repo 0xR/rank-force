@@ -205,6 +205,100 @@ describe('Configure / Participants', () => {
   });
 });
 
+describe('Configure / Participants ranking progress', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  async function setupProgressSession(
+    opts: {
+      items?: Item[];
+      dimensions?: RankDimension[];
+      rankingsByUser?: Record<string, Record<string, string[]>>;
+    } = {},
+  ) {
+    const alice = User.make('Alice', 'u-alice');
+    const bob = User.make('Bob', 'u-bob');
+    const documentId = await createSession();
+    const handle = await loadDocHandle(documentId);
+    handle.change((d) => {
+      d.users.push(alice, bob);
+      if (opts.items) d.items.push(...opts.items);
+      if (opts.dimensions) {
+        d.dimensions.push(...opts.dimensions);
+        for (const dim of opts.dimensions) {
+          d.dimensionWeights[dim.id] = 1 / opts.dimensions.length;
+        }
+      }
+      if (opts.rankingsByUser) {
+        for (const [uid, byDim] of Object.entries(opts.rankingsByUser)) {
+          d.rankingsByUser[uid] = byDim;
+        }
+      }
+    });
+
+    localStorage.setItem(NAVIGATOR_NAME_KEY, JSON.stringify('Alice'));
+    localStorage.setItem(NAVIGATOR_ID_KEY, JSON.stringify(alice.id));
+
+    const memoryHistory = createMemoryHistory({
+      initialEntries: [`/session/${documentId}/configure`],
+    });
+    const router = createRouter({ routeTree, history: memoryHistory });
+    render(
+      <RepoContext.Provider value={repo}>
+        <RouterProvider router={router} />
+      </RepoContext.Provider>,
+    );
+    return { alice, bob };
+  }
+
+  it('shows nothing when there are no items or criteria yet', async () => {
+    await setupProgressSession();
+    expect(
+      await screen.findByRole('button', { name: /Remove Alice/ }),
+    ).toBeTruthy();
+    expect(screen.queryByText(/Not started/i)).toBeNull();
+    expect(screen.queryByLabelText(/All rankings complete/i)).toBeNull();
+    expect(screen.queryByLabelText(/of \d+ ranked/i)).toBeNull();
+  });
+
+  it('shows "Not started" when items and criteria exist but the user has not ranked', async () => {
+    const item = Item.make('Apple', 'i-1');
+    const dim = RankDimension.make('Quality', 'Lo', 'Hi', 'ascending', 'd-1');
+    await setupProgressSession({ items: [item], dimensions: [dim] });
+    const notStarted = await screen.findAllByText(/Not started/i);
+    expect(notStarted.length).toBe(2);
+  });
+
+  it('shows "Ranked" when every position is filled', async () => {
+    const apple = Item.make('Apple', 'i-1');
+    const banana = Item.make('Banana', 'i-2');
+    const dim = RankDimension.make('Quality', 'Lo', 'Hi', 'ascending', 'd-1');
+    const { alice } = await setupProgressSession({
+      items: [apple, banana],
+      dimensions: [dim],
+      rankingsByUser: { 'u-alice': { 'd-1': ['i-1', 'i-2'] } },
+    });
+    expect(alice.id).toBe('u-alice');
+    const ranked = await screen.findByLabelText('All rankings complete');
+    expect(ranked.textContent).toMatch(/Ranked/);
+  });
+
+  it('shows "X / Y" when partially ranked', async () => {
+    const apple = Item.make('Apple', 'i-1');
+    const banana = Item.make('Banana', 'i-2');
+    const dim1 = RankDimension.make('Q', 'Lo', 'Hi', 'ascending', 'd-1');
+    const dim2 = RankDimension.make('R', 'Lo', 'Hi', 'ascending', 'd-2');
+    await setupProgressSession({
+      items: [apple, banana],
+      dimensions: [dim1, dim2],
+      rankingsByUser: { 'u-alice': { 'd-1': ['i-1', 'i-2'] } },
+    });
+    const partial = await screen.findByLabelText('2 of 4 ranked');
+    expect(partial.textContent?.replace(/\s+/g, ' ').trim()).toBe('2 / 4');
+  });
+});
+
 async function setupSessionWithItems(items: Item[]) {
   const alice = User.make('Alice', 'u-alice');
   const documentId = await createSession();

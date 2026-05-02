@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Textarea } from '@/components/ui/textarea';
 import { Item } from '@/core/Item';
+import { RankAssignment } from '@/core/RankAssignment';
 import { RankDimension } from '@/core/RankDimension';
 import { RankTemplate, rankTemplates } from '@/core/RankTemplate';
 import { Ratio } from '@/core/Ratio';
@@ -564,15 +565,66 @@ function InviteStrip({ shareUrl }: { shareUrl: string }) {
   );
 }
 
+function rankingProgress(
+  rankAssignment: RankAssignment,
+  user: User,
+): { filled: number; total: number } {
+  const total = rankAssignment.items.length * rankAssignment.dimensions.length;
+  const ranking = rankAssignment.rankingsByUser.get(user);
+  if (!ranking || total === 0) return { filled: 0, total };
+  let filled = 0;
+  for (const arr of ranking.rankings.values()) filled += arr.length;
+  return { filled, total };
+}
+
+function ParticipantStatus({
+  filled,
+  total,
+}: {
+  filled: number;
+  total: number;
+}) {
+  if (total === 0) return null;
+  if (filled === 0) {
+    return (
+      <span className="text-2xs font-mono uppercase tracking-coord text-space-5 shrink-0">
+        Not started
+      </span>
+    );
+  }
+  if (filled >= total) {
+    return (
+      <span
+        className="inline-flex items-center gap-1.5 text-2xs font-mono uppercase tracking-coord text-cyan shrink-0"
+        aria-label="All rankings complete"
+      >
+        <span className="h-1.5 w-1.5 rounded-full bg-cyan" aria-hidden />
+        Ranked
+      </span>
+    );
+  }
+  return (
+    <span
+      className="font-mono tabular-nums text-2xs tracking-coord shrink-0"
+      aria-label={`${filled} of ${total} ranked`}
+    >
+      <span className="text-cream">{filled}</span>
+      <span className="text-space-5"> / {total}</span>
+    </span>
+  );
+}
+
 function ParticipantList({
   users,
   currentUserId,
   hasData,
+  progress,
   onRemove,
 }: {
   users: User[];
   currentUserId: string | undefined;
   hasData: (userId: string) => boolean;
+  progress: (user: User) => { filled: number; total: number };
   onRemove: (user: User) => void;
 }) {
   if (users.length === 0) return null;
@@ -580,13 +632,14 @@ function ParticipantList({
     <ul className="rounded-lg border border-space-4 divide-y divide-space-4 overflow-hidden">
       {users.map((u) => {
         const isSelf = u.id === currentUserId;
+        const { filled, total } = progress(u);
         return (
           <li
             key={u.id}
             className="group flex items-center gap-3 px-3 py-2.5 bg-space-1 hover:bg-space-2 transition-colors duration-150 ease-out-quart"
           >
             <UserCircle2 className="h-4 w-4 text-space-5" strokeWidth={1.5} />
-            <span className="flex-1 text-cream truncate">
+            <span className="flex-1 min-w-0 text-cream truncate">
               {u.name}
               {isSelf && (
                 <span className="ml-2 text-2xs font-mono uppercase tracking-coord text-space-5">
@@ -594,6 +647,7 @@ function ParticipantList({
                 </span>
               )}
             </span>
+            <ParticipantStatus filled={filled} total={total} />
             <button
               type="button"
               onClick={() => onRemove(u)}
@@ -602,7 +656,7 @@ function ParticipantList({
                 isSelf
                   ? "You can't remove yourself"
                   : hasData(u.id)
-                    ? `${u.name} has rankings — confirm before removing`
+                    ? `${u.name} has rankings, confirm before removing`
                     : `Remove ${u.name}`
               }
               className="opacity-0 group-hover:opacity-100 focus:opacity-100 inline-flex items-center justify-center h-7 w-7 rounded text-space-6 hover:text-destructive hover:bg-space-3 transition duration-150 ease-out-quart disabled:opacity-30 disabled:hover:text-space-6 disabled:hover:bg-transparent disabled:cursor-not-allowed"
@@ -780,6 +834,7 @@ export function Configure() {
             users={rankAssigment.users}
             currentUserId={user.id}
             hasData={(userId) => rankAssigment.hasRankings(userId)}
+            progress={(target) => rankingProgress(rankAssigment, target)}
             onRemove={(target) => {
               if (rankAssigment.hasRankings(target.id)) {
                 const ok = window.confirm(
