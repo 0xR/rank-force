@@ -30,15 +30,15 @@ export const rankTemplates: readonly RankTemplate[] = [
       'Sort items by urgency and importance. Best when deciding what to do next.',
     dimensions: [
       {
-        name: 'Urgency',
-        labelStart: 'Not urgent',
-        labelEnd: 'Urgent',
-        direction: 'ascending',
-      },
-      {
         name: 'Importance',
         labelStart: 'Not important',
         labelEnd: 'Important',
+        direction: 'ascending',
+      },
+      {
+        name: 'Urgency',
+        labelStart: 'Not urgent',
+        labelEnd: 'Urgent',
         direction: 'ascending',
       },
     ],
@@ -70,15 +70,15 @@ export const rankTemplates: readonly RankTemplate[] = [
       'Score risks by probability and impact. Standard for risk registers and incident triage.',
     dimensions: [
       {
-        name: 'Probability',
-        labelStart: 'Unlikely',
-        labelEnd: 'Likely',
-        direction: 'ascending',
-      },
-      {
         name: 'Impact',
         labelStart: 'Minor',
         labelEnd: 'Severe',
+        direction: 'ascending',
+      },
+      {
+        name: 'Probability',
+        labelStart: 'Unlikely',
+        labelEnd: 'Likely',
         direction: 'ascending',
       },
     ],
