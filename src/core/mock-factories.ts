@@ -1,33 +1,55 @@
 import { Item } from '@/core/Item';
-import { RankDimension } from '@/core/RankDimension';
+import { RankDimension, RankDimensionDirection } from '@/core/RankDimension';
 import { State } from '@/core/State';
 import { User } from '@/core/User';
 
+export type DimensionInput = {
+  name: string;
+  labelStart: string;
+  labelEnd: string;
+  direction: RankDimensionDirection;
+};
+
 export type BuildStateOptions = {
-  users: number;
-  items: number;
-  dimensions: number;
+  users: number | string[];
+  items: number | string[];
+  dimensions: number | DimensionInput[];
   ranked: boolean;
 };
 
 export function buildState({
-  users: userCount,
-  items: itemCount,
-  dimensions: dimensionCount,
+  users: userInput,
+  items: itemInput,
+  dimensions: dimensionInput,
   ranked,
 }: BuildStateOptions): State {
-  const users = Array.from({ length: userCount }, (_, i) =>
-    User.make(`User ${i + 1}`),
-  );
-  const items = Array.from({ length: itemCount }, (_, i) =>
-    Item.make(`Item ${i + 1}`, `item-${i + 1}`),
-  );
-  const dimensions = Array.from({ length: dimensionCount }, (_, i) =>
+  const userNames =
+    typeof userInput === 'number'
+      ? Array.from({ length: userInput }, (_, i) => `User ${i + 1}`)
+      : userInput;
+  const users = userNames.map((name) => User.make(name));
+
+  const itemLabels =
+    typeof itemInput === 'number'
+      ? Array.from({ length: itemInput }, (_, i) => `Item ${i + 1}`)
+      : itemInput;
+  const items = itemLabels.map((label, i) => Item.make(label, `item-${i + 1}`));
+
+  const dimensionDefs: DimensionInput[] =
+    typeof dimensionInput === 'number'
+      ? Array.from({ length: dimensionInput }, (_, i) => ({
+          name: `Dimension ${i + 1}`,
+          labelStart: 'low',
+          labelEnd: 'high',
+          direction: 'ascending',
+        }))
+      : dimensionInput;
+  const dimensions = dimensionDefs.map((def, i) =>
     RankDimension.make(
-      `Dimension ${i + 1}`,
-      'low',
-      'high',
-      'ascending',
+      def.name,
+      def.labelStart,
+      def.labelEnd,
+      def.direction,
       `dimension-${i + 1}`,
     ),
   );

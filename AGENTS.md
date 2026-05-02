@@ -42,8 +42,8 @@ Available only in `pnpm dev` (Vite DEV); in production the route redirects to `/
 
 Use this to skip the setup flow when reproducing or testing UI on the **ranking** or **score** pages. Each button creates a new Automerge doc via `repo.create`, seeds it with `buildState` (`src/core/mock-factories.ts`), writes the first user's id to `localStorage` under `rank-force-navigator-id` (the stable per-browser navigator id), and navigates to the target route.
 
-- **Jump to ranking**: click **"Configured (no rankings)"** — seeds 3 users / 4 items / 2 dimensions, unranked, lands on `/session/$documentId/ranking`.
-- **Jump to score**: click **"Complete with score"** — same shape but fully ranked, lands on `/session/$documentId/score`.
+- **Jump to ranking**: click **"Impact / Effort — configured (no rankings)"** — seeds 3 users / 6 software-dev items / Impact × Effort dimensions, unranked, lands on `/session/$documentId/ranking`.
+- **Jump to score**: click **"Impact / Effort — complete with score"** — same shape with hardcoded, mostly-aligned per-user rankings, lands on `/session/$documentId/score`.
 
 To add a new entry-point shortcut, append to the `scenarios` array in `src/dev/scenarios.tsx` with a `BuildStateOptions` shape and a `target` route id.
 
