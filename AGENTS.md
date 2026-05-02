@@ -32,6 +32,10 @@ Co-Authored-By: (the agent model's name and attribution byline)
 
 For UI/visual changes, verify the result with the Chrome DevTools MCP (take a snapshot or screenshot, check console errors). Assume the dev server is already running outside the sandbox — do not start `pnpm dev` yourself.
 
+The dev server runs **outside** the harness sandbox, so the sandbox cannot reach `localhost:5173` over the network — `curl` / `wget` from Bash will fail. **The Chrome DevTools MCP also runs outside the sandbox**, so it CAN reach the dev server. Always reach for the Chrome DevTools MCP for verification; never conclude "the dev server is unreachable" from a sandbox-side probe.
+
+Use `mcp__chrome-devtools__list_pages` / `new_page` / `navigate_page` to drive the browser, then `take_snapshot` (a11y tree, preferred) or `take_screenshot` to inspect, and `list_console_messages` to confirm no errors.
+
 ## Committing
 
 Commits are GPG-signed. The sandbox blocks `gpg`'s connection to `keyboxd`, so `git commit` must run with the sandbox disabled.
