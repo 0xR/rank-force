@@ -28,6 +28,10 @@ AI commits MUST include:
 Co-Authored-By: (the agent model's name and attribution byline)
 ```
 
+## Visual changes
+
+For UI/visual changes, verify the result with the Chrome DevTools MCP (take a snapshot or screenshot, check console errors). Assume the dev server is already running outside the sandbox — do not start `pnpm dev` yourself.
+
 ## Committing
 
 Commits are GPG-signed. The sandbox blocks `gpg`'s connection to `keyboxd`, so `git commit` must run with the sandbox disabled.
