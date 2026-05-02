@@ -140,21 +140,36 @@ export class RankAssignment {
     this.rankingsByUser.set(user, userRanking);
   }
 
-  get score() {
-    if (!this.rankingComplete) {
-      return undefined;
+  get score(): RankScore[] {
+    const userRankings = Array.from(this.rankingsByUser.values());
+
+    const scores: RankScore[] = [];
+    for (const item of this.store.items) {
+      let weightedSum = 0;
+      let weightUsed = 0;
+      for (const dimension of this.store.dimensions) {
+        const weight = this.store.dimensionWeights[dimension.id];
+        if (weight === undefined) continue;
+
+        const contributingScores: number[] = [];
+        for (const userRanking of userRankings) {
+          const ranking = userRanking.rankingByDimension(dimension);
+          const rs = ranking.find((r) => r.item.id === item.id);
+          if (rs) contributingScores.push(rs.score.value);
+        }
+        if (contributingScores.length === 0) continue;
+
+        const mean =
+          contributingScores.reduce((a, b) => a + b, 0) /
+          contributingScores.length;
+        weightedSum += weight * mean;
+        weightUsed += weight;
+      }
+
+      if (weightUsed === 0) continue;
+      scores.push(new RankScore(item, new Ratio(weightedSum / weightUsed)));
     }
 
-    const scoresForUsers = Array.from(this.rankingsByUser.values())
-      .filter((userRanking) => userRanking.rankingComplete(this.store))
-      .map((userRanking) => userRanking.score(this.store));
-    const scores = this.store.items.map((item, index) => {
-      const scoreValue = scoresForUsers.reduce(
-        (score, userScores) => score + userScores[index]!.score.value,
-        0,
-      );
-      return new RankScore(item, new Ratio(scoreValue / scoresForUsers.length));
-    });
     return scores.sort((a, b) => b.score.value - a.score.value);
   }
 

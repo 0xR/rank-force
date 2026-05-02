@@ -106,34 +106,34 @@ function aggregatePoints(
   xDimension: RankDimension,
   aggregate: RankScore[],
 ): QuadrantPoint[] {
-  const completeRankings = Array.from(
-    rankAssignment.rankingsByUser.values(),
-  ).filter((ur) => isUserComplete(ur, rankAssignment));
-  if (completeRankings.length === 0) return [];
-
+  const userRankings = Array.from(rankAssignment.rankingsByUser.values());
   const ranks = rankByItemId(aggregate);
-  const avg = (xs: number[]) =>
-    xs.length === 0 ? 0 : xs.reduce((a, b) => a + b, 0) / xs.length;
 
-  return rankAssignment.items.map((item) => {
-    const xs = completeRankings.map(
-      (ur) =>
-        ur.rankingByDimension(xDimension).find((s) => s.item.id === item.id)
-          ?.score.value ?? 0,
-    );
-    const ys = completeRankings.map(
-      (ur) =>
-        ur.rankingByDimension(yDimension).find((s) => s.item.id === item.id)
-          ?.score.value ?? 0,
-    );
-    return {
+  const points: QuadrantPoint[] = [];
+  for (const score of aggregate) {
+    const item = score.item;
+    const xs: number[] = [];
+    const ys: number[] = [];
+    for (const ur of userRankings) {
+      const xs1 = ur
+        .rankingByDimension(xDimension)
+        .find((s) => s.item.id === item.id);
+      if (xs1) xs.push(xs1.score.value);
+      const ys1 = ur
+        .rankingByDimension(yDimension)
+        .find((s) => s.item.id === item.id);
+      if (ys1) ys.push(ys1.score.value);
+    }
+    if (xs.length === 0 || ys.length === 0) continue;
+    points.push({
       itemId: item.id,
       label: item.label,
       rank: ranks.get(item.id) ?? 0,
-      x: avg(xs),
-      y: avg(ys),
-    };
-  });
+      x: xs.reduce((a, b) => a + b, 0) / xs.length,
+      y: ys.reduce((a, b) => a + b, 0) / ys.length,
+    });
+  }
+  return points;
 }
 
 function userPoints(
@@ -144,16 +144,19 @@ function userPoints(
 ): QuadrantPoint[] {
   const yScores = ur.rankingByDimension(yDimension);
   const xScores = ur.rankingByDimension(xDimension);
-  return yScores.map((ys) => {
+  const points: QuadrantPoint[] = [];
+  for (const ys of yScores) {
     const xs = xScores.find((s) => s.item.id === ys.item.id);
-    return {
+    if (!xs) continue;
+    points.push({
       itemId: ys.item.id,
       label: ys.item.label,
       rank: ranks.get(ys.item.id) ?? 0,
-      x: xs?.score.value ?? 0,
+      x: xs.score.value,
       y: ys.score.value,
-    };
-  });
+    });
+  }
+  return points;
 }
 
 function AggregateList({ scores }: { scores: RankScore[] }) {
@@ -236,8 +239,9 @@ function ParticipantQuadrants({
     <ul className="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
       {users.map((u) => {
         const ranking = rankAssignment.rankingsByUser.get(u);
-        const complete =
-          ranking !== undefined && isUserComplete(ranking, rankAssignment);
+        const points = ranking
+          ? userPoints(ranking, yDimension, xDimension, ranks)
+          : [];
         return (
           <li
             key={u.id}
@@ -255,11 +259,11 @@ function ParticipantQuadrants({
                 {u.name}
               </span>
             </div>
-            {complete && ranking ? (
+            {points.length > 0 ? (
               <Quadrant
                 yDimension={yDimension}
                 xDimension={xDimension}
-                points={userPoints(ranking, yDimension, xDimension, ranks)}
+                points={points}
                 variant="small"
               />
             ) : (
@@ -284,9 +288,14 @@ export function Score() {
     [rankAssigment.usersById],
   );
 
-  const aggregate = useMemo(
-    () => rankAssigment.score ?? [],
-    [rankAssigment.score],
+  const aggregate = useMemo(() => rankAssigment.score, [rankAssigment.score]);
+
+  const fullyRankedUserCount = useMemo(
+    () =>
+      Array.from(rankAssigment.rankingsByUser.values()).filter((ur) =>
+        isUserComplete(ur, rankAssigment),
+      ).length,
+    [rankAssigment],
   );
 
   const is2D = rankAssigment.dimensions.length === 2;
@@ -318,6 +327,12 @@ export function Score() {
             {users.length} participant{users.length === 1 ? '' : 's'}
           </Badge>
         </div>
+        {users.length > 0 && (
+          <p className="text-2xs font-mono uppercase tracking-coord text-space-6 -mt-2">
+            {fullyRankedUserCount} of {users.length} fully ranked
+            {fullyRankedUserCount < users.length && ' · partial average shown'}
+          </p>
+        )}
 
         {showMatrix && (
           <div className="w-full">

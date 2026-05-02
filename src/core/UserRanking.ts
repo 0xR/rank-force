@@ -14,22 +14,21 @@ export class UserRanking {
     rankings: Map<RankDimension, Item[]> = new Map(),
   ) {
     for (const [dimension, items] of rankings.entries()) {
-      const indexRatioToScore =
-        dimension.direction === 'ascending'
-          ? (indexRatio: number) => 1 - indexRatio
-          : (indexRatio: number) => indexRatio;
+      const N = items.length;
+      const M = store.items.length;
+      const coverage = M === 0 ? 1 : N / M;
 
-      const score = items.map(
-        (item, index) =>
-          new RankScore(
-            item,
-            new Ratio(
-              indexRatioToScore(
-                items.length === 1 ? 1 : index / (items.length - 1),
-              ),
-            ),
-          ),
-      );
+      const score = items.map((item, index) => {
+        if (N === 1) {
+          return new RankScore(item, new Ratio(1));
+        }
+        const t = index / (N - 1);
+        const value =
+          dimension.direction === 'ascending'
+            ? 1 - t * coverage
+            : 1 - coverage + t * coverage;
+        return new RankScore(item, new Ratio(value));
+      });
       this.rankings.set(dimension, score);
     }
   }

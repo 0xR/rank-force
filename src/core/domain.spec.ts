@@ -300,19 +300,20 @@ describe('Domain', () => {
     testStore.rankAssignment.addDimension(rankDimension1, rankDimension2);
 
     expect(testStore.rankAssignment.rankingComplete).toBe(false);
-    expect(testStore.rankAssignment.score).toBeUndefined();
+    expect(testStore.rankAssignment.score).toHaveLength(0);
     testStore.rankAssignment.rank(user, testStore.dimensions[0]!, []);
     testStore.rankAssignment.rank(user, testStore.dimensions[1]!, []);
     expect(testStore.rankAssignment.rankingComplete).toBe(true);
     expect(testStore.rankAssignment.score).toHaveLength(0);
     testStore.rankAssignment.addItems('item1', 'item2');
     expect(testStore.rankAssignment.rankingComplete).toBe(false);
-    expect(testStore.rankAssignment.score).toBeUndefined();
+    expect(testStore.rankAssignment.score).toHaveLength(0);
     testStore.rankAssignment.rank(user, testStore.dimensions[0]!, [
       testStore.items[0]!,
       testStore.items[1]!,
     ]);
     expect(testStore.rankAssignment.rankingComplete).toBe(false);
+    expect(testStore.rankAssignment.score).toHaveLength(2);
     testStore.rankAssignment.rank(user, testStore.dimensions[1]!, [
       testStore.items[1]!,
       testStore.items[0]!,
@@ -323,12 +324,83 @@ describe('Domain', () => {
       RankDimension.make('complexity', 'low', 'high', 'ascending'),
     );
     expect(testStore.rankAssignment.rankingComplete).toBe(false);
-    expect(testStore.rankAssignment.score).toBeUndefined();
+    expect(testStore.rankAssignment.score).toHaveLength(2);
     testStore.rankAssignment.rank(user, testStore.dimensions[2]!, [
       testStore.items[0]!,
       testStore.items[1]!,
     ]);
     expect(testStore.rankAssignment.rankingComplete).toBe(true);
+  });
+
+  it('compresses partial ascending ranking into [1, 1 - N/M]', () => {
+    const user = User.make('~user 0');
+    const rankDimension = RankDimension.make(
+      'importance',
+      'high',
+      'low',
+      'ascending',
+    );
+    const testStore = new TestStore();
+    testStore.rankAssignment.addDimension(rankDimension);
+    testStore.rankAssignment.addItems(
+      'a',
+      'b',
+      'c',
+      'd',
+      'e',
+      'f',
+      'g',
+      'h',
+      'i',
+      'j',
+    );
+    const top5 = testStore.items.slice(0, 5);
+    testStore.rankAssignment.rank(user, testStore.dimensions[0]!, top5);
+
+    const ranking = testStore.rankAssignment.rankingsByUser
+      .get(user)!
+      .rankingByDimension(testStore.dimensions[0]!);
+    expect(ranking.map((r) => r.score.value)).toEqual([
+      1, 0.875, 0.75, 0.625, 0.5,
+    ]);
+  });
+
+  it('renormalizes weights per item when a dimension has no contributors for it', () => {
+    const user = User.make('~user 0');
+    const dim1 = RankDimension.make('a', 'low', 'high', 'ascending');
+    const dim2 = RankDimension.make('b', 'low', 'high', 'ascending');
+    const testStore = new TestStore();
+    testStore.rankAssignment.addDimension(dim1, dim2);
+    testStore.rankAssignment.addItems('item1', 'item2');
+    // user only ranks dim1 → dim2 has no contributors for any item
+    testStore.rankAssignment.rank(user, testStore.dimensions[0]!, [
+      testStore.items[0]!,
+      testStore.items[1]!,
+    ]);
+
+    // weights renormalize: item1 gets dim1's score (top of ascending = 1)
+    const score = testStore.rankAssignment.score;
+    expect(score).toHaveLength(2);
+    expect(score![0]!.item.id).toBe(testStore.items[0]!.id);
+    expect(score![0]!.score.value).toBe(1);
+    expect(score![1]!.score.value).toBe(0);
+  });
+
+  it('hides items from the aggregate when no user has ranked them on any dimension', () => {
+    const user = User.make('~user 0');
+    const dim = RankDimension.make('a', 'low', 'high', 'ascending');
+    const testStore = new TestStore();
+    testStore.rankAssignment.addDimension(dim);
+    testStore.rankAssignment.addItems('item1', 'item2', 'item3');
+    // user only ranks 2 of 3 items
+    testStore.rankAssignment.rank(user, testStore.dimensions[0]!, [
+      testStore.items[0]!,
+      testStore.items[1]!,
+    ]);
+
+    const score = testStore.rankAssignment.score;
+    expect(score).toHaveLength(2);
+    expect(score!.map((s) => s.item.id)).not.toContain(testStore.items[2]!.id);
   });
 
   it('should support incomplete rankings', () => {
@@ -353,9 +425,12 @@ describe('Domain', () => {
       testStore.items[0]!,
     ]);
 
-    // incomplete ranking ignored in the score
-    expect(testStore.rankAssignment.score).toBeUndefined();
-    // but the ranking is still stored
+    // partial ranking now contributes to the score; only ranked items appear
+    const partial = testStore.rankAssignment.score;
+    expect(partial).toBeDefined();
+    expect(partial).toHaveLength(1);
+    expect(partial![0]!.item.id).toBe(testStore.items[0]!.id);
+    // and the ranking is still stored
     expect(
       testStore.rankingsByUser[user.id]?.[testStore.dimensions[0]!.id],
     ).toHaveLength(1);
@@ -415,7 +490,7 @@ describe('Domain', () => {
 
     testStore.rankAssignment.removeDimensions(rankDimension);
 
-    expect(testStore.rankAssignment.score).toHaveLength(2);
+    expect(testStore.rankAssignment.score).toHaveLength(0);
   });
 
   it('should produce non-NaN scores for a fully-ranked buildState', () => {
