@@ -47,7 +47,7 @@ export function UnrankedItem({
         type="button"
         onClick={onPromote}
         aria-label={`Rank ${item.label}`}
-        className="flex-1 flex items-center gap-3 px-3 py-2.5 text-left rounded-md hover:bg-space-3 transition-colors"
+        className="min-w-0 flex-1 flex items-center gap-3 px-3 py-2.5 text-left rounded-md hover:bg-space-3 transition-colors"
       >
         <span className="w-7 shrink-0 flex justify-end">
           <StarMark className="h-3.5 w-3.5 text-space-5 group-hover:text-cyan transition-colors" />
@@ -62,7 +62,7 @@ export function UnrankedItem({
         aria-label={`Drag ${item.label} to rank`}
         {...attributes}
         {...listeners}
-        className="hidden md:inline-flex shrink-0 items-center justify-center h-auto w-8 rounded-md text-space-5 hover:text-space-6 cursor-grab active:cursor-grabbing touch-none"
+        className="shrink-0 inline-flex items-center justify-center h-auto w-8 rounded-md text-space-5 hover:text-space-6 cursor-grab active:cursor-grabbing touch-none"
       >
         <GripVertical className="h-4 w-4" strokeWidth={1.5} />
       </button>
