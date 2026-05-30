@@ -1,7 +1,7 @@
 import { Item } from '@/core/Item';
 import { RankAssignment } from '@/core/RankAssignment';
 import { RankDimension } from '@/core/RankDimension';
-import { State, Store } from '@/core/State';
+import { scrubRemovedItemIds, State, Store } from '@/core/State';
 import { User } from '@/core/User';
 
 export class TestStore implements Store {
@@ -84,7 +84,9 @@ export class TestStore implements Store {
   }
 
   removeItems(...items: Item[]) {
+    const removedIds = new Set(items.map((i) => i.id));
     this.items = this.items.filter((item) => !items.includes(item));
+    scrubRemovedItemIds(this.rankingsByUser, removedIds);
   }
 
   replaceItems(items: Item[]) {
@@ -93,16 +95,7 @@ export class TestStore implements Store {
       this.items.filter((i) => !nextIds.has(i.id)).map((i) => i.id),
     );
     this.items = [...items];
-    if (removedIds.size === 0) return;
-    for (const userId of Object.keys(this.rankingsByUser)) {
-      const byDim = this.rankingsByUser[userId];
-      if (!byDim) continue;
-      for (const dimId of Object.keys(byDim)) {
-        const arr = byDim[dimId];
-        if (!arr) continue;
-        byDim[dimId] = arr.filter((id) => !removedIds.has(id));
-      }
-    }
+    scrubRemovedItemIds(this.rankingsByUser, removedIds);
   }
 
   toPlainObject(): State {

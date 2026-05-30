@@ -24,18 +24,18 @@ export class RankAssignment {
             const dimension = this.store.dimensions.find(
               (d) => d.id === dimensionId,
             );
+            // `items`/`dimensions` are authoritative. A concurrent merge can
+            // leave a ranking referencing a dimension or item that no longer
+            // exists (e.g. an organiser removed it while a participant was
+            // ranking). Drop those dangling references instead of throwing so
+            // the session stays loadable for everyone.
             if (!dimension) {
-              throw new Error(
-                `Dimension ${dimensionId} not found in assignment`,
-              );
+              return;
             }
-            const items = itemIds.map((itemId) =>
-              this.store.items.find((i) => i.id === itemId),
-            );
-            if (items.some((item) => !item)) {
-              throw new Error(`Item not found in assignment`);
-            }
-            rankingMap.set(dimension, items as Item[]);
+            const items = itemIds
+              .map((itemId) => this.store.items.find((i) => i.id === itemId))
+              .filter((item): item is Item => item !== undefined);
+            rankingMap.set(dimension, items);
           },
         );
         const userRanking = new UserRanking(
@@ -49,8 +49,10 @@ export class RankAssignment {
 
     Object.entries(store.dimensionWeights).forEach(([dimensionId, weight]) => {
       const dimension = this.store.dimensions.find((d) => d.id === dimensionId);
+      // A weight can outlive its dimension after a concurrent removal — ignore
+      // the orphaned entry rather than crashing the whole assignment.
       if (!dimension) {
-        throw new Error(`Dimension ${dimensionId} not found in assignment`);
+        return;
       }
       this.dimensionWeight.set(dimension, new Ratio(weight));
     });

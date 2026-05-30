@@ -30,3 +30,26 @@ export type Mutators = {
 };
 
 export type Store = State & Mutators;
+
+/**
+ * Drop every reference to a removed item id from a `rankingsByUser` map,
+ * mutating the nested arrays in place. `items` is authoritative, so a ranking
+ * must never outlive the items it points at.
+ */
+export function scrubRemovedItemIds(
+  rankingsByUser: Record<string, Record<string, string[]>>,
+  removedIds: Set<string>,
+): void {
+  if (removedIds.size === 0) return;
+  for (const userId of Object.keys(rankingsByUser)) {
+    const byDim = rankingsByUser[userId];
+    if (!byDim) continue;
+    for (const dimId of Object.keys(byDim)) {
+      const arr = byDim[dimId];
+      if (!arr) continue;
+      for (let i = arr.length - 1; i >= 0; i--) {
+        if (removedIds.has(arr[i]!)) arr.splice(i, 1);
+      }
+    }
+  }
+}

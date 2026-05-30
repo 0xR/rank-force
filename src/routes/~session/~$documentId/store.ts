@@ -1,6 +1,6 @@
 import { Item } from '@/core/Item';
 import { RankDimension } from '@/core/RankDimension';
-import { Mutators, State } from '@/core/State';
+import { Mutators, State, scrubRemovedItemIds } from '@/core/State';
 import { User } from '@/core/User';
 import { AnyDocumentId } from '@automerge/automerge-repo';
 import { useDocument } from '@automerge/automerge-repo-react-hooks';
@@ -47,6 +47,7 @@ export const draftMutators = {
     for (let i = d.items.length - 1; i >= 0; i--) {
       if (ids.has(d.items[i]!.id)) (d.items as Item[]).splice(i, 1);
     }
+    scrubRemovedItemIds(d.rankingsByUser, ids);
   },
   replaceItems(d: State, items: Item[]) {
     const nextIds = new Set(items.map((i) => i.id));
@@ -60,18 +61,7 @@ export const draftMutators = {
     }
     d.items.push(...items.map(({ id, label }) => ({ id, label })));
 
-    if (removedIds.size === 0) return;
-    for (const userId of Object.keys(d.rankingsByUser)) {
-      const byDim = d.rankingsByUser[userId];
-      if (!byDim) continue;
-      for (const dimId of Object.keys(byDim)) {
-        const arr = byDim[dimId];
-        if (!arr) continue;
-        for (let i = arr.length - 1; i >= 0; i--) {
-          if (removedIds.has(arr[i]!)) arr.splice(i, 1);
-        }
-      }
-    }
+    scrubRemovedItemIds(d.rankingsByUser, removedIds);
   },
   removeDimensions(d: State, dimensions: RankDimension[]) {
     const ids = new Set(dimensions.map((x) => x.id));
