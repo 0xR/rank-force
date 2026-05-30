@@ -7,6 +7,9 @@ import { Ratio } from './Ratio';
 
 export class UserRanking {
   readonly rankings: Map<RankDimension, RankScore[]> = new Map();
+  // Score every unranked item shares on a dimension: the mean of the bottom
+  // slots they collectively occupy. Only set when the user left items unranked.
+  private readonly bottomScore: Map<RankDimension, number> = new Map();
 
   constructor(
     private store: Store,
@@ -14,23 +17,38 @@ export class UserRanking {
     rankings: Map<RankDimension, Item[]> = new Map(),
   ) {
     for (const [dimension, items] of rankings.entries()) {
-      const N = items.length;
+      const R = items.length;
       const M = store.items.length;
-      const coverage = M === 0 ? 1 : N / M;
+      // Merit position p (1 = best) maps linearly to [1, 0] across all M items.
+      const slotScore = (p: number) => (M <= 1 ? 1 : 1 - (p - 1) / (M - 1));
 
+      // Ranked items take the best R slots; direction only reorders within them
+      // (ascending: first-dragged is best; descending: last-dragged is best).
       const score = items.map((item, index) => {
-        if (N === 1) {
-          return new RankScore(item, new Ratio(1));
-        }
-        const t = index / (N - 1);
-        const value =
-          dimension.direction === 'ascending'
-            ? 1 - t * coverage
-            : 1 - coverage + t * coverage;
-        return new RankScore(item, new Ratio(value));
+        const p = dimension.direction === 'descending' ? R - index : index + 1;
+        return new RankScore(item, new Ratio(slotScore(p)));
       });
       this.rankings.set(dimension, score);
+
+      // Unranked items count as lowest, sharing the mean of the bottom slots.
+      const U = M - R;
+      if (U > 0) {
+        let sum = 0;
+        for (let p = R + 1; p <= M; p++) sum += slotScore(p);
+        this.bottomScore.set(dimension, sum / U);
+      }
     }
+  }
+
+  // The score this user assigns an item on a dimension for aggregation:
+  // its ranked score, or the shared bottom score if left unranked. Returns
+  // undefined when the user has not ranked anything on the dimension yet.
+  scoreForItem(dimension: RankDimension, item: Item): number | undefined {
+    const ranked = this.rankings.get(dimension);
+    if (!ranked) return undefined;
+    const found = ranked.find((rankScore) => rankScore.item.id === item.id);
+    if (found) return found.score.value;
+    return this.bottomScore.get(dimension);
   }
 
   rank(dimension: RankDimension, items: Item[]) {

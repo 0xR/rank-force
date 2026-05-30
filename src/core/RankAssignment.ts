@@ -147,6 +147,17 @@ export class RankAssignment {
 
     const scores: RankScore[] = [];
     for (const item of this.store.items) {
+      // Hide items that no participant has ranked on any dimension — an
+      // untouched item shouldn't surface as a bottom-scored entry.
+      const rankedByAnyone = userRankings.some((userRanking) =>
+        this.store.dimensions.some((dimension) =>
+          userRanking
+            .rankingByDimension(dimension)
+            .some((r) => r.item.id === item.id),
+        ),
+      );
+      if (!rankedByAnyone) continue;
+
       let weightedSum = 0;
       let weightUsed = 0;
       for (const dimension of this.store.dimensions) {
@@ -155,9 +166,8 @@ export class RankAssignment {
 
         const contributingScores: number[] = [];
         for (const userRanking of userRankings) {
-          const ranking = userRanking.rankingByDimension(dimension);
-          const rs = ranking.find((r) => r.item.id === item.id);
-          if (rs) contributingScores.push(rs.score.value);
+          const v = userRanking.scoreForItem(dimension, item);
+          if (v !== undefined) contributingScores.push(v);
         }
         if (contributingScores.length === 0) continue;
 

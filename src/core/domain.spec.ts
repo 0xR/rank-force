@@ -332,7 +332,7 @@ describe('Domain', () => {
     expect(testStore.rankAssignment.rankingComplete).toBe(true);
   });
 
-  it('compresses partial ascending ranking into [1, 1 - N/M]', () => {
+  it('spreads a partial ascending ranking across all M slots', () => {
     const user = User.make('~user 0');
     const rankDimension = RankDimension.make(
       'importance',
@@ -360,8 +360,13 @@ describe('Domain', () => {
     const ranking = testStore.rankAssignment.rankingsByUser
       .get(user)!
       .rankingByDimension(testStore.dimensions[0]!);
+    // M = 10, so ranked items take the top 5 of 10 slots: 1 - (p-1)/9.
     expect(ranking.map((r) => r.score.value)).toEqual([
-      1, 0.875, 0.75, 0.625, 0.5,
+      1,
+      1 - 1 / 9,
+      1 - 2 / 9,
+      1 - 3 / 9,
+      1 - 4 / 9,
     ]);
   });
 
