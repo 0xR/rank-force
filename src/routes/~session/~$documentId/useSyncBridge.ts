@@ -96,15 +96,22 @@ export function useSyncBridge(
         await client.subscribe();
         // Bootstrap: the persister builds the snapshot incrementally from
         // change bytes only — it never sees a doc's initial-state change
-        // unless someone publishes it. Push every change we already have
-        // so a fresh persister can reconstruct the full history. Idempotent
-        // at the persister (same change hashes → same save bytes).
-        const initialChanges = Automerge.getAllChanges(handle.doc());
-        for (const change of initialChanges) {
+        // unless someone publishes it. We must seed it with any change it
+        // lacks (the create change, plus offline edits), but re-sending the
+        // whole history on every load is wasteful and keeps the indicator
+        // pulsing for as long as the replay runs.
+        const snapshot = await fetchSnapshot(documentId);
+        if (!mounted) return;
+        // With a snapshot we know exactly what the persister already has, so
+        // publish only the changes it lacks. Without one (truly fresh
+        // persister) a full replay is the only way to reconstruct history.
+        const bootstrapChanges = snapshot
+          ? Automerge.getChanges(Automerge.load<State>(snapshot), handle.doc())
+          : Automerge.getAllChanges(handle.doc());
+        for (const change of bootstrapChanges) {
           if (!mounted) return;
           await trackedPublish(change);
         }
-        const snapshot = await fetchSnapshot(documentId);
         if (!mounted || !snapshot) return;
         handle.update((doc) => Automerge.loadIncremental(doc, snapshot));
       } catch (err) {

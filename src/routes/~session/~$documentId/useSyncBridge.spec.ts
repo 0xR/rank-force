@@ -167,6 +167,68 @@ describe('useSyncBridge', () => {
     expect(FakeMqttClient.lastInstance!.published.length).toBeGreaterThan(0);
   });
 
+  it('skips bootstrap replay when the snapshot already holds every local change', async () => {
+    const handle = await makeHandle();
+    // The persister snapshot already contains everything the local doc has.
+    const snapshotBytes = Automerge.save(handle.doc()!);
+
+    renderHook(() =>
+      useSyncBridge(handle, handle.documentId, 'user-1', {
+        createClient: (token) => new FakeMqttClient(token),
+        fetchSnapshot: async () => snapshotBytes,
+      }),
+    );
+    await flush();
+    await flush();
+
+    expect(FakeMqttClient.lastInstance!.published).toHaveLength(0);
+  });
+
+  it('replays the full history when no snapshot exists yet', async () => {
+    const handle = await makeHandle();
+    await act(async () => {
+      handle.change((d) => {
+        d.dimensionWeights['a'] = 0.1;
+      });
+      await Promise.resolve();
+    });
+    const expected = Automerge.getAllChanges(handle.doc()!).length;
+
+    renderHook(() =>
+      useSyncBridge(handle, handle.documentId, 'user-1', {
+        createClient: (token) => new FakeMqttClient(token),
+        fetchSnapshot: async () => null,
+      }),
+    );
+    await flush();
+    await flush();
+
+    expect(FakeMqttClient.lastInstance!.published).toHaveLength(expected);
+  });
+
+  it('publishes only the changes the snapshot is missing', async () => {
+    const handle = await makeHandle();
+    // Snapshot captured before the local offline edit below.
+    const snapshotBytes = Automerge.save(handle.doc()!);
+    await act(async () => {
+      handle.change((d) => {
+        d.dimensionWeights['offline'] = 0.5;
+      });
+      await Promise.resolve();
+    });
+
+    renderHook(() =>
+      useSyncBridge(handle, handle.documentId, 'user-1', {
+        createClient: (token) => new FakeMqttClient(token),
+        fetchSnapshot: async () => snapshotBytes,
+      }),
+    );
+    await flush();
+    await flush();
+
+    expect(FakeMqttClient.lastInstance!.published).toHaveLength(1);
+  });
+
   it('merges a fetched snapshot into the doc', async () => {
     const handle = await makeHandle();
 
