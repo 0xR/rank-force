@@ -27,6 +27,7 @@ function makeSnapshotStore(initial?: {
     addUsers: () => {},
     removeUsers: () => {},
     renameUser: () => {},
+    renameItem: () => {},
     removeItems: () => {},
     replaceItems: () => {},
     removeDimensions: () => {},
@@ -544,6 +545,53 @@ describe('Domain', () => {
     ]);
   });
 
+  it('renames an item without changing its id or rankings', () => {
+    const user = User.make('Alice', 'u-alice');
+    const dimension = createDimension();
+    const testStore = new TestStore();
+    testStore.rankAssignment.addDimension(dimension);
+    testStore.rankAssignment.addItems('Apple', 'Banana');
+    const [apple, banana] = testStore.items;
+    testStore.rankAssignment.rank(user, testStore.dimensions[0]!, [
+      apple!,
+      banana!,
+    ]);
+
+    testStore.rankAssignment.renameItem(apple!.id, 'Apricot');
+
+    expect(testStore.items.map((i) => ({ id: i.id, label: i.label }))).toEqual([
+      { id: apple!.id, label: 'Apricot' },
+      { id: banana!.id, label: 'Banana' },
+    ]);
+    expect(testStore.rankingsByUser['u-alice']?.[dimension.id]).toEqual([
+      apple!.id,
+      banana!.id,
+    ]);
+  });
+
+  it('renameItem blocks renaming to a label already used by another item', () => {
+    const testStore = new TestStore();
+    testStore.rankAssignment.addItems('Apple', 'Banana');
+    const [apple, banana] = testStore.items;
+
+    testStore.rankAssignment.renameItem(apple!.id, 'Banana');
+
+    expect(testStore.items.map((i) => i.label)).toEqual(['Apple', 'Banana']);
+    expect(testStore.items.map((i) => i.id)).toEqual([apple!.id, banana!.id]);
+  });
+
+  it('renameItem trims and ignores empty/whitespace-only labels', () => {
+    const testStore = new TestStore();
+    testStore.rankAssignment.addItems('Apple');
+    const [apple] = testStore.items;
+
+    testStore.rankAssignment.renameItem(apple!.id, '  Apricot  ');
+    expect(testStore.items[0]!.label).toBe('Apricot');
+
+    testStore.rankAssignment.renameItem(apple!.id, '   ');
+    expect(testStore.items[0]!.label).toBe('Apricot');
+  });
+
   it('addDimension batch yields equal weights against a snapshot-read store', () => {
     const { store, applied } = makeSnapshotStore();
     const assignment = new RankAssignment(store);
@@ -697,6 +745,53 @@ describe('Domain', () => {
     expect(testStore.items[0]!.id).toBe(apple!.id);
     expect(testStore.items[1]!.label).toBe('Banana');
     expect(testStore.items[1]!.id).not.toBe(apple!.id);
+  });
+
+  it('replaceItems pairs leftover items with leftover labels as renames, inheriting id and ranking slot', () => {
+    const user = User.make('user', '0');
+    const rankDimension = createDimension();
+    const testStore = new TestStore();
+    testStore.rankAssignment.addDimension(rankDimension);
+    testStore.rankAssignment.addItems('Apple', 'Banana', 'Cherry');
+    const [apple, banana, cherry] = testStore.items;
+    testStore.rankAssignment.rank(user, testStore.dimensions[0]!, [
+      apple!,
+      banana!,
+      cherry!,
+    ]);
+
+    // Apple and Cherry stay (exact match); Banana is renamed to Blueberry.
+    testStore.rankAssignment.replaceItems(['Apple', 'Blueberry', 'Cherry']);
+
+    expect(testStore.items.map((i) => ({ id: i.id, label: i.label }))).toEqual([
+      { id: apple!.id, label: 'Apple' },
+      { id: banana!.id, label: 'Blueberry' },
+      { id: cherry!.id, label: 'Cherry' },
+    ]);
+    // The renamed item keeps Banana's ranking slot.
+    expect(
+      testStore.rankingsByUser[user.id]?.[testStore.dimensions[0]!.id],
+    ).toEqual([apple!.id, banana!.id, cherry!.id]);
+  });
+
+  it('replaceItems mints fresh ids only for labels beyond the leftover count', () => {
+    const testStore = new TestStore();
+    testStore.rankAssignment.addItems('Apple', 'Banana');
+    const [apple, banana] = testStore.items;
+
+    // Apricot pairs with Apple-leftover, Blueberry with Banana-leftover,
+    // Cherry is surplus -> new id.
+    testStore.rankAssignment.replaceItems(['Apricot', 'Blueberry', 'Cherry']);
+
+    expect(testStore.items.map((i) => i.label)).toEqual([
+      'Apricot',
+      'Blueberry',
+      'Cherry',
+    ]);
+    expect(testStore.items[0]!.id).toBe(apple!.id);
+    expect(testStore.items[1]!.id).toBe(banana!.id);
+    expect(testStore.items[2]!.id).not.toBe(apple!.id);
+    expect(testStore.items[2]!.id).not.toBe(banana!.id);
   });
 
   it('replaceItems with [] removes everything and scrubs rankings', () => {

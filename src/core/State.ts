@@ -19,6 +19,7 @@ export type Mutators = {
   addUsers(...users: User[]): void;
   removeUsers(...users: User[]): void;
   renameUser(userId: string, name: string): void;
+  renameItem(id: string, label: string): void;
   removeItems(...items: Item[]): void;
   replaceItems(items: Item[]): void;
   setUserRanking(

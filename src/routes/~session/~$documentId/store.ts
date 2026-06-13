@@ -42,6 +42,12 @@ export const draftMutators = {
       (user as { name: string }).name = name;
     }
   },
+  renameItem(d: State, id: string, label: string) {
+    const item = d.items.find((i) => i.id === id);
+    if (item) {
+      (item as { label: string }).label = label;
+    }
+  },
   removeItems(d: State, items: Item[]) {
     const ids = new Set(items.map((i) => i.id));
     for (let i = d.items.length - 1; i >= 0; i--) {
@@ -116,6 +122,8 @@ export function useSessionStore(docUrl: AnyDocumentId): SharedStore {
         changeDoc((d) => draftMutators.removeUsers(d, users)),
       renameUser: (userId, name) =>
         changeDoc((d) => draftMutators.renameUser(d, userId, name)),
+      renameItem: (id, label) =>
+        changeDoc((d) => draftMutators.renameItem(d, id, label)),
       removeItems: (...items) =>
         changeDoc((d) => draftMutators.removeItems(d, items)),
       replaceItems: (items) =>

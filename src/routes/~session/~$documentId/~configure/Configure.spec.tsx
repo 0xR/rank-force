@@ -385,7 +385,10 @@ describe('Configure / Items bulk-edit', () => {
       expect(items.map((i) => i.label)).toEqual(['Cherry', 'Apple', 'Date']);
       expect(items[0]!.id).toBe(cherry.id);
       expect(items[1]!.id).toBe(apple.id);
-      expect(items[2]!.id).not.toBe(banana.id);
+      // Cherry/Apple match by name; the leftover "Date" line pairs with the
+      // leftover Banana item top-to-bottom, so it is treated as a rename and
+      // inherits Banana's id (preserving its ranking slot).
+      expect(items[2]!.id).toBe(banana.id);
     });
     expect(screen.queryByLabelText(/Items, one per line/)).toBeNull();
   });

@@ -10,6 +10,7 @@ import { RankDimension } from '@/core/RankDimension';
 import { RankTemplate, rankTemplates } from '@/core/RankTemplate';
 import { Ratio } from '@/core/Ratio';
 import { User } from '@/core/User';
+import { cn } from '@/lib/utils';
 import { Route } from '@/routes/~session/~$documentId.tsx';
 import { ShareSessionButton } from '@/routes/~session/~$documentId/ShareSessionButton';
 import { useRankAssignment } from '@/routes/~session/~$documentId/shared/UseRankAssignment';
@@ -28,7 +29,7 @@ import {
   Users,
   X,
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 function PageHeader() {
   return (
@@ -147,13 +148,127 @@ function BulkItemEditor({
   );
 }
 
+function IndexBadge({ index }: { index: number }) {
+  return (
+    <span className="font-mono tabular-nums text-2xs tracking-coord text-space-5 w-7 text-right shrink-0">
+      {String(index + 1).padStart(2, '0')}
+    </span>
+  );
+}
+
+function ItemRowEditor({
+  item,
+  index,
+  isTaken,
+  onSave,
+  onCancel,
+}: {
+  item: Item;
+  index: number;
+  isTaken: (label: string) => boolean;
+  onSave: (label: string) => void;
+  onCancel: () => void;
+}) {
+  const [value, setValue] = useState(item.label);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    inputRef.current?.select();
+  }, []);
+
+  const trimmed = value.trim();
+  const empty = trimmed.length === 0;
+  const taken = !empty && isTaken(trimmed);
+  const valid = !empty && !taken;
+  const hint = empty ? "Name can't be empty" : taken ? 'Name already used' : '';
+
+  function save() {
+    if (!valid) {
+      inputRef.current?.focus();
+      return;
+    }
+    onSave(trimmed);
+  }
+
+  return (
+    <li className="flex flex-col gap-1.5 px-3 py-2.5 bg-space-2">
+      <form
+        className="flex items-center gap-3"
+        onSubmit={(e) => {
+          e.preventDefault();
+          save();
+        }}
+      >
+        <IndexBadge index={index} />
+        <input
+          ref={inputRef}
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') {
+              e.preventDefault();
+              onCancel();
+            }
+          }}
+          onBlur={() => {
+            if (valid && trimmed !== item.label) onSave(trimmed);
+            else onCancel();
+          }}
+          aria-label={`Rename ${item.label}`}
+          aria-invalid={!valid}
+          aria-describedby={hint ? `item-${item.id}-hint` : undefined}
+          className={cn(
+            'flex-1 min-w-0 h-8 rounded-md border bg-space-1 px-2.5 text-sm text-cream transition-colors duration-150 ease-out-quart focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-0',
+            valid
+              ? 'border-space-4 focus-visible:border-cyan focus-visible:ring-cyan'
+              : 'border-destructive focus-visible:border-destructive focus-visible:ring-destructive',
+          )}
+        />
+        <div className="flex items-center gap-1 shrink-0">
+          <button
+            type="submit"
+            disabled={!valid}
+            onMouseDown={(e) => e.preventDefault()}
+            className="inline-flex items-center justify-center h-7 w-7 rounded text-space-6 transition duration-150 ease-out-quart enabled:hover:text-cyan enabled:hover:bg-space-3 disabled:opacity-40 disabled:cursor-not-allowed"
+            aria-label={`Save name for ${item.label}`}
+          >
+            <Check className="h-4 w-4" strokeWidth={1.5} />
+          </button>
+          <button
+            type="button"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={onCancel}
+            className="inline-flex items-center justify-center h-7 w-7 rounded text-space-6 hover:text-cream hover:bg-space-3 transition duration-150 ease-out-quart"
+            aria-label={`Cancel renaming ${item.label}`}
+          >
+            <X className="h-4 w-4" strokeWidth={1.5} />
+          </button>
+        </div>
+      </form>
+      {hint && (
+        <p
+          id={`item-${item.id}-hint`}
+          role="alert"
+          className="pl-10 text-2xs text-destructive"
+        >
+          {hint}
+        </p>
+      )}
+    </li>
+  );
+}
+
 function ItemList({
   items,
   onRemove,
+  onRename,
 }: {
   items: Item[];
   onRemove: (item: Item) => void;
+  onRename: (item: Item, label: string) => void;
 }) {
+  const [editingId, setEditingId] = useState<string | null>(null);
+
   if (items.length === 0) {
     return (
       <EmptyHint>No items yet. Add at least two before ranking.</EmptyHint>
@@ -161,25 +276,51 @@ function ItemList({
   }
   return (
     <ul className="rounded-lg border border-space-4 divide-y divide-space-4 overflow-hidden">
-      {items.map((item, i) => (
-        <li
-          key={item.id}
-          className="group flex items-center gap-3 px-3 py-2.5 bg-space-1 hover:bg-space-2 transition-colors duration-150 ease-out-quart"
-        >
-          <span className="font-mono tabular-nums text-2xs tracking-coord text-space-5 w-7 text-right">
-            {String(i + 1).padStart(2, '0')}
-          </span>
-          <span className="flex-1 text-cream truncate">{item.label}</span>
-          <button
-            type="button"
-            onClick={() => onRemove(item)}
-            className="opacity-0 group-hover:opacity-100 focus:opacity-100 inline-flex items-center justify-center h-7 w-7 rounded text-space-6 hover:text-destructive hover:bg-space-3 transition duration-150 ease-out-quart"
-            aria-label={`Remove ${item.label}`}
+      {items.map((item, i) =>
+        editingId === item.id ? (
+          <ItemRowEditor
+            key={item.id}
+            item={item}
+            index={i}
+            isTaken={(label) =>
+              items.some(
+                (other) => other.id !== item.id && other.label === label,
+              )
+            }
+            onSave={(label) => {
+              onRename(item, label);
+              setEditingId(null);
+            }}
+            onCancel={() => setEditingId(null)}
+          />
+        ) : (
+          <li
+            key={item.id}
+            className="group flex items-center gap-3 px-3 py-2.5 bg-space-1 hover:bg-space-2 transition-colors duration-150 ease-out-quart"
           >
-            <X className="h-4 w-4" strokeWidth={1.5} />
-          </button>
-        </li>
-      ))}
+            <IndexBadge index={i} />
+            <span className="flex-1 text-cream truncate">{item.label}</span>
+            <div className="flex items-center gap-1 shrink-0">
+              <button
+                type="button"
+                onClick={() => setEditingId(item.id)}
+                className="opacity-0 group-hover:opacity-100 focus:opacity-100 inline-flex items-center justify-center h-7 w-7 rounded text-space-6 hover:text-cream hover:bg-space-3 transition duration-150 ease-out-quart"
+                aria-label={`Edit ${item.label}`}
+              >
+                <Pencil className="h-4 w-4" strokeWidth={1.5} />
+              </button>
+              <button
+                type="button"
+                onClick={() => onRemove(item)}
+                className="opacity-0 group-hover:opacity-100 focus:opacity-100 inline-flex items-center justify-center h-7 w-7 rounded text-space-6 hover:text-destructive hover:bg-space-3 transition duration-150 ease-out-quart"
+                aria-label={`Remove ${item.label}`}
+              >
+                <X className="h-4 w-4" strokeWidth={1.5} />
+              </button>
+            </div>
+          </li>
+        ),
+      )}
     </ul>
   );
 }
@@ -709,12 +850,14 @@ function ItemsPanel({
   itemCount,
   onAdd,
   onRemove,
+  onRename,
   onReplace,
 }: {
   items: Item[];
   itemCount: number;
   onAdd: (label: string) => void;
   onRemove: (item: Item) => void;
+  onRename: (item: Item, label: string) => void;
   onReplace: (labels: string[]) => void;
 }) {
   const [mode, setMode] = useState<'list' | 'bulk'>('list');
@@ -735,7 +878,7 @@ function ItemsPanel({
   return (
     <div className="flex flex-col gap-4">
       <ItemForm onSubmit={onAdd} />
-      <ItemList items={items} onRemove={onRemove} />
+      <ItemList items={items} onRemove={onRemove} onRename={onRename} />
       <div className="flex items-center justify-between gap-3">
         <p className="text-2xs font-mono uppercase tracking-coord text-space-6">
           {itemCount} item{itemCount === 1 ? '' : 's'}
@@ -784,6 +927,7 @@ export function Configure() {
           itemCount={itemCount}
           onAdd={(label) => rankAssigment.addItems(label)}
           onRemove={(item) => rankAssigment.removeItems(item)}
+          onRename={(item, label) => rankAssigment.renameItem(item.id, label)}
           onReplace={(labels) => rankAssigment.replaceItems(labels)}
         />
       </Section>

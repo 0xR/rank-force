@@ -213,15 +213,39 @@ export class RankAssignment {
       unique.push(label);
     }
 
-    const existingByLabel = new Map<string, Item>();
-    for (const item of this.store.items) {
-      if (!existingByLabel.has(item.label))
-        existingByLabel.set(item.label, item);
-    }
+    // First claim exact-label matches so unchanged items keep their id (and
+    // thus every user's ranking slot).
+    const claimedIds = new Set<string>();
+    const matchByLabel = new Map<string, Item>();
+    const resolved = new Array<Item | undefined>(unique.length);
+    unique.forEach((label, index) => {
+      let match = matchByLabel.get(label);
+      if (match === undefined) {
+        match = this.store.items.find(
+          (item) => item.label === label && !claimedIds.has(item.id),
+        );
+        if (match) matchByLabel.set(label, match);
+      }
+      if (match) {
+        claimedIds.add(match.id);
+        resolved[index] = { id: match.id, label };
+      }
+    });
 
-    const next = unique.map(
-      (label) => existingByLabel.get(label) ?? Item.make(label),
+    // Pair leftover items (current order) with leftover labels (input order):
+    // these are renames that inherit the old id, so the ranking slot survives.
+    // Labels beyond the leftover items are brand-new; items beyond the labels
+    // are dropped (and scrubbed from rankings by the store).
+    const leftoverItems = this.store.items.filter(
+      (item) => !claimedIds.has(item.id),
     );
+    let leftoverCursor = 0;
+    const next = unique.map((label, index) => {
+      const alreadyResolved = resolved[index];
+      if (alreadyResolved) return alreadyResolved;
+      const inherited = leftoverItems[leftoverCursor++];
+      return inherited ? { id: inherited.id, label } : Item.make(label);
+    });
     this.store.replaceItems(next);
   }
 
@@ -239,6 +263,16 @@ export class RankAssignment {
     if (existing) {
       this.usersById.set(userId, { ...existing, name });
     }
+  }
+
+  renameItem(id: string, label: string) {
+    const trimmed = label.trim();
+    if (trimmed.length === 0) return;
+    const collides = this.store.items.some(
+      (item) => item.id !== id && item.label === trimmed,
+    );
+    if (collides) return;
+    this.store.renameItem(id, trimmed);
   }
 
   setDimensionWeight(rankDimension: RankDimension, ratio: Ratio) {

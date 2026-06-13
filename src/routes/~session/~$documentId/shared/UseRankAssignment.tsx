@@ -20,6 +20,7 @@ export function useRankAssignment() {
       addUsers: s.addUsers,
       removeUsers: s.removeUsers,
       renameUser: s.renameUser,
+      renameItem: s.renameItem,
       removeItems: s.removeItems,
       replaceItems: s.replaceItems,
       removeDimensions: s.removeDimensions,
