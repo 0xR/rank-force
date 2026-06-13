@@ -29,6 +29,22 @@ describe('RankTemplate', () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
+  it('offers single-dimension Importance and Priority templates', () => {
+    const importance = rankTemplates.find((t) => t.id === 'importance');
+    const priority = rankTemplates.find((t) => t.id === 'priority');
+    expect(importance?.dimensions).toHaveLength(1);
+    expect(priority?.dimensions).toHaveLength(1);
+  });
+
+  it('no longer offers the ICE template', () => {
+    expect(rankTemplates.find((t) => t.id === 'ice')).toBeUndefined();
+  });
+
+  it('leads with Eisenhower, then the single-dimension templates', () => {
+    const ids = rankTemplates.map((t) => t.id);
+    expect(ids.slice(0, 3)).toEqual(['eisenhower', 'importance', 'priority']);
+  });
+
   it('toDimensions mints fresh ulids on each call', () => {
     const [template] = rankTemplates;
     const a = RankTemplate.toDimensions(template!);

@@ -44,6 +44,34 @@ export const rankTemplates: readonly RankTemplate[] = [
     ],
   },
   {
+    id: 'importance',
+    name: 'Importance',
+    description:
+      'Rank by a single measure of importance. The simplest place to start.',
+    dimensions: [
+      {
+        name: 'Importance',
+        labelStart: 'Not important',
+        labelEnd: 'Important',
+        direction: 'ascending',
+      },
+    ],
+  },
+  {
+    id: 'priority',
+    name: 'Priority',
+    description:
+      'One gut-feel priority axis — use when a single number says enough.',
+    dimensions: [
+      {
+        name: 'Priority',
+        labelStart: 'Low',
+        labelEnd: 'High',
+        direction: 'ascending',
+      },
+    ],
+  },
+  {
     id: 'impact-effort',
     name: 'Impact / Effort',
     description:
@@ -112,32 +140,6 @@ export const rankTemplates: readonly RankTemplate[] = [
         labelStart: 'Low',
         labelEnd: 'High',
         direction: 'descending',
-      },
-    ],
-  },
-  {
-    id: 'ice',
-    name: 'ICE',
-    description:
-      'Light prioritization by Impact, Confidence, and Ease. Good for fast triage when RICE feels heavy.',
-    dimensions: [
-      {
-        name: 'Impact',
-        labelStart: 'Low',
-        labelEnd: 'High',
-        direction: 'ascending',
-      },
-      {
-        name: 'Confidence',
-        labelStart: 'Low',
-        labelEnd: 'High',
-        direction: 'ascending',
-      },
-      {
-        name: 'Ease',
-        labelStart: 'Hard',
-        labelEnd: 'Easy',
-        direction: 'ascending',
       },
     ],
   },
